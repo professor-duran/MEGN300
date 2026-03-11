@@ -1,0 +1,418 @@
+\documentclass[11pt,letterpaper]{article}
+
+% --- Packages ---
+\usepackage[margin=1in, headheight=24pt]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+% --- Colors ---
+\definecolor{minesblue}{RGB}{33,69,126}
+\definecolor{minesgold}{RGB}{204,174,0}
+\definecolor{tipgreen}{RGB}{34,120,58}
+\definecolor{warnred}{RGB}{180,30,30}
+\definecolor{lightgray}{RGB}{245,245,245}
+
+% --- Hyperref Setup ---
+\hypersetup{colorlinks=true,linkcolor=minesblue,urlcolor=minesblue,citecolor=minesblue}
+
+% --- Header/Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{minesblue}{\textbf{MEGN 300 -- Instrumentation and Automation}}}
+\fancyhead[R]{\textcolor{minesblue}{Spring 2026}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{minesblue}\leaders\hrule height \headrulewidth\hfill}}
+
+% --- Custom tcolorbox environments ---
+\newtcolorbox{faqbox}[1][]{colback=lightgray,colframe=minesblue,fonttitle=\bfseries,title={#1},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{tipbox}{colback=tipgreen!5,colframe=tipgreen,fonttitle=\bfseries\color{tipgreen},title={Tip},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{warnbox}{colback=warnred!5,colframe=warnred,fonttitle=\bfseries\color{warnred},title={Common Pitfall},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{protip}{colback=minesgold!8,colframe=minesgold!80!black,fonttitle=\bfseries\color{minesgold!80!black},title={Pro Tip},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{priorities}{colback=minesblue!5,colframe=minesblue!60,fonttitle=\bfseries\color{minesblue},title={\small$\blacktriangleright$ Top Priorities This Module},arc=2pt,boxrule=0.6pt,left=6pt,right=6pt,top=3pt,bottom=3pt,before upper={\small}}
+
+% --- Section formatting ---
+\titleformat{\section}
+    {\Large\bfseries\color{minesblue}}
+    {\thesection}{1em}{}[\vspace{-4pt}\textcolor{minesgold}{\rule{\textwidth}{1.5pt}}]
+\titleformat{\subsection}
+    {\large\bfseries\color{minesblue!80}}
+    {\thesubsection}{1em}{}
+
+% --- Document ---
+\begin{document}
+
+% --- Title ---
+\begin{center}
+    {\LARGE\bfseries\textcolor{minesblue}{MEGN 300 Instrumentation \& Automation}}\\[6pt]
+    {\Large\textcolor{minesblue!70}{Student Guide: FAQ, Tips, and Common Pitfalls}}\\[8pt]
+    {\large Spring 2026}\\[4pt]
+    \textcolor{minesgold}{\rule{0.6\textwidth}{2pt}}
+\end{center}
+
+\vspace{0.5cm}
+
+\noindent This guide accompanies the \textit{MEGN~300 Master Reference Document} and the official course Canvas page. It is \textbf{not a replacement} for the syllabus, lab handouts, or Canvas; always refer to those for exact deadlines and submission requirements. The purpose of this guide is to help you anticipate common questions, avoid frequent mistakes, and build strong instrumentation habits. Read the relevant section \textit{before} each lab module.
+
+\begin{tcolorbox}[colback=minesgold!10, colframe=minesgold!70!black, boxrule=0.6pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt]
+\textbf{How to use this guide:} Before each lab or design challenge, open this guide to the relevant module section. Read the \textit{Common Pitfall} and \textit{Pro Tip} boxes first; those address the mistakes that cost teams the most time and points.
+\end{tcolorbox}
+
+\tableofcontents
+\newpage
+
+%=============================================================================
+\section{Course Philosophy}
+%=============================================================================
+
+\begin{faqbox}[Q: What is MEGN 300 really about?]
+MEGN~300 teaches you to \textbf{measure physical quantities accurately and control engineering systems automatically}. It bridges theory (physics, math, statistics) and practice (circuits, sensors, LabVIEW, NI~DAQ hardware). Every concept leads to a hands-on skill: if you understand error analysis, you can design a measurement system with quantified uncertainty. If you understand PID control, you can regulate temperature, speed, or pressure in a real system.
+\end{faqbox}
+
+\begin{faqbox}[Q: What resources should I be using?]
+Three documents work together:
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item \textbf{This Student Guide}: quick-hit tips, common pitfalls, and FAQ for each module.
+    \item \textbf{The Master Reference Document}: deep technical content organized in four parts (Measurement Fundamentals, Signals \& Signal Processing, Electronics, and Control Systems). Every chapter has worked ThermoRig examples, practice questions with solutions, and Requirements Mapping boxes. Consult it when you need the equations, theory, or design procedures. Start with the ``What Should I Be Reading Right Now? triage guide on page~2 to find exactly the section you need.
+    \item \textbf{Canvas}: assignment details, deadlines, rubrics, lab handouts, and LabVIEW starter VIs.
+\end{enumerate}
+\end{faqbox}
+
+\begin{protip}
+\textbf{The Master Reference Document has a LabVIEW appendix with a Signal Walk Debugging Protocol.} Before every lab, check the appendix for the DAQmx programming pattern, essential VIs, and the ``Common Mistakes'' checklist. Most LabVIEW grading deductions come from the six mistakes listed there.
+\end{protip}
+
+%=============================================================================
+\section{Module 1: Measurement Fundamentals and Static Calibration}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Understand the five-block measurement system and where errors enter.
+    \item Know the difference between accuracy, precision, systematic, and random error.
+    \item Perform a static calibration: collect data, fit a line, and report uncertainty.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: What is the difference between accuracy and precision?]
+\textbf{Accuracy} is closeness to the true value (affected by systematic/bias errors). \textbf{Precision} is closeness of repeated measurements to each other (affected by random errors). A sensor can be precise but inaccurate (all readings cluster together but off-center). Calibration fixes accuracy. Averaging improves precision. You need both. The Master Reference Document, Chapter~1, has the dartboard analogy and worked examples.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{The \#1 calibration mistake}: not waiting for the sensor to reach steady state at each calibration point. If you are calibrating a temperature sensor and change the bath temperature, wait at least $5\tau$ (five time constants) before recording. A thermocouple with $\tau = 1$\,s needs 5\,s; an RTD probe with $\tau = 10$\,s needs 50\,s. Recording during the transient produces systematically wrong calibration data.
+\end{warnbox}
+
+\begin{tipbox}
+When writing your calibration report, always report: the calibration equation (with coefficients), the range over which it is valid, the maximum residual, the number of calibration points, and the uncertainty of your reference standard. A calibration without documented uncertainty is just a guess.
+\end{tipbox}
+
+\begin{protip}
+\textbf{Learn the Wheatstone bridge now; it appears everywhere.} Strain gauges, RTDs, pressure sensors, and load cells all use bridge circuits. The Master Reference Document, Chapter~2, walks through quarter-, half-, and full-bridge configurations with the RTD ThermoRig example and self-heating calculations.
+\end{protip}
+
+%=============================================================================
+\section{Module 2: Dynamic Measurements and Time Constants}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Measure $\tau$ from a step response (first-order sensor).
+    \item Understand the bandwidth-rise time relationship: $f_{-3\text{dB}} \times t_r \approx 0.35$.
+    \item Know when a sensor's dynamic response will distort your measurement.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: How do I measure the time constant of a sensor?]
+Apply a step change (e.g., plunge a thermocouple from room temperature into boiling water). Record the output vs.\ time. The time constant $\tau$ is the time to reach 63.2\% of the final value. Or, plot $\ln(1 - y/y_\infty)$ vs.\ $t$; the slope is $-1/\tau$. See the Master Reference Document, Chapter~3, for the full procedure and the ThermoRig worked example.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Forgetting that sensors have bandwidth limits.} A thermocouple with $\tau = 0.2$\,s cannot faithfully measure a temperature oscillating at 1\,Hz; it will attenuate the signal to 62\% and add 52\textdegree{} of phase lag. If your measurement is dynamic, always check that the sensor bandwidth exceeds $5\times$ your signal frequency. The Master Reference Document has the attenuation formulas.
+\end{warnbox}
+
+\begin{tipbox}
+\textbf{The Rule of Five}: wait $5\tau$ for settling. Use $f_{\text{sensor}} \geq 5 f_{\text{signal}}$ for flat response. Both give $<$1\% error.
+\end{tipbox}
+
+%=============================================================================
+\section{Module 3: Error Analysis and Uncertainty}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Calculate mean, standard deviation, standard error, and 95\% confidence intervals.
+    \item Propagate uncertainty through a multi-variable equation using RSS.
+    \item Report measurements correctly: $\bar{x} \pm U$ (95\% CI, $n$ = ...).
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: When do I use $n$ vs.\ $n-1$ in the standard deviation?]
+Use $n-1$ (Bessel's correction) for the \textbf{sample} standard deviation when your measurements are a sample of a larger population (this is almost always the case in MEGN~300). Use $n$ only when you have measured the \emph{entire} population.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{You cannot average away systematic error.} If your instrument has a 2\,\textdegree{}C calibration offset, averaging 1000 readings gives you a very precise number that is still 2\,\textdegree{}C wrong. Calibrate first, then average. The Master Reference Document, Chapter~4, has a warning box dedicated to this.
+\end{warnbox}
+
+\begin{protip}
+\textbf{After propagating uncertainty, identify the dominant contributor.} In the RSS formula, the term with the largest partial derivative times its uncertainty dominates the total. Improving that single measurement improves the overall result more than improving all others combined. The ThermoRig heat flux example in Chapter~4 shows how thickness ($L$) dominates even though it seems like the simplest measurement.
+\end{protip}
+
+%=============================================================================
+\section{Module 4: Analog vs.\ Digital, Sampling, and Aliasing}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Understand the Nyquist criterion: $f_s > 2 f_{\max}$.
+    \item Know that aliasing cannot be undone after sampling.
+    \item Calculate ADC resolution (LSB) for a given bit depth and range.
+\end{enumerate}
+\end{priorities}
+
+\begin{warnbox}
+\textbf{Aliasing is the single most common data acquisition mistake.} If you sample at 1\,kS/s without an anti-alias filter, any noise above 500\,Hz folds into your measurement as a false lower-frequency signal. The NI~USB-6001 has \textbf{no built-in anti-alias filter}; you must add an external RC or active filter before the analog input. The Master Reference Document, Chapter~9, has the alias frequency formula and the ThermoRig switching-regulator example.
+\end{warnbox}
+
+\begin{tipbox}
+Use $f_s \geq 10 \times f_{\max}$ in practice (not just $2\times$). This gives you a good waveform shape, margin for the anti-alias filter roll-off, and room for the FFT to resolve your signal clearly. For a 100\,Hz signal, sample at 1\,kS/s minimum.
+\end{tipbox}
+
+\begin{faqbox}[Q: How many bits do I actually need?]
+Calculate the LSB: $\text{LSB} = V_{\text{range}} / 2^n$. Compare this to your sensor's output change per unit measurand. If your thermocouple produces 40\,$\mu$V/\textdegree{}C and your ADC LSB is 2.44\,mV (12-bit, 10\,V range), your temperature resolution is $2.44\,\text{mV} / 0.040\,\text{mV/\textdegree{}C} = 61$\,\textdegree{}C. That is useless. You need amplification (Chapter~12 of the MRD) to bring the signal into the ADC's usable range.
+\end{faqbox}
+
+%=============================================================================
+\section{Module 5: Frequency Analysis (Fourier and FFT)}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Understand that any signal is a sum of sinusoids (Fourier principle).
+    \item Use the FFT in LabVIEW to identify frequency components.
+    \item Know how to choose $N$, $f_s$, and window type.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: How do I choose FFT parameters in LabVIEW?]
+Three decisions: (1) \textbf{Sampling rate} $f_s$: at least $2.56 \times$ the highest frequency of interest (the ``2.56 rule'' provides anti-alias margin). (2) \textbf{Number of points} $N$: determines frequency resolution $\Delta f = f_s / N$. Use a power of 2 for computational efficiency. (3) \textbf{Window}: use Hanning for general analysis; flat-top for accurate amplitude of known tones; rectangular only if the signal is perfectly periodic in the window.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Spectral leakage makes your FFT look wrong.} If the signal frequency does not exactly land on an FFT bin, energy ``leaks'' into adjacent bins, creating a broad smear instead of a sharp peak. The fix is windowing (Hanning is the default). Without a window, a 100.5\,Hz tone sampled at 1\,kS/s with $N = 1000$ ($\Delta f = 1$\,Hz) looks like it has energy spread across 20+ bins. With a Hanning window, the peak sharpens dramatically.
+\end{warnbox}
+
+\begin{protip}
+\textbf{Average multiple FFT blocks for clean spectra.} A single FFT of noisy data has high variance. In LabVIEW, use ``RMS Averaging'' in the FFT Power Spectrum VI. Start with 10 averages; use 100 for noisy signals. The noise floor drops by $10\log_{10}(N_{\text{avg}})$\,dB.
+\end{protip}
+
+%=============================================================================
+\section{Module 6: Analog and Digital Filter Design}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Design a passive RC low-pass filter and calculate its cutoff frequency.
+    \item Know the three response types: Butterworth (flat), Chebyshev (sharp), Bessel (linear phase).
+    \item Implement a digital filter in LabVIEW.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: Which filter type should I use?]
+\textbf{Butterworth} is the default. Use it unless you have a specific reason not to. \textbf{Chebyshev}: when you need a steeper cutoff with fewer components (accept passband ripple). \textbf{Bessel}: when preserving the shape of a pulse or transient is critical (linear phase). The Master Reference Document, Chapters~10--11, has design procedures for both analog and digital implementations.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{A first-order RC filter is only $-$20\,dB/decade.} At 10$\times$ the cutoff frequency, it attenuates by only 20\,dB (10$\times$). For anti-aliasing, this is often insufficient. Use at least a 2nd-order filter (Sallen-Key active, $-$40\,dB/decade) or combine an analog anti-alias filter with digital filtering in LabVIEW.
+\end{warnbox}
+
+\begin{protip}
+\textbf{Build the analog filter first, then refine digitally.} Use a simple RC or 2nd-order Sallen-Key as the mandatory anti-alias filter before the ADC, then do the precision filtering in LabVIEW software. This gives you the best of both worlds: aliasing protection from analog hardware, and flexible/precise filtering from digital software.
+\end{protip}
+
+%=============================================================================
+\section{Module 7: Signal Conditioning and Amplifiers}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Know the non-inverting, differential, and instrumentation amplifier configurations.
+    \item Calculate the gain needed to match your sensor output to the ADC input range.
+    \item Understand common-mode rejection and why it matters.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: Why can't I just connect the sensor directly to the ADC?]
+Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V; the ADC needs volts). (2) The sensor impedance is too high (the ADC loads it, changing the reading). (3) Noise rides on the signal (the amplifier rejects common-mode noise). The Master Reference Document, Chapter~12, covers the complete signal conditioning chain from bridge circuit through instrumentation amplifier to ADC.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Loading error from mismatched impedances.} If your sensor output impedance is 10\,k$\Omega$ and you connect it to a 10\,k$\Omega$ input, you lose 50\% of the signal. The 100:1 rule: the measuring instrument's input impedance must be $\geq$100$\times$ the source impedance. Use a buffer amplifier (voltage follower) to solve this.
+\end{warnbox}
+
+\begin{protip}
+\textbf{The INA128 is your best friend for bridge circuits.} It has $>$10\,G$\Omega$ balanced input impedance, $>$100\,dB CMRR, and gain set by a single resistor ($G = 1 + 50\text{k}/R_G$). Whenever you measure a Wheatstone bridge (strain gauge, RTD, load cell), reach for an instrumentation amplifier first.
+\end{protip}
+
+%=============================================================================
+\section{Module 8: High-Power Devices and Switching}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Know when to use a MOSFET, relay, or SSR.
+    \item Always add a flyback diode for inductive loads.
+    \item Understand PWM for proportional power control.
+\end{enumerate}
+\end{priorities}
+
+\begin{warnbox}
+\textbf{Inductive loads (motors, solenoids, relays) will destroy your MOSFET without a flyback diode.} When you switch off an inductive load, the collapsing magnetic field generates a voltage spike of hundreds or thousands of volts. A 1N5819 Schottky diode across the load (cathode to positive) costs \$0.10 and prevents \$5--\$50 of damage. See the Master Reference Document, Chapter~13, for the spike calculation and circuit diagram.
+\end{warnbox}
+
+\begin{tipbox}
+\textbf{For DC loads}: use an N-channel logic-level MOSFET (IRLZ44N) in the low side. For AC loads: use a solid-state relay (SSR). For bidirectional motor control: use an H-bridge IC (L298N, DRV8871). Never switch AC mains with a bare MOSFET.
+\end{tipbox}
+
+%=============================================================================
+\section{Module 9: Control Systems and PID}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Understand the difference between open-loop and closed-loop control.
+    \item Know what each PID term does: P (speed), I (accuracy), D (damping).
+    \item Tune a PID controller using the Ziegler-Nichols or manual method.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: My P-only controller has a steady-state offset. Why?]
+P-only control requires $e > 0$ to produce $u > 0$. If $e = 0$, the controller output is zero, and the process drifts. The system settles where the disturbance (heat loss, friction) exactly balances the control effort at some nonzero error. Only integral (I) action can drive the error to zero, because the integral accumulates error over time and keeps increasing the output until $e = 0$. See the Master Reference Document, Chapter~16, for the detailed explanation.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Integral windup is the \#1 PID debugging headache.} If your system overshoots massively after a large setpoint change, the integral term has ``wound up'' while the actuator was saturated. Enable anti-windup: stop accumulating the integral when the output hits its limit. The Master Reference Document, Chapter~16, has the discrete-time pseudocode with anti-windup clamping.
+\end{warnbox}
+
+\begin{protip}
+\textbf{Manual PID tuning sequence}: (1)~Start P-only; increase $K_p$ until the response is fast with $\sim$20\% overshoot. (2)~Add I; start $K_i$ small, increase until the steady-state error vanishes. If overshoot grows, reduce $K_i$. (3)~Add D; start $K_d$ small, increase to reduce overshoot. If the output becomes noisy, $K_d$ is too high. Tune $K_p$ first, then $K_i$, then $K_d$; never all three at once.
+\end{protip}
+
+\begin{faqbox}[Q: My PID output is noisy and jerky. What is wrong?]
+The derivative term amplifies noise. Three fixes: (1) reduce $K_d$, (2) add a low-pass filter on the derivative (the LabVIEW PID VI has a built-in derivative filter parameter $N$; set it to 10--20), (3) filter the process variable before it enters the PID (a moving average of 5--10 points works well for thermocouples and other slow sensors).
+\end{faqbox}
+
+%=============================================================================
+\section{LabVIEW Survival Guide}
+%=============================================================================
+
+\begin{faqbox}[Q: My VI runs but the DAQ gives ``resource reserved'' errors. What happened?]
+You forgot to wire \texttt{DAQmx Clear Task} outside your While Loop. When LabVIEW stops (even by pressing Stop), the DAQ task stays locked unless explicitly cleared. Always wire Clear Task on the exit path of the loop, connected via the error wire chain.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Six LabVIEW mistakes that cost 80\% of grading deductions} (from the Master Reference Document LabVIEW appendix):
+\begin{enumerate}[nosep,leftmargin=*]
+\item No loop timing (Wait function missing; loop runs at max speed).
+\item DAQ task not cleared (``resource reserved'' on next run).
+\item Wrong channel mode (RSE instead of Differential).
+\item Chart vs.\ Graph confusion (Chart for real-time; Graph for post-acquisition).
+\item PID loop rate not controlled (gains become unpredictable).
+\item No anti-alias filter before ADC.
+\end{enumerate}
+Eliminate all six and you avoid most lost points.
+\end{warnbox}
+
+\begin{tipbox}
+\textbf{Debug with Highlight Execution and Probes.} The light bulb icon animates dataflow so you can see values moving along wires. Right-click any wire and add a Probe to watch its value in real time. These two tools solve 90\% of LabVIEW bugs.
+\end{tipbox}
+
+\begin{protip}
+\textbf{Log data inside the loop, not after.} Write each data point to a file within the While Loop using ``Write to Measurement File.'' If LabVIEW crashes (or you press Stop too early), you still have all the data collected up to that point. Accumulating data in arrays and writing at the end risks losing everything.
+\end{protip}
+
+%=============================================================================
+\section{Design Challenge Tips}
+%=============================================================================
+
+\begin{faqbox}[Q: How should I approach a Design Challenge?]
+Design Challenges are timed, in-class engineering problems. The key is structured thinking under pressure:
+\begin{enumerate}[leftmargin=*, itemsep=2pt, topsep=0pt]
+    \item \textbf{Read the entire prompt first} (2 minutes). Identify what you are measuring, what accuracy is required, and what hardware is available.
+    \item \textbf{Sketch the signal chain} (3 minutes). Draw the five blocks: sensor $\to$ conditioning $\to$ DAQ $\to$ processing $\to$ output. Identify what each block does.
+    \item \textbf{Calculate before building} (5 minutes). What gain do you need? What filter cutoff? What sampling rate? What is the expected output voltage range?
+    \item \textbf{Build and test incrementally} (remaining time). Wire the sensor first and verify the raw signal. Then add amplification. Then add the filter. Then set up LabVIEW. Test after each step.
+\end{enumerate}
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Do not start wiring until you have done the math.} The most common Design Challenge failure is connecting everything, running LabVIEW, and seeing garbage on the screen with no idea why. Five minutes of calculation (gain, filter, sampling rate) prevents two hours of blind debugging.
+\end{warnbox}
+
+\begin{protip}
+\textbf{Keep a cheat sheet of key formulas.} You will want these at your fingertips during Design Challenges:
+\begin{itemize}[nosep,leftmargin=*]
+\item $f_c = 1/(2\pi RC)$ (RC filter cutoff)
+\item $\text{LSB} = V_{\text{range}}/2^n$ (ADC resolution)
+\item $G = 1 + R_f/R_g$ (non-inverting amp gain)
+\item $f_s > 2 f_{\max}$ (Nyquist), practical $f_s \geq 10 f_{\max}$
+\item $\text{SNR}_{\text{dB}} = 20\log_{10}(V_s/V_n)$
+\item $e_{ss} = 0$ requires integral action (PI or PID)
+\end{itemize}
+The Quick Reference Tables in the Master Reference Document consolidate all of these.
+\end{protip}
+
+%=============================================================================
+\section{Lab Practical Exam Preparation}
+%=============================================================================
+
+\begin{faqbox}[Q: What should I study for the lab practical exams?]
+Lab practicals test both theory and hands-on skills. You may be asked to: wire a circuit on a breadboard, configure the NI~DAQ, write a LabVIEW VI from scratch, perform a calibration, use the FFT, design a filter, or tune a PID controller. The best preparation is to re-do each lab exercise from scratch without looking at your previous work. If you can do it from memory, you are ready.
+\end{faqbox}
+
+\begin{tipbox}
+\textbf{Practice the physical skills.} Reading a resistor color code, wiring a Wheatstone bridge on a breadboard, connecting the NI~DAQ terminals, and using a multimeter and bench power supply are all skills that improve dramatically with practice. Do not wait until the exam to discover you cannot remember which DAQ terminal is AI0+.
+\end{tipbox}
+
+%=============================================================================
+\section{Quick Reference: Module Checklist}
+%=============================================================================
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{} c l X l @{}}
+\toprule
+\textbf{Wk} & \textbf{Module} & \textbf{Key Skills} & \textbf{MRD Ch.} \\
+\midrule
+1--2 & Measurement Fundamentals & Sensor terminology, calibration, bridge circuits & 1--2 \\
+3--4 & Dynamic Meas.\ \& Error & Time constants, frequency response, uncertainty propagation & 3--4 \\
+5--6 & Signals \& Digitization & ADC specs, aliasing, SNR, anti-alias filters & 5--6, 9 \\
+7--8 & Frequency Analysis & Fourier series, FFT, windowing, PSD & 7--8 \\
+9--10 & Filtering & Analog (RC, Sallen-Key), digital (FIR/IIR), LabVIEW filters & 10--11 \\
+11--12 & Signal Conditioning & Amplifiers, INA, high-power switches, PWM & 12--13 \\
+13--14 & Control Systems & Open/closed-loop, PID tuning, LabVIEW PID VI & 14--16 \\
+15--16 & Integration \& Exams & Complete system design, lab practicals & All \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\vspace{1cm}
+\begin{center}
+\textcolor{minesblue}{\rule{0.4\textwidth}{1pt}}\\[6pt]
+\textit{Measure carefully, filter thoughtfully, control precisely, and document everything.}\\[6pt]
+\textcolor{minesblue}{\rule{0.4\textwidth}{1pt}}
+\end{center}
+
+\end{document}
