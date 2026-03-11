@@ -1,0 +1,47 @@
+name: Build LaTeX PDFs
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.tex'
+      - 'figs/**'
+      - '.github/workflows/build-pdfs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Master Reference Document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: megn300_master_reference.tex
+          latexmk_use_xelatex: false
+          args: -pdf -interaction=nonstopmode -file-line-error
+          extra_system_packages: ghostscript
+
+      - name: Build Student Guide
+        if: hashFiles('MEGN300_Student_Guide.tex') != ''
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: MEGN300_Student_Guide.tex
+          latexmk_use_xelatex: false
+          args: -pdf -interaction=nonstopmode -file-line-error
+
+      - name: Commit PDFs
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -f megn300_master_reference.pdf
+          if [ -f MEGN300_Student_Guide.pdf ]; then
+            git add -f MEGN300_Student_Guide.pdf
+          fi
+          git diff --staged --quiet || git commit -m "Auto-build PDFs [skip ci]"
+          git push
