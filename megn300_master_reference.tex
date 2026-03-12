@@ -5521,6 +5521,258 @@ The multi-node model reveals internal temperature gradients. The heater surface 
 \item $V = (0.02)^3 = 8 \times 10^{-6}$\,m$^3$. $A_s = 6 \times (0.02)^2 = 2.4 \times 10^{-3}$\,m$^2$. $m = 8960 \times 8 \times 10^{-6} = 0.0717$\,kg. $\tau = 0.0717 \times 385/(100 \times 2.4 \times 10^{-3}) = 115$\,s. Time to 1\,\degC{} of ambient: $T(t) = 25 + 75e^{-t/115} = 26$\,\degC{} when $75e^{-t/115} = 1$, $t = 115\ln(75) = 115 \times 4.32 = 497$\,s $\approx 8.3$\,min.
 \item The time constant $\tau = mC_p/(hA_s)$ is inversely proportional to $h$. Only $h$ changes: from $\sim$10\,W/m$^2\cdot$K in still air to $\sim$500\,W/m$^2\cdot$K in stirred water (50$\times$ increase). All other parameters ($m$, $C_p$, $A_s$) are properties of the thermocouple and do not change with the medium.
 \end{enumerate}
+
+
+% ================================================================
+% APPENDIX: GLOSSARY
+% ================================================================
+\chapter*{Glossary of Key Terms and Acronyms}
+\addcontentsline{toc}{chapter}{Glossary of Key Terms and Acronyms}
+
+\begin{description}[style=nextline,leftmargin=3em,font=\sffamily\bfseries]
+\item[AC] Alternating Current. Current that periodically reverses direction; characterized by frequency and RMS amplitude.
+\item[ADC] Analog-to-Digital Converter. Converts a continuous analog voltage to a discrete digital number.
+\item[Aliasing] The misidentification of a high-frequency signal as a lower frequency due to insufficient sampling rate. Prevented by sampling at $> 2f_{\max}$ (Nyquist criterion) and using anti-alias filters.
+\item[Bandwidth] The range of frequencies a system can process or transmit. For amplifiers: the frequency range over which gain is within 3\,dB of the midband value.
+\item[Biot Number (Bi)] Dimensionless ratio $Bi = hL_c/k$ comparing internal conduction resistance to external convection resistance. If $Bi < 0.1$, the lumped capacitance assumption is valid.
+\item[BJT] Bipolar Junction Transistor. A current-controlled semiconductor switch (NPN or PNP).
+\item[Buck Converter] A switching DC-DC converter that steps voltage down. $V_{\text{out}} = D \times V_{\text{in}}$.
+\item[Boost Converter] A switching DC-DC converter that steps voltage up. $V_{\text{out}} = V_{\text{in}}/(1-D)$.
+\item[Calibration] The process of comparing a measurement device's output to a known standard and applying corrections to minimize systematic error.
+\item[CMRR] Common-Mode Rejection Ratio. Measures an amplifier's ability to reject signals common to both inputs. Higher is better; instrumentation amplifiers achieve 80--120\,dB.
+\item[DAC] Digital-to-Analog Converter. Converts a digital number to an analog voltage or current.
+\item[DAQ] Data Acquisition. The process of sampling signals from sensors and converting them to digital data for processing.
+\item[dB] Decibel. A logarithmic unit: $\text{dB} = 20\log_{10}(V_{\text{out}}/V_{\text{in}})$. Used for gain, attenuation, and signal levels.
+\item[DC] Direct Current. Current that flows in one direction at a constant (or slowly varying) magnitude.
+\item[DFT/FFT] Discrete Fourier Transform / Fast Fourier Transform. Decomposes a time-domain signal into its frequency components. The FFT is an efficient algorithm for computing the DFT.
+\item[Duty Cycle ($D$)] The fraction of a PWM period during which the signal is HIGH. $D = t_{\text{on}}/T$.
+\item[ENOB] Effective Number of Bits. The actual resolution of an ADC after accounting for noise: $\text{ENOB} = (\text{SINAD} - 1.76)/6.02$.
+\item[ESD] Electrostatic Discharge. A sudden flow of electricity between two objects at different potentials. Damages CMOS components.
+\item[FIR] Finite Impulse Response. A digital filter type with guaranteed stability and exactly linear phase. Requires more computation than IIR for the same rolloff.
+\item[Flyback Diode] A diode placed across an inductive load to clamp voltage spikes when the current is switched off. Essential for all motor, solenoid, and relay circuits.
+\item[GBW] Gain-Bandwidth Product. For an op-amp, $\text{GBW} = A_v \times f$. The maximum usable frequency at gain $G$ is $f_{\max} = \text{GBW}/G$.
+\item[GPIO] General-Purpose Input/Output. A digital pin on a microcontroller configurable as input or output.
+\item[Ground Loop] A closed loop formed by multiple ground connections that picks up magnetically induced noise. Eliminated by star grounding.
+\item[GUM] Guide to the Expression of Uncertainty in Measurement (JCGM 100:2008). The international standard for reporting measurement uncertainty.
+\item[H-Bridge] A circuit of four switches that drives a motor in both directions by reversing current flow.
+\item[IIR] Infinite Impulse Response. A digital filter type that uses feedback; efficient but can be unstable and has nonlinear phase.
+\item[INA] Instrumentation Amplifier. A precision differential amplifier with very high input impedance and high CMRR, designed for low-level sensor signals.
+\item[KCL] Kirchhoff's Current Law. The sum of currents entering a node equals the sum leaving.
+\item[KVL] Kirchhoff's Voltage Law. The sum of voltages around any closed loop is zero.
+\item[LDO] Low-Dropout Regulator. A linear voltage regulator that requires only a small voltage differential between input and output.
+\item[MOSFET] Metal-Oxide-Semiconductor Field-Effect Transistor. A voltage-controlled semiconductor switch. N-channel is most common for low-side switching.
+\item[MTBF] Mean Time Between Failures. Average operating time before a system failure.
+\item[MTTR] Mean Time To Repair. Average time to restore a failed system to operation.
+\item[Nyquist Frequency] Half the sampling rate ($f_s/2$). The maximum frequency that can be correctly represented in a sampled signal.
+\item[Op-Amp] Operational Amplifier. A high-gain differential amplifier used as a building block for signal conditioning circuits.
+\item[PID] Proportional-Integral-Derivative controller. The standard feedback controller combining proportional response, integral error elimination, and derivative damping.
+\item[PWM] Pulse Width Modulation. A technique for controlling average power by varying the duty cycle of a square wave.
+\item[Quantization] The process of mapping a continuous value to the nearest discrete level in an ADC. Introduces quantization noise with RMS value $q/\sqrt{12}$ where $q$ is the LSB size.
+\item[RMS] Root Mean Square. The effective value of an AC signal: $V_{\text{RMS}} = V_{\text{peak}}/\sqrt{2}$ for sinusoidal signals.
+\item[RTD] Resistance Temperature Detector. A temperature sensor based on the change of electrical resistance with temperature (typically platinum, Pt100).
+\item[Sensitivity] The ratio of output change to input change: $S = \Delta V_{\text{out}} / \Delta x_{\text{measurand}}$. Units depend on the sensor type.
+\item[SINAD] Signal-to-Noise and Distortion ratio. Measures total signal quality including harmonic distortion.
+\item[SNR] Signal-to-Noise Ratio. The ratio of signal power to noise power, usually expressed in dB.
+\item[SSR] Solid-State Relay. A relay using semiconductor switching instead of mechanical contacts. No moving parts, faster, longer life.
+\item[Thevenin Equivalent] Any linear circuit reduced to a voltage source ($V_{Th}$) in series with a resistance ($R_{Th}$).
+\item[Time Constant ($\tau$)] The time for a first-order system to reach 63.2\% of its final value. For RC circuits: $\tau = RC$. For RL: $\tau = L/R$. For thermal: $\tau = mC_p/(hA)$.
+\item[Type I/II/III Error] Type~I: false positive (rejecting a true null hypothesis). Type~II: false negative (failing to reject a false null). Type~III: correctly rejecting the null but for the wrong reason (asking the wrong question).
+\item[Uncertainty] A quantitative estimate of the range within which the true value of a measurand is expected to lie, expressed at a stated confidence level (typically 95\%).
+\item[Wheatstone Bridge] A circuit of four resistances used to detect small resistance changes in sensors (strain gauges, RTDs). Produces a voltage proportional to the fractional resistance change.
+\item[Z-Transform] The discrete-time equivalent of the Laplace transform. Maps discrete sequences to the complex $z$-plane for stability analysis and digital filter design.
+\item[Ziegler-Nichols (Z-N)] A heuristic PID tuning method based on the ultimate gain and oscillation period of a system at marginal stability. Provides starting-point tuning parameters.
+\end{description}
+
+
+% ================================================================
+% APPENDIX: QUICK REFERENCE TABLES
+% ================================================================
+\chapter*{Quick Reference Tables}
+\addcontentsline{toc}{chapter}{Quick Reference Tables}
+
+\section*{Sensor Selection Guide}
+\begin{center}
+\begin{tabular}{p{2.5cm}p{3cm}p{2cm}p{2cm}p{3cm}}
+\toprule
+\textbf{Measurand} & \textbf{Sensor Type} & \textbf{Range} & \textbf{Accuracy} & \textbf{Output} \\
+\midrule
+Temperature & Thermocouple (K) & $-200$ to $1250$\,\degC{} & $\pm 2.2$\,\degC{} & $\mu$V (needs amp) \\
+Temperature & RTD (Pt100) & $-200$ to $850$\,\degC{} & $\pm 0.3$\,\degC{} & Resistance (bridge) \\
+Temperature & Thermistor (NTC) & $-40$ to $125$\,\degC{} & $\pm 0.2$\,\degC{} & Resistance (divider) \\
+Pressure & Piezoresistive & 0--10\,bar & $\pm 0.5\%$ FS & mV/V (bridge) \\
+Strain & Foil gauge & $\pm 5\%$ & $\pm 1\,\mu\epsilon$ & mV/V (bridge) \\
+Acceleration & MEMS (ADXL345) & $\pm 16$\,g & $\pm 0.5\%$ & Digital (I2C/SPI) \\
+Proximity & Ultrasonic & 2\,cm--4\,m & $\pm 3$\,mm & Pulse width \\
+Current & Hall effect (ACS712) & $\pm 30$\,A & $\pm 1.5\%$ & Analog voltage \\
+Light & Photodiode & varies & varies & Current ($\mu$A) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{ADC Resolution and LSB Size}
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Resolution} & \textbf{Levels} & \textbf{LSB (3.3\,V range)} & \textbf{LSB (5\,V range)} \\
+\midrule
+8-bit & 256 & 12.9\,mV & 19.5\,mV \\
+10-bit & 1024 & 3.22\,mV & 4.88\,mV \\
+12-bit & 4096 & 0.806\,mV & 1.22\,mV \\
+16-bit & 65536 & 50.4\,$\mu$V & 76.3\,$\mu$V \\
+24-bit & 16.7M & 0.197\,$\mu$V & 0.298\,$\mu$V \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Filter Type Comparison}
+\begin{center}
+\begin{tabular}{p{2.5cm}p{3cm}p{3cm}p{3.5cm}}
+\toprule
+\textbf{Filter} & \textbf{Passband} & \textbf{Rolloff} & \textbf{Best For} \\
+\midrule
+Butterworth & Maximally flat & $-20n$\,dB/dec & General purpose \\
+Chebyshev I & Ripple in passband & Steeper than Butter. & Sharp cutoff needed \\
+Chebyshev II & Ripple in stopband & Steep, flat passband & Rejecting specific band \\
+Bessel & Maximally flat group delay & Gentlest rolloff & Preserving waveform shape \\
+Elliptic & Ripple in both bands & Steepest possible & Minimum order needed \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Thermocouple Types}
+\begin{center}
+\begin{tabular}{cccl}
+\toprule
+\textbf{Type} & \textbf{Range (\degC)} & \textbf{Sensitivity ($\mu$V/\degC)} & \textbf{Notes} \\
+\midrule
+K & $-200$ to $1250$ & 41 & Most common, general purpose \\
+J & $-40$ to $750$ & 52 & Higher sensitivity, oxidizes above 500\,\degC \\
+T & $-200$ to $350$ & 43 & Best for cryogenic and food applications \\
+E & $-200$ to $900$ & 68 & Highest sensitivity of common types \\
+N & $-270$ to $1300$ & 39 & Improved K-type, better stability \\
+S & $-50$ to $1768$ & 10 & Platinum, high-temperature reference \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Common PID Tuning Starting Points}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & $\boldsymbol{K_p}$ & $\boldsymbol{T_i}$ & $\boldsymbol{T_d}$ \\
+\midrule
+Ziegler-Nichols (P only) & $0.5\,K_u$ & --- & --- \\
+Ziegler-Nichols (PI) & $0.45\,K_u$ & $P_u/1.2$ & --- \\
+Ziegler-Nichols (PID) & $0.6\,K_u$ & $P_u/2$ & $P_u/8$ \\
+Tyreus-Luyben (PID) & $K_u/2.2$ & $2.2\,P_u$ & $P_u/6.3$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Where $K_u$ is the ultimate gain and $P_u$ is the ultimate period. These are starting points; always fine-tune experimentally.
+
+\section*{Key Equations at a Glance}
+
+\textbf{Ohm's Law}: $V = IR$. \textbf{Power}: $P = VI = I^2R = V^2/R$.
+
+\textbf{Voltage divider}: $V_{\text{out}} = V_{\text{in}} \cdot R_2/(R_1 + R_2)$.
+
+\textbf{RC time constant}: $\tau = RC$. \textbf{Cutoff frequency}: $f_c = 1/(2\pi RC)$.
+
+\textbf{Nyquist criterion}: $f_s \geq 2 f_{\max}$ (practical: $f_s \geq 5$--$10 f_{\max}$).
+
+\textbf{Quantization step}: $q = V_{\text{range}} / 2^n$. \textbf{ENOB}: $(\text{SINAD} - 1.76)/6.02$.
+
+\textbf{Uncertainty propagation}: $u_f = \sqrt{\sum (\partial f/\partial x_i)^2 \cdot u_{x_i}^2}$.
+
+\textbf{SNR}: $\text{SNR (dB)} = 20\log_{10}(V_{\text{signal}}/V_{\text{noise}})$.
+
+\textbf{Gain (dB)}: $20\log_{10}(V_{\text{out}}/V_{\text{in}})$. $+6$\,dB $= 2\times$. $-3$\,dB $= 0.707\times$. $-20$\,dB $= 0.1\times$.
+
+\textbf{PID}: $u(t) = K_p\left[e(t) + \frac{1}{T_i}\int e\,dt + T_d\frac{de}{dt}\right]$.
+
+\textbf{Phase lag from latency}: $\phi = -360 \cdot f \cdot \tau_{\text{total}}$ (degrees).
+
+\textbf{Biot number}: $Bi = hL_c/k$. Lumped capacitance valid if $Bi < 0.1$.
+
+\textbf{Thermal time constant}: $\tau = mC_p/(hA_s)$.
+
+\textbf{Steady-state temperature}: $T_{ss} = T_{\text{amb}} + \dot{Q}/(hA)$.
+
+
+% ================================================================
+% APPENDIX: WHY PROJECTS FAIL
+% ================================================================
+\chapter*{Why Instrumentation Projects Fail}
+\addcontentsline{toc}{chapter}{Why Instrumentation Projects Fail}
+
+The following failure patterns are drawn from over a decade of observing student projects in instrumentation, controls, and capstone design courses. They are listed in approximate order of frequency.
+
+\section*{1. Aliasing from Insufficient Sampling or Missing Anti-Alias Filter}
+The most common technical failure. Students sample at a rate barely above the signal of interest, observe strange low-frequency artifacts in the data, and spend hours debugging the sensor when the problem is in the DAQ configuration. The fix is straightforward: sample at 5--10$\times$ the highest frequency of interest and place an analog low-pass filter before the ADC with $f_c$ at or below $f_s/2$.
+
+\section*{2. Ground Loops and Noise from Poor Wiring Practice}
+The second most common failure. Symptoms: noisy sensor readings that change when you touch the wires, 60\,Hz interference patterns in FFT plots, readings that shift when a motor turns on. The root cause is almost always daisy-chained ground connections or signal and power wires running in parallel. Star grounding, twisted-pair signal wiring, and physical separation of power and signal conductors eliminate most noise problems without expensive shielding.
+
+\section*{3. Sensor Selected Without Checking Output Compatibility}
+Students select a sensor from an online tutorial without verifying that the output voltage range matches the ADC input range, that the output impedance is compatible with the ADC input impedance, or that the sensor's response time is fast enough for the measurement. A 10\,V sensor connected to a 3.3\,V ADC saturates the reading and may damage the ADC. A high-impedance sensor connected to a low-impedance ADC input produces a severe loading error.
+
+\section*{4. PID Tuned Without Understanding the Process}
+Students type Z-N tuning parameters into a PID block, observe overshoot or oscillation, and respond by randomly adjusting gains without a systematic approach. The Z-N method produces aggressive starting parameters that are intended to be refined. Begin with proportional-only control to understand the process response, then add integral action slowly to eliminate steady-state error, and add derivative only if the process dynamics require damping.
+
+\section*{5. Uncertainty Analysis Omitted or Applied Incorrectly}
+Raw measurements reported without uncertainty bounds are scientifically meaningless, yet many students skip uncertainty analysis entirely or apply the formulas incorrectly (most commonly: adding uncertainties linearly instead of in quadrature, or confusing precision and accuracy). Every reported measurement should include an uncertainty estimate following the GUM framework.
+
+\section*{6. Filter Design Based on Rules of Thumb Instead of Requirements}
+Students apply a ``standard'' 10\,Hz low-pass filter to every signal without analyzing what frequencies are actually present, what the noise spectrum looks like, or what frequency content must be preserved. The result is either insufficient filtering (noise passes through) or excessive filtering (the signal of interest is attenuated or phase-shifted). Always start by examining the signal's frequency content (FFT), then design the filter to preserve the signal band and reject the noise band.
+
+\section*{7. Power Supply Inadequate for Actuator Loads}
+A bench supply or USB port that works fine with sensors alone browns out when a motor or heater activates, causing the MCU to reset. The fix: calculate total system current including actuator inrush, select a supply with 50\% margin, and separate the actuator power rail from the sensor/MCU rail with independent regulation.
+
+\section*{8. Documentation Insufficient for Reproduction}
+The system works on demo day, but the report lacks the wiring diagram, DAQ channel assignments, LabVIEW block diagram screenshots, calibration data, and sampling parameters needed for someone else to reproduce the results. If a competent peer cannot replicate your setup from your report alone, the documentation has failed.
+
+\section*{9. Safety Ignored Until Something Breaks}
+No fuse on the power input, no flyback diode on the relay coil, no current limit on the bench supply. The first failure destroys a component (or several). Adding protection after a failure costs time and money that prevention would have avoided. Design the protection circuit first, then add the functional circuit inside the protected envelope.
+
+\section*{10. Scope Creep and Feature Addition Without Requirements Traceability}
+Students add features (wireless data logging, color displays, additional sensors) that were not in the original requirements, consuming time that should have been spent on verification and documentation. Every addition should trace to a requirement; if there is no requirement, there should be no feature.
+
+
+% ================================================================
+% APPENDIX: ABET OUTCOME MAPPING
+% ================================================================
+\chapter*{ABET Student Outcome Mapping}
+\addcontentsline{toc}{chapter}{ABET Student Outcome Mapping}
+
+MEGN~300 is designed to develop the following ABET student outcomes. The table below maps each outcome to the course activities and document chapters that most directly address it.
+
+\begin{center}
+\begin{longtable}{p{0.8cm}p{5.5cm}p{5.5cm}}
+\toprule
+\textbf{SO} & \textbf{ABET Student Outcome} & \textbf{Course Mapping} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{SO} & \textbf{ABET Student Outcome} & \textbf{Course Mapping} \\
+\midrule
+\endhead
+1 & Identify, formulate, and solve complex engineering problems by applying principles of engineering, science, and mathematics. & Measurement theory (Ch~1--3), error analysis and uncertainty propagation (Ch~4), signal processing (Ch~6--12), PID control design (Ch~15--17), heat transfer modeling (Ch~18). Labs require formulating measurement problems and applying mathematical models to physical systems. \\
+\midrule
+2 & Apply engineering design to produce solutions that meet specified needs with consideration of public health, safety, and welfare, as well as global, cultural, social, environmental, and economic factors. & Safety chapter (Laboratory Safety), circuit protection design (Ch~14--15), functional safety requirements (Ch~15), sensor selection for real-world constraints, energy-efficient signal conditioning design. \\
+\midrule
+3 & Communicate effectively with a range of audiences. & Lab reports requiring clear documentation of methodology, results, and uncertainty. Practice questions requiring written technical explanations. Requirements mapping boxes throughout demonstrate professional specification language. \\
+\midrule
+5 & Function effectively on a team whose members together provide leadership, create a collaborative and inclusive environment, establish goals, plan tasks, and meet objectives. & Lab exercises conducted in teams. Integration of multiple subsystems (sensors, DAQ, signal conditioning, control) requiring coordinated team effort and interface management. \\
+\midrule
+6 & Develop and conduct appropriate experimentation, analyze and interpret data, and use engineering judgment to draw conclusions. & All lab exercises involve experimental design, data collection, statistical analysis (Ch~5), FFT-based frequency analysis (Ch~8--9), uncertainty quantification (Ch~4), and engineering judgment in interpreting results. This is the core competency of the course. \\
+\midrule
+7 & Acquire and apply new knowledge as needed, using appropriate learning strategies. & Students must independently read datasheets, select sensors, configure DAQ hardware, learn LabVIEW programming (Appendix), and apply filter design tools. The Master Reference Document serves as a self-study resource supporting independent learning. \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\textbf{Note}: ABET Student Outcome~4 (recognizing ethical and professional responsibilities) is addressed primarily through the safety practices, proper uncertainty reporting (honest representation of measurement quality), and the emphasis on documentation standards throughout the course. These outcomes are assessed through lab reports, exams, and the final project deliverables.
+
 \chapter*{References and Further Resources}
 \addcontentsline{toc}{chapter}{References and Further Resources}
 
