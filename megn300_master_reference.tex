@@ -89,7 +89,7 @@ This reference document accompanies the MEGN~300 lecture modules and lab exercis
 
 \textbf{Part~II: Signals and Signal Processing} covers how measured signals are represented, converted between analog and digital domains, decomposed into frequency components, and cleaned up with filters. These chapters bridge measurement theory and practical data acquisition.
 
-\textbf{Part~III: Electronics for Instrumentation} covers the electronic building blocks that condition, amplify, and switch signals in real measurement and control systems.
+\textbf{Part~III: Electronics for Instrumentation} covers the electronic building blocks that condition, amplify, and switch signals in real measurement and control systems. It begins with circuit fundamentals (Ohm's Law, Kirchhoff's Laws, voltage dividers, RC/RL transients, and grounding) before moving to amplifiers, power electronics, and DC-DC converters.
 
 \textbf{Part~IV: Control Systems} covers the fundamentals of open-loop and closed-loop control, culminating in the PID controller that is the workhorse of industrial automation.
 
@@ -3508,6 +3508,322 @@ Application in instrumentation: envelope detection for bearing fault diagnosis, 
 % ################################################################
 \part{Electronics for Instrumentation}
 
+\chapter{Circuit Fundamentals}
+
+This chapter reviews the core electrical concepts that underpin every topic in Parts~III and IV. If you are comfortable with Ohm's Law, Kirchhoff's Laws, and basic RC/RL transients, this chapter serves as a concise reference. If these ideas are new or rusty, work through the examples before moving on to amplifiers and power electronics.
+
+\section{Voltage, Current, Resistance, and Power}
+
+\textbf{Voltage} ($V$, measured in volts) is the electrical potential difference between two points. It is the ``pressure'' that pushes charge through a circuit. \textbf{Current} ($I$, measured in amperes) is the rate of charge flow: $I = dQ/dt$. Conventional current flows from higher to lower potential (positive to negative); electron flow is opposite. \textbf{Resistance} ($R$, measured in ohms, $\Omega$) quantifies how strongly a material opposes current flow. \textbf{Power} ($P$, measured in watts) is the rate of energy transfer: $P = VI$. In a resistor, $P = I^2 R = V^2/R$.
+
+\begin{keyconceptbox}[Ohm's Law]
+The voltage across a resistor is proportional to the current through it:
+\begin{equation}
+V = IR \qquad \Leftrightarrow \qquad I = \frac{V}{R} \qquad \Leftrightarrow \qquad R = \frac{V}{I}
+\end{equation}
+This is the single most-used equation in electronics. It applies to any purely resistive element: resistors, wire, heating elements, and the on-resistance of a MOSFET switch.
+\end{keyconceptbox}
+
+\textbf{Conductance} ($G = 1/R$, measured in siemens, S) is the reciprocal of resistance. It is convenient when combining parallel resistances: $G_{\text{total}} = G_1 + G_2 + \cdots$.
+
+\textbf{Energy} ($E$, measured in joules) is power integrated over time: $E = P \cdot t$. A 100\,W heater running for 60\,s dissipates $100 \times 60 = 6000$\,J. Battery capacity is often stated in watt-hours (Wh) or milliamp-hours (mAh): a 2000\,mAh battery at 3.7\,V stores $2.0 \times 3.7 = 7.4$\,Wh $= 26{,}640$\,J.
+
+\section{Kirchhoff's Laws}
+
+Gustav Kirchhoff formulated two conservation laws that, together with Ohm's Law, allow you to solve any circuit.
+
+\subsection{Kirchhoff's Current Law (KCL)}
+The algebraic sum of currents entering a node is zero:
+\begin{equation}
+\sum I_{\text{in}} = \sum I_{\text{out}}
+\end{equation}
+Current is conserved. Whatever flows into a junction must flow out. If three wires meet at a node carrying 2\,A, 3\,A, and $I_3$, then $I_3 = -(2+3) = -5$\,A (5\,A flowing out).
+
+\subsection{Kirchhoff's Voltage Law (KVL)}
+The algebraic sum of voltages around any closed loop is zero:
+\begin{equation}
+\sum V_{\text{loop}} = 0
+\end{equation}
+Energy is conserved. The voltage rises (sources) must equal the voltage drops (resistors, loads) around any closed path.
+
+\begin{examplebox}[KVL Applied: Series Resistor Circuit]
+A 12\,V supply drives two series resistors: $R_1 = 4\,\text{k}\Omega$ and $R_2 = 8\,\text{k}\Omega$. Apply KVL: $V_s - V_{R1} - V_{R2} = 0$. The current is $I = V_s/(R_1 + R_2) = 12/12{,}000 = 1\,\text{mA}$. Then $V_{R1} = 1\,\text{mA} \times 4\,\text{k}\Omega = 4\,\text{V}$ and $V_{R2} = 8\,\text{V}$. Check: $12 - 4 - 8 = 0$. KVL is satisfied.
+\end{examplebox}
+
+\section{Series and Parallel Circuits}
+
+\subsection{Series Combination}
+Components in series carry the same current. Resistances add directly:
+\begin{equation}
+R_{\text{series}} = R_1 + R_2 + \cdots + R_n
+\end{equation}
+The total resistance is always larger than any individual resistor. Voltage divides among the resistors in proportion to their resistance.
+
+\subsection{Parallel Combination}
+Components in parallel share the same voltage across their terminals. Conductances add (equivalently, reciprocals of resistance add):
+\begin{equation}
+\frac{1}{R_{\text{parallel}}} = \frac{1}{R_1} + \frac{1}{R_2} + \cdots + \frac{1}{R_n}
+\end{equation}
+For two resistors: $R_{\text{parallel}} = R_1 R_2 / (R_1 + R_2)$. The total resistance is always less than the smallest individual resistor.
+
+\begin{tipbox}[Quick Parallel Calculation]
+Two equal resistors in parallel give half the resistance: $R_{\text{parallel}} = R/2$. A 10\,k$\Omega$ resistor in parallel with a 1\,k$\Omega$ resistor gives $10 \times 1 / (10 + 1) = 909\,\Omega$, which is close to the smaller resistor alone. In parallel combinations, the smallest resistor dominates.
+\end{tipbox}
+
+\section{Voltage Dividers}
+
+The voltage divider is the most common subcircuit in instrumentation. Two series resistors connected across a source produce an output voltage at their junction:
+\begin{equation}
+V_{\text{out}} = V_{\text{in}} \cdot \frac{R_2}{R_1 + R_2}
+\end{equation}
+
+\textbf{Applications in MEGN 300}: scaling a sensor output to match the ADC input range (0--3.3\,V for the ESP32), creating a reference voltage, and biasing op-amp circuits.
+
+\begin{warningbox}[Loading a Voltage Divider]
+A voltage divider only produces the calculated voltage if the load draws negligible current compared to the divider current. Rule of thumb: the load resistance should be at least 10$\times$ the divider output resistance ($R_1 \| R_2$). If not, the load acts as a parallel resistor on $R_2$ and pulls the output voltage down. Use a voltage follower (op-amp buffer) to isolate a high-impedance divider from a low-impedance load.
+\end{warningbox}
+
+\begin{examplebox}[ThermoRig: 12\,V Sensor to 3.3\,V ADC]
+A pressure sensor outputs 0--10\,V. The ESP32 ADC accepts 0--3.3\,V. Design: $V_{\text{out}} = V_{\text{in}} \times R_2/(R_1 + R_2)$. Target ratio: $3.3/10 = 0.33$. Choose $R_1 = 20\,\text{k}\Omega$, $R_2 = 10\,\text{k}\Omega$: output $= 10 \times 10/30 = 3.33$\,V. Divider current: $10/30{,}000 = 0.33$\,mA (low, does not load the sensor). Add a 100\,nF capacitor across $R_2$ to filter high-frequency noise.
+\end{examplebox}
+
+\section{Thevenin and Norton Equivalent Circuits}
+
+Any linear circuit, no matter how complex, can be reduced to a single voltage source in series with a single resistance (Thevenin) or a single current source in parallel with a single resistance (Norton).
+
+\textbf{Thevenin equivalent}: $V_{Th}$ = open-circuit voltage at the output terminals; $R_{Th}$ = resistance seen from the output terminals with all independent sources set to zero (voltage sources shorted, current sources opened).
+
+\textbf{Norton equivalent}: $I_N = V_{Th}/R_{Th}$; $R_N = R_{Th}$.
+
+\textbf{Why this matters for instrumentation}: every sensor has an output impedance ($R_{Th}$). If you connect a low-impedance load (like a multimeter on the current range, or an ADC with a low input impedance), the output voltage drops from $V_{Th}$ because of the voltage drop across $R_{Th}$. This is the root cause of loading errors in measurement systems.
+
+\section{Capacitors and Inductors}
+
+\subsection{Capacitors}
+A capacitor stores energy in an electric field between two conductive plates separated by a dielectric:
+\begin{equation}
+Q = CV, \qquad I = C\frac{dV}{dt}, \qquad E = \frac{1}{2}CV^2
+\end{equation}
+Capacitance $C$ is measured in farads (F). Practical values: pF (high-frequency coupling), nF (decoupling, filtering), $\mu$F (bulk energy storage, timing). A capacitor opposes changes in voltage; it passes AC and blocks DC. Impedance: $Z_C = 1/(2\pi f C)$, which decreases with frequency.
+
+\textbf{Types used in MEGN~300}: ceramic (100\,pF--10\,$\mu$F, low ESR, ideal for decoupling), electrolytic (1\,$\mu$F--10{,}000\,$\mu$F, polarized, bulk energy storage), and tantalum (0.1--100\,$\mu$F, low ESR, compact but voltage-sensitive).
+
+\subsection{Inductors}
+An inductor stores energy in a magnetic field generated by current flowing through a coil:
+\begin{equation}
+V = L\frac{dI}{dt}, \qquad E = \frac{1}{2}LI^2
+\end{equation}
+Inductance $L$ is measured in henrys (H). An inductor opposes changes in current; it passes DC and blocks AC. Impedance: $Z_L = 2\pi f L$, which increases with frequency. Motor windings, solenoid coils, and relay coils are all inductors. This is why they produce voltage spikes when switched (Chapter~14).
+
+\section{RC and RL Time Constants}
+
+\subsection{RC Circuit}
+A resistor and capacitor in series produce an exponential charging or discharging response. The time constant is:
+\begin{equation}
+\tau = RC
+\end{equation}
+After one time constant, the capacitor charges to 63.2\% of the final value. After $5\tau$, it reaches 99.3\% (practically complete). The step response is:
+\begin{equation}
+V_C(t) = V_{\text{final}} \left(1 - e^{-t/\tau}\right) \quad \text{(charging)}, \qquad V_C(t) = V_{\text{initial}} \cdot e^{-t/\tau} \quad \text{(discharging)}
+\end{equation}
+
+\textbf{Applications}: low-pass filtering ($R$ in series, $C$ to ground; cutoff $f_c = 1/(2\pi RC)$), debouncing a mechanical switch ($\tau \approx 10$\,ms), and ADC input filtering to reduce noise.
+
+\begin{examplebox}[Anti-Alias Filter for DAQ]
+You need a low-pass filter with $f_c = 1$\,kHz to prevent aliasing before a 10\,kS/s ADC. Choose $C = 10$\,nF. Then $R = 1/(2\pi f_c C) = 1/(2\pi \times 1000 \times 10 \times 10^{-9}) = 15.9\,\text{k}\Omega$. Use a standard 16\,k$\Omega$ resistor ($f_c = 995$\,Hz, close enough). This is a single-pole, $-20$\,dB/decade rolloff. For steeper attenuation, use higher-order filters (Chapter~11).
+\end{examplebox}
+
+\subsection{RL Circuit}
+A resistor and inductor in series produce an analogous exponential response with time constant:
+\begin{equation}
+\tau = L/R
+\end{equation}
+Current rises as $I(t) = I_{\text{final}}(1 - e^{-t/\tau})$ when voltage is applied, and decays as $I(t) = I_{\text{initial}} \cdot e^{-t/\tau}$ when the source is removed. RL time constants are critical for understanding relay pull-in time (the coil current must reach the hold-in threshold) and flyback voltage spikes (the energy stored as $\frac{1}{2}LI^2$ must dissipate when the switch opens).
+
+\section{AC Circuit Fundamentals}
+
+\subsection{Impedance}
+In AC circuits, resistance generalizes to impedance ($Z$), which has both magnitude and phase. For a resistor: $Z_R = R$ (purely real, voltage and current in phase). For a capacitor: $Z_C = 1/(j\omega C)$ (current leads voltage by 90$^\circ$). For an inductor: $Z_L = j\omega L$ (current lags voltage by 90$^\circ$). Impedances combine like resistances: in series they add, in parallel the reciprocals add. Ohm's Law applies using impedance: $V = IZ$.
+
+\subsection{RMS Values}
+Alternating signals are characterized by their root-mean-square (RMS) value, which represents the equivalent DC value that delivers the same average power to a resistive load:
+\begin{equation}
+V_{\text{RMS}} = \frac{V_{\text{peak}}}{\sqrt{2}} \approx 0.707 \cdot V_{\text{peak}} \qquad \text{(sinusoidal signals only)}
+\end{equation}
+US household power: $V_{\text{peak}} = 170$\,V, $V_{\text{RMS}} = 120$\,V. Power calculations always use RMS: $P = V_{\text{RMS}}^2/R = I_{\text{RMS}}^2 R$.
+
+\subsection{Decibels}
+Signal magnitudes in instrumentation are often expressed in decibels (dB), a logarithmic ratio:
+\begin{equation}
+\text{Gain (dB)} = 20 \log_{10}\left(\frac{V_{\text{out}}}{V_{\text{in}}}\right) = 10 \log_{10}\left(\frac{P_{\text{out}}}{P_{\text{in}}}\right)
+\end{equation}
+A gain of $+6$\,dB $\approx$ doubling the voltage. A gain of $-3$\,dB $\approx$ voltage reduced to 0.707 (half-power point, used to define filter cutoff frequencies). A gain of $-20$\,dB $=$ voltage reduced by a factor of 10. Decibels are additive through a signal chain: a $+20$\,dB amplifier followed by a $-6$\,dB attenuator gives $+14$\,dB overall.
+
+\section{Grounding and Ground Loops}
+
+\textbf{Ground} is the reference node (0\,V) against which all voltages are measured. In theory, ground is a single point at 0\,V everywhere. In practice, ground conductors have nonzero resistance and carry return currents, creating small voltage differences between ``ground'' points in different parts of the circuit.
+
+A \textbf{ground loop} occurs when two or more ground connections create a closed loop that can pick up magnetically induced currents (from nearby motors, transformers, or switching supplies), generating noise on the signal ground. Ground loops are one of the most common sources of measurement noise in instrumentation labs.
+
+\begin{tipbox}[Star Grounding]
+Connect all subsystem grounds to a single point (the star point) near the power supply, rather than daisy-chaining ground connections from one module to the next. Keep signal ground (sensors, ADC) and power ground (motors, relays) on separate conductors that meet only at the star point. This prevents motor return currents from flowing through the sensor ground path and corrupting measurements.
+\end{tipbox}
+
+\section{Practical Component Selection}
+
+\subsection{Resistor Color Code}
+Through-hole resistors use colored bands to encode their value. The standard 4-band code works as follows: the first two bands are significant digits, the third band is the multiplier (number of zeros), and the fourth band indicates tolerance. Read the bands starting from the end closest to one lead (the tolerance band is usually spaced slightly farther from the others).
+
+\begin{center}
+\begin{tabular}{lccl}
+\toprule
+\textbf{Color} & \textbf{Digit} & \textbf{Multiplier} & \textbf{Tolerance} \\
+\midrule
+Black   & 0 & $\times 1$         & --- \\
+Brown   & 1 & $\times 10$        & $\pm 1\%$ \\
+Red     & 2 & $\times 100$       & $\pm 2\%$ \\
+Orange  & 3 & $\times 1{,}000$   & --- \\
+Yellow  & 4 & $\times 10{,}000$  & --- \\
+Green   & 5 & $\times 100{,}000$ & $\pm 0.5\%$ \\
+Blue    & 6 & $\times 1{,}000{,}000$ & $\pm 0.25\%$ \\
+Violet  & 7 & $\times 10{,}000{,}000$ & $\pm 0.1\%$ \\
+Gray    & 8 & ---                & $\pm 0.05\%$ \\
+White   & 9 & ---                & --- \\
+Gold    & --- & $\times 0.1$     & $\pm 5\%$ \\
+Silver  & --- & $\times 0.01$    & $\pm 10\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{5-band resistors} (precision, 1\% or better) use three significant digits, a multiplier, and a tolerance band. The reading process is the same: first three bands are digits, fourth is multiplier, fifth is tolerance.
+
+\begin{examplebox}[Reading Resistor Color Codes]
+\textbf{4-band}: Brown--Black--Orange--Gold $= 10 \times 1{,}000 = 10\,\text{k}\Omega$, $\pm 5\%$. The range is 9.5\,k$\Omega$ to 10.5\,k$\Omega$.
+
+\textbf{4-band}: Red--Violet--Red--Gold $= 27 \times 100 = 2.7\,\text{k}\Omega$, $\pm 5\%$.
+
+\textbf{5-band}: Brown--Red--Black--Brown--Brown $= 120 \times 10 = 1.2\,\text{k}\Omega$, $\pm 1\%$.
+
+\textbf{Common mnemonic} (digit order 0--9): ``Better Be Right Or Your Great Big Venture Goes Wrong'' (Black, Brown, Red, Orange, Yellow, Green, Blue, Violet, Gray, White).
+\end{examplebox}
+
+\begin{tipbox}[SMD Resistor Markings]
+Surface-mount resistors use a numeric code instead of color bands. The 3-digit code (e.g., ``103'') uses the first two digits as significant figures and the third as the number of zeros: $103 = 10 \times 10^3 = 10\,\text{k}\Omega$. The 4-digit code (e.g., ``4702'') uses three significant digits: $4702 = 470 \times 10^2 = 47\,\text{k}\Omega$. ``R'' indicates a decimal point: ``4R7'' $= 4.7\,\Omega$. Very small SMD packages (0402 and below) often have no marking at all; keep them in labeled bags or tape reels to avoid confusion.
+\end{tipbox}
+
+\subsection{Resistor Tolerance and Standard Values}
+Resistors come in standard value series (E12, E24, E96) spaced logarithmically. The E12 series (10\% tolerance) has 12 values per decade: 10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82. The E24 series (5\%) has 24 values. E96 (1\%) has 96 values. When designing a voltage divider or filter, choose the nearest standard value and verify the circuit still meets specifications at the tolerance extremes.
+
+\subsection{Power Rating}
+Every resistor has a maximum power dissipation. Standard through-hole resistors: 1/4\,W. Verify: $P = I^2R$ or $P = V^2/R$ at worst-case operating conditions. If the dissipation exceeds the rating, the resistor overheats, changes value, and eventually fails (sometimes by catching fire).
+
+\subsection{Capacitor Voltage Rating}
+Every capacitor has a maximum working voltage. Exceeding it causes dielectric breakdown (shorts, explosion for electrolytics). Rule of thumb: derate by 50\% for reliability (use a 25\,V cap on a 12\,V rail). Electrolytic capacitors are polarized; reversing polarity causes catastrophic failure.
+
+\subsection{Wire Gauge Reference (AWG)}
+American Wire Gauge (AWG) is the standard for specifying wire size. Smaller AWG numbers indicate thicker wire with higher current capacity. The following table covers the gauges most commonly used in MEGN~300 projects:
+
+\begin{center}
+\begin{tabular}{cccl}
+\toprule
+\textbf{AWG} & \textbf{Diameter (mm)} & \textbf{Max Current (A)} & \textbf{Typical Use} \\
+\midrule
+30 & 0.25 & 0.5  & Wire-wrap, fine signal wiring \\
+28 & 0.32 & 0.8  & Ribbon cable, breadboard jumpers \\
+26 & 0.40 & 1.3  & Ribbon cable, light signal wiring \\
+24 & 0.51 & 2.1  & Standard signal and sensor wiring \\
+22 & 0.64 & 3.0  & General purpose hookup wire \\
+20 & 0.81 & 5.0  & Power wiring, LED strips \\
+18 & 1.02 & 7.5  & Motor power, moderate loads \\
+16 & 1.29 & 10   & High-current motor, battery leads \\
+14 & 1.63 & 15   & High-power supply, automotive \\
+12 & 2.05 & 20   & Household branch circuits (US) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Current ratings above are approximate for chassis wiring in open air (single conductor, 30\degC{} ambient). Bundled wires in conduit or cable should be derated by 20--40\%. When in doubt, go one gauge thicker.
+
+\begin{warningbox}[Stranded vs. Solid Wire]
+Use \textbf{stranded wire} for any connection that moves, flexes, or is subject to vibration (motor leads, connections to moving parts, cables between enclosures). Solid wire work-hardens and breaks after repeated flexing. Use \textbf{solid wire} only for permanent, stationary connections (breadboard jumpers, point-to-point wiring on perfboard). Never use solid wire for connections to motors, servos, or any moving mechanism.
+\end{warningbox}
+
+\subsection{SI Prefixes and Unit Conversions}
+Instrumentation spans many orders of magnitude. Memorize these prefixes:
+
+\begin{center}
+\begin{tabular}{ccll}
+\toprule
+\textbf{Prefix} & \textbf{Symbol} & \textbf{Factor} & \textbf{Common Usage} \\
+\midrule
+pico  & p  & $10^{-12}$ & Capacitance (pF), charge \\
+nano  & n  & $10^{-9}$  & Capacitance (nF), time (ns) \\
+micro & $\mu$ & $10^{-6}$ & Voltage ($\mu$V), current ($\mu$A), time ($\mu$s) \\
+milli & m  & $10^{-3}$  & Voltage (mV), current (mA), time (ms) \\
+---   & ---  & $10^{0}$ & Base unit (V, A, $\Omega$, s, Hz) \\
+kilo  & k  & $10^{3}$   & Resistance (k$\Omega$), frequency (kHz) \\
+mega  & M  & $10^{6}$   & Resistance (M$\Omega$), frequency (MHz) \\
+giga  & G  & $10^{9}$   & Frequency (GHz) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warningbox}[Case Sensitivity in Unit Prefixes]
+Lowercase ``m'' means milli ($10^{-3}$). Uppercase ``M'' means mega ($10^{6}$). Confusing them changes a value by a factor of one billion. A 4.7\,m$\Omega$ resistor (milliohm, a current-sense shunt) is very different from a 4.7\,M$\Omega$ resistor (megaohm, a high-impedance input bias resistor). Similarly, ``mA'' is milliamps and ``MA'' is megaamps. Always double-check the case when reading datasheets and specifications.
+\end{warningbox}
+
+\subsection{Common Schematic Symbols}
+Knowing how to read a schematic is a prerequisite for building, debugging, and documenting any circuit. The following symbols appear throughout this course and in component datasheets:
+
+\textbf{Passive components}: resistor (zigzag or rectangle), capacitor (two parallel lines; polarized electrolytic adds a curved line for the negative plate), inductor (series of loops or bumps), fuse (thin line with a break or ``S'' shape).
+
+\textbf{Semiconductors}: diode (triangle pointing into a bar; current flows in the triangle direction, from anode to cathode), LED (diode with arrows representing emitted light), Zener diode (diode with bent bar ends), NPN BJT (arrow on emitter pointing away from base), PNP BJT (arrow on emitter pointing toward base), N-channel MOSFET (arrow on body diode pointing inward, gate on left side), P-channel MOSFET (arrow pointing outward).
+
+\textbf{Sources and references}: DC voltage source (circle with $+$/$-$), AC voltage source (circle with sine wave), ground symbol (three horizontal lines of decreasing length, or a triangle pointing down), chassis ground (three diagonal lines).
+
+\textbf{Active components}: op-amp (triangle with $+$ and $-$ inputs and one output), comparator (same symbol as op-amp but context indicates comparison function).
+
+\subsection{Multimeter Usage Quick Reference}
+The digital multimeter (DMM) is the most-used instrument in MEGN~300. Correct usage prevents both measurement errors and equipment damage.
+
+\textbf{Voltage measurement} (DC or AC): set the dial to V; connect probes in parallel across the component or nodes of interest. The DMM presents very high input impedance ($>$1\,M$\Omega$) and draws negligible current.
+
+\textbf{Current measurement}: set the dial to A or mA; move the red probe to the current jack (usually a separate terminal). Connect the meter in series: break the circuit and insert the meter into the break so all current flows through it. The DMM presents very low impedance ($<$1\,$\Omega$) when measuring current.
+
+\textbf{Resistance measurement}: set the dial to $\Omega$. Disconnect the component from the circuit (de-energize first!). Connect probes across the component. The DMM sends a small known current through the component and measures the resulting voltage to compute resistance.
+
+\textbf{Continuity}: set to the continuity/beep mode (diode symbol or speaker icon). Touch probes to two points. The meter beeps if resistance is below a threshold (typically $<$50\,$\Omega$), indicating an electrical connection.
+
+\begin{warningbox}[The Current-Mode Dead-Short Trap]
+If you leave the multimeter in current mode (low impedance, probes in the current jacks) and connect it in parallel across a voltage source, the meter becomes a near-short-circuit. This blows the meter's internal fuse (best case) or damages the meter and the circuit (worst case). After every current measurement, move the red probe back to the voltage jack and switch the dial to voltage mode. This is the single most common multimeter damage mode in the MEGN~300 lab.
+\end{warningbox}
+
+\subsection{Breadboard Layout and Conventions}
+Breadboards are used for rapid prototyping before committing to a soldered or PCB design. Internal connections run as follows: the two long rails along the top and bottom edges are bus strips (typically used for power and ground, marked with red/blue or $+$/$-$ lines). The central rows of five-hole groups are connected horizontally within each group but not across the center channel. The center channel separates the two halves and is sized to straddle a DIP IC package.
+
+\textbf{Best practices}: run power ($+$) on the red rail and ground on the blue rail, both on the same side of the board for short return paths. Place ICs straddling the center channel. Use short, flat jumper wires (color-coded: red for power, black for ground, other colors for signals). Keep wires close to the board surface to reduce noise pickup and make the circuit readable. Label every IC and major node with a small sticky note.
+
+\textbf{Limitations}: breadboard contact resistance is 0.01--0.1\,$\Omega$ per connection (adds up over long signal paths), stray capacitance is 2--5\,pF between adjacent rows (limits high-frequency performance to $<$1\,MHz), and connections loosen over time (intermittent failures). Never deploy a breadboard as a final product.
+
+\begin{keyconceptbox}[Requirements Mapping: Circuit Parameters to Shall Statements]
+Circuit analysis directly generates testable requirements. ``The input stage voltage divider shall scale the 0--10\,V sensor output to 0--3.3\,V with an accuracy of $\pm$2\%.'' ``The signal ground and power ground shall connect at a single star point within 50\,mm of the main power entry connector.'' ``All resistors in the signal conditioning path shall be 1\% tolerance (E96 series) or better.'' ``Bulk decoupling capacitors shall have a voltage rating at least 1.5$\times$ the rail voltage.''
+\end{keyconceptbox}
+
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A circuit has a 9\,V battery driving three resistors: $R_1 = 1\,\text{k}\Omega$ in series with the parallel combination of $R_2 = 2\,\text{k}\Omega$ and $R_3 = 3\,\text{k}\Omega$. Find the total current from the battery and the voltage across each resistor.
+\item An RC low-pass filter uses $R = 10\,\text{k}\Omega$ and $C = 100$\,nF. What is the $-3$\,dB cutoff frequency? How long does the capacitor take to reach 99\% of a step input?
+\item A Thevenin analysis of a sensor circuit yields $V_{Th} = 2.5$\,V and $R_{Th} = 5\,\text{k}\Omega$. You connect it to an ADC with 1\,M$\Omega$ input impedance. What voltage does the ADC actually read? What if the ADC input impedance were only 10\,k$\Omega$?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $R_{2\|3} = (2 \times 3)/(2 + 3) = 1.2\,\text{k}\Omega$. $R_{\text{total}} = 1.0 + 1.2 = 2.2\,\text{k}\Omega$. $I = 9/2200 = 4.09$\,mA. $V_{R1} = 4.09\,\text{mA} \times 1\,\text{k}\Omega = 4.09$\,V. $V_{R2\|R3} = 4.09\,\text{mA} \times 1.2\,\text{k}\Omega = 4.91$\,V. Check: $4.09 + 4.91 = 9.0$\,V (KVL satisfied).
+\item $f_c = 1/(2\pi RC) = 1/(2\pi \times 10{,}000 \times 100 \times 10^{-9}) = 159$\,Hz. For 99\% of final value: $5\tau = 5 \times RC = 5 \times 10{,}000 \times 100 \times 10^{-9} = 5$\,ms.
+\item With 1\,M$\Omega$ load: $V_{\text{ADC}} = 2.5 \times 10^6/(5000 + 10^6) = 2.488$\,V (0.5\% loading error, negligible). With 10\,k$\Omega$ load: $V_{\text{ADC}} = 2.5 \times 10{,}000/(5000 + 10{,}000) = 1.667$\,V (33\% loading error, severe). This illustrates why ADC input impedance matters and why a buffer amplifier may be needed.
+\end{enumerate}
+
+
 \chapter{Amplifiers}
 
 \section{Why Amplification?}
@@ -4012,6 +4328,55 @@ T_j = T_{\text{ambient}} + P_{\text{diss}} \times (R_{\theta,JC} + R_{\theta,CS}
 where $R_{\theta,JC}$ is junction-to-case (from datasheet), $R_{\theta,CS}$ is case-to-sink (depends on thermal interface: $\sim$0.5\,\degC{}/W with thermal paste, $\sim$2\,\degC{}/W with bare contact), and $R_{\theta,SA}$ is sink-to-ambient (from heatsink datasheet).
 
 Example: IRLZ44N MOSFET ($R_{\theta,JC} = 1.5$\,\degC{}/W), thermal paste ($R_{\theta,CS} = 0.5$), switching 5\,A with $R_{DS(on)} = 0.022\,\Omega$: $P = 5^2 \times 0.022 = 0.55$\,W. Without heatsink ($R_{\theta,JA} = 62$\,\degC{}/W): $T_j = 25 + 0.55 \times 62 = 59$\,\degC{} (safe, $< 175$\,\degC{} limit). At 20\,A: $P = 8.8$\,W, $T_j = 25 + 8.8 \times 62 = 571$\,\degC{} (destroyed!). Need a heatsink: $R_{\theta,SA} < (175-25)/8.8 - 2 = 15$\,\degC{}/W.
+\section{DC-DC Converters: Buck and Boost Regulators}
+
+The switching transistors and PWM concepts covered earlier in this chapter have a direct application beyond motor control: DC-DC power conversion. Most instrumentation systems require multiple voltage rails (3.3\,V for the MCU, 5\,V for sensors, 12\,V or 24\,V for actuators) from a single source. Linear regulators (LDOs) can step voltage down, but they dissipate the voltage difference as heat: a 12\,V to 3.3\,V LDO wastes 72\% of the input power. Switching regulators solve this by rapidly chopping the input voltage and using an inductor to transfer energy efficiently, achieving 85--95\% efficiency.
+
+\subsection{Buck Converter (Step-Down)}
+A buck converter produces an output voltage lower than the input. The core circuit has four elements: a switching MOSFET, a diode (or synchronous MOSFET), an inductor, and an output capacitor. The MOSFET switches at 100\,kHz--2\,MHz with a duty cycle $D$. During the ON phase, current flows through the MOSFET and inductor to the load, storing energy in the inductor's magnetic field. During the OFF phase, the inductor's stored energy drives current through the diode to the load, maintaining continuous current flow.
+
+The output voltage is controlled by the duty cycle:
+\begin{equation}
+V_{\text{out}} = D \times V_{\text{in}}, \qquad D = \frac{V_{\text{out}}}{V_{\text{in}}}
+\end{equation}
+
+For a 12\,V to 3.3\,V conversion: $D = 3.3/12 = 0.275$ (27.5\% duty cycle). The MOSFET is ON for 27.5\% of each switching period and OFF for 72.5\%. Efficiency is typically 85--95\%, meaning only 5--15\% of the input power is wasted as heat, compared to 72\% for an LDO doing the same conversion.
+
+\textbf{Common buck converter ICs for student projects}: LM2596 (3\,A, adjustable, through-hole friendly), MP1584 (3\,A, compact module), LM3671 (600\,mA, ultra-compact for battery applications).
+
+\begin{tipbox}[When to Use a Buck vs. an LDO]
+Use an LDO when: (1) the voltage drop is small ($V_{\text{in}} - V_{\text{out}} < 2$\,V), (2) current is under 500\,mA, (3) you need very low output noise (analog sensor circuits, precision ADCs), or (4) simplicity matters (an LDO needs only two capacitors). Use a buck converter when: (1) the voltage drop is large ($>$2\,V), (2) current exceeds 500\,mA, (3) efficiency matters (battery-powered systems), or (4) the heat from an LDO would be problematic. Many systems use both: a buck to step 12\,V down to 5\,V efficiently, then an LDO to produce a clean 3.3\,V from that 5\,V rail.
+\end{tipbox}
+
+\subsection{Boost Converter (Step-Up)}
+A boost converter produces an output voltage higher than the input. The topology reverses the buck: the inductor is on the input side, the MOSFET shorts the inductor to ground during the ON phase (storing energy), and during the OFF phase the inductor's energy adds to the input voltage and charges the output capacitor through the diode.
+
+\begin{equation}
+V_{\text{out}} = \frac{V_{\text{in}}}{1 - D}
+\end{equation}
+
+For a 3.7\,V lithium cell boosted to 5\,V: $D = 1 - 3.7/5 = 0.26$ (26\% duty cycle). As duty cycle approaches 1.0, the theoretical output approaches infinity, but practical limits (inductor saturation, diode losses, parasitic resistance) restrict useful boost ratios to about 4:1.
+
+\textbf{Applications in MEGN~300}: powering a 5\,V sensor system from a single 3.7\,V lithium cell, generating a 12\,V rail for relay coils from a 5\,V USB supply, and driving LED strings that require higher voltage than the available supply.
+
+\subsection{Buck-Boost Converter}
+A buck-boost converter can produce an output voltage either higher or lower than the input. This is essential when the input varies across the output target: a lithium battery ranges from 4.2\,V (fully charged) to 3.0\,V (discharged). If the system needs 3.3\,V, neither a pure buck nor a pure boost works across the full range. A buck-boost handles both conditions seamlessly.
+
+The SEPIC (Single-Ended Primary-Inductor Converter) is a popular buck-boost topology that produces a non-inverted output with good regulation. Common ICs: TPS63000 series (Adjustable, 1.8--5.5\,V output, 96\% peak efficiency).
+
+\subsection{Switching Regulator Noise}
+The main disadvantage of all switching regulators is output ripple and electromagnetic interference (EMI). The rapid switching (100\,kHz+) generates noise at the switching frequency and its harmonics. This noise can corrupt sensitive analog measurements.
+
+Mitigation strategies: (1) add an LC output filter (extra inductor + capacitor) after the switching regulator, (2) use an LDO as a post-regulator to clean up the output for analog circuits, (3) keep switching regulator traces physically separated from analog signal traces on the PCB, and (4) use a continuous ground plane under the switching regulator with short, wide power traces. The Master Reference Document PCB Design chapter (Chapter~16) covers layout best practices for switching regulators.
+
+\begin{examplebox}[ThermoRig: Multi-Rail Power Architecture]
+The ThermoRig uses a 12\,V wall adapter as its primary source. A buck converter (LM2596 module) steps 12\,V down to 5\,V at up to 2\,A for the sensor power rail (85\% efficient, 0.3\,W waste heat vs. 2.6\,W for an LDO). An LDO (AMS1117-3.3) then produces 3.3\,V from the 5\,V rail for the ESP32 (66\% efficient, but only 300\,mA, so waste heat is 0.5\,W, manageable). The 12\,V rail directly powers the heater SSR control and the cooling fan. Total power architecture: three voltage rails from one input, with the high-current conversion handled by the switching regulator and the noise-sensitive MCU rail cleaned up by the LDO.
+\end{examplebox}
+
+\begin{keyconceptbox}[Requirements Mapping: Power Conversion]
+``The power supply system shall convert the 12\,VDC input to a regulated 5.0\,V $\pm$ 3\% rail at up to 2\,A continuous.'' ``The 3.3\,V MCU rail shall have output ripple less than 30\,mV peak-to-peak measured at the ESP32 power pins.'' ``The power supply system shall achieve a minimum overall efficiency of 80\% at full rated load.'' ``All switching regulator modules shall include input and output capacitors per the manufacturer's reference design.''
+\end{keyconceptbox}
+
 \section{Functional Safety: Fail-Safes and Emergency Stops}
 \subsection{What Happens When the Controller Fails?}
 Every automation system must answer this question: if the microcontroller crashes, the software enters an infinite loop, the communication link drops, or the power supply glitches, what happens to the actuators?
