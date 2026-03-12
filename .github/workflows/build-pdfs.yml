@@ -23,17 +23,16 @@ jobs:
         uses: xu-cheng/latex-action@v3
         with:
           root_file: megn300_master_reference.tex
-          latexmk_use_xelatex: false
           args: -pdf -interaction=nonstopmode -file-line-error
-          extra_system_packages: ghostscript
+          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol
 
       - name: Build Student Guide
         if: hashFiles('MEGN300_Student_Guide.tex') != ''
         uses: xu-cheng/latex-action@v3
         with:
           root_file: MEGN300_Student_Guide.tex
-          latexmk_use_xelatex: false
           args: -pdf -interaction=nonstopmode -file-line-error
+          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol
 
       - name: Commit PDFs
         run: |
@@ -43,5 +42,8 @@ jobs:
           if [ -f MEGN300_Student_Guide.pdf ]; then
             git add -f MEGN300_Student_Guide.pdf
           fi
-          git diff --staged --quiet || git commit -m "Auto-build PDFs [skip ci]"
-          git push
+          git diff --staged --quiet || {
+            git commit -m "Auto-build PDFs [skip ci]"
+            git pull --rebase origin main
+            git push
+          }
