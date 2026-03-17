@@ -85,7 +85,7 @@ MEGN~300 teaches you to \textbf{measure physical quantities accurately and contr
 Three documents work together:
 \begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
     \item \textbf{This Student Guide}: quick-hit tips, common pitfalls, and FAQ for each module.
-    \item \textbf{The Master Reference Document}: deep technical content organized in four parts (Measurement Fundamentals, Signals \& Signal Processing, Electronics, and Control Systems). Every chapter has worked ThermoRig examples, practice questions with solutions, and Requirements Mapping boxes. Consult it when you need the equations, theory, or design procedures. Start with the ``What Should I Be Reading Right Now? triage guide on page~2 to find exactly the section you need.
+    \item \textbf{The Master Reference Document}: deep technical content organized in five parts (Measurement Fundamentals, Signals \& Signal Processing, Electronics including debugging methodology, Control Systems, and Engineering Science Reference). Every chapter has worked ThermoRig examples, practice questions with solutions, and Requirements Mapping boxes. Consult it when you need the equations, theory, or design procedures. Start with the ``What Should I Be Reading Right Now?'' triage guide on page~2 to find exactly the section you need.
     \item \textbf{Canvas}: assignment details, deadlines, rubrics, lab handouts, and LabVIEW starter VIs.
 \end{enumerate}
 \end{faqbox}
@@ -183,7 +183,7 @@ Use $n-1$ (Bessel's correction) for the \textbf{sample} standard deviation when 
 \end{priorities}
 
 \begin{warnbox}
-\textbf{Aliasing is the single most common data acquisition mistake.} If you sample at 1\,kS/s without an anti-alias filter, any noise above 500\,Hz folds into your measurement as a false lower-frequency signal. The NI~USB-6001 has \textbf{no built-in anti-alias filter}; you must add an external RC or active filter before the analog input. The Master Reference Document, Chapter~9, has the alias frequency formula and the ThermoRig switching-regulator example.
+\textbf{Aliasing is the single most common data acquisition mistake.} If you sample at 1\,kS/s without an anti-alias filter, any noise above 500\,Hz folds into your measurement as a false lower-frequency signal. The NI~USB-6001 has \textbf{no built-in anti-alias filter}; you must add an external RC or active filter before the analog input. The Master Reference Document, Chapter~11, has the alias frequency formula and the ThermoRig switching-regulator example.
 \end{warnbox}
 
 \begin{tipbox}
@@ -191,7 +191,7 @@ Use $f_s \geq 10 \times f_{\max}$ in practice (not just $2\times$). This gives y
 \end{tipbox}
 
 \begin{faqbox}[Q: How many bits do I actually need?]
-Calculate the LSB: $\text{LSB} = V_{\text{range}} / 2^n$. Compare this to your sensor's output change per unit measurand. If your thermocouple produces 40\,$\mu$V/\textdegree{}C and your ADC LSB is 2.44\,mV (12-bit, 10\,V range), your temperature resolution is $2.44\,\text{mV} / 0.040\,\text{mV/\textdegree{}C} = 61$\,\textdegree{}C. That is useless. You need amplification (Chapter~12 of the MRD) to bring the signal into the ADC's usable range.
+Calculate the LSB: $\text{LSB} = V_{\text{range}} / 2^n$. Compare this to your sensor's output change per unit measurand. If your thermocouple produces 40\,$\mu$V/\textdegree{}C and your ADC LSB is 2.44\,mV (12-bit, 10\,V range), your temperature resolution is $2.44\,\text{mV} / 0.040\,\text{mV/\textdegree{}C} = 61$\,\textdegree{}C. That is useless. You need amplification (Chapter~15 of the MRD) to bring the signal into the ADC's usable range.
 \end{faqbox}
 
 %=============================================================================
@@ -231,7 +231,7 @@ Three decisions: (1) \textbf{Sampling rate} $f_s$: at least $2.56 \times$ the hi
 \end{priorities}
 
 \begin{faqbox}[Q: Which filter type should I use?]
-\textbf{Butterworth} is the default. Use it unless you have a specific reason not to. \textbf{Chebyshev}: when you need a steeper cutoff with fewer components (accept passband ripple). \textbf{Bessel}: when preserving the shape of a pulse or transient is critical (linear phase). The Master Reference Document, Chapters~10--11, has design procedures for both analog and digital implementations.
+\textbf{Butterworth} is the default. Use it unless you have a specific reason not to. \textbf{Chebyshev}: when you need a steeper cutoff with fewer components (accept passband ripple). \textbf{Bessel}: when preserving the shape of a pulse or transient is critical (linear phase). The Master Reference Document, Chapters~12--13, has design procedures for both analog and digital implementations.
 \end{faqbox}
 
 \begin{warnbox}
@@ -255,7 +255,7 @@ Three decisions: (1) \textbf{Sampling rate} $f_s$: at least $2.56 \times$ the hi
 \end{priorities}
 
 \begin{faqbox}[Q: Why can't I just connect the sensor directly to the ADC?]
-Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V; the ADC needs volts). (2) The sensor impedance is too high (the ADC loads it, changing the reading). (3) Noise rides on the signal (the amplifier rejects common-mode noise). The Master Reference Document, Chapter~12, covers the complete signal conditioning chain from bridge circuit through instrumentation amplifier to ADC.
+Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V; the ADC needs volts). (2) The sensor impedance is too high (the ADC loads it, changing the reading). (3) Noise rides on the signal (the amplifier rejects common-mode noise). The Master Reference Document, Chapter~15, covers the complete signal conditioning chain from bridge circuit through instrumentation amplifier to ADC.
 \end{faqbox}
 
 \begin{warnbox}
@@ -279,12 +279,92 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{priorities}
 
 \begin{warnbox}
-\textbf{Inductive loads (motors, solenoids, relays) will destroy your MOSFET without a flyback diode.} When you switch off an inductive load, the collapsing magnetic field generates a voltage spike of hundreds or thousands of volts. A 1N5819 Schottky diode across the load (cathode to positive) costs \$0.10 and prevents \$5--\$50 of damage. See the Master Reference Document, Chapter~13, for the spike calculation and circuit diagram.
+\textbf{Inductive loads (motors, solenoids, relays) will destroy your MOSFET without a flyback diode.} When you switch off an inductive load, the collapsing magnetic field generates a voltage spike of hundreds or thousands of volts. A 1N5819 Schottky diode across the load (cathode to positive) costs \$0.10 and prevents \$5--\$50 of damage. See the Master Reference Document, Chapter~16, for the spike calculation and circuit diagram.
 \end{warnbox}
 
 \begin{tipbox}
 \textbf{For DC loads}: use an N-channel logic-level MOSFET (IRLZ44N) in the low side. For AC loads: use a solid-state relay (SSR). For bidirectional motor control: use an H-bridge IC (L298N, DRV8871). Never switch AC mains with a bare MOSFET.
 \end{tipbox}
+
+%=============================================================================
+\section{Module 8B: Sensors and Actuators Fundamentals}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Understand transduction: how sensors convert physical quantities to electrical signals.
+    \item Know the key specs: range, sensitivity, accuracy, bandwidth, output impedance.
+    \item Match actuator type to load requirements before selecting a driver circuit.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: How do I choose between a thermocouple, RTD, and thermistor?]
+\textbf{Thermocouple}: widest range ($-200$ to $1250$\,\textdegree{}C for Type K), fastest response, self-generating (no excitation needed), but lowest output ($\mu$V-level, needs amplifier). \textbf{RTD (Pt100)}: best accuracy ($\pm$0.1\,\textdegree{}C), excellent linearity, but slower and requires bridge excitation. \textbf{Thermistor}: highest sensitivity (10$\times$ TC), but highly nonlinear and limited range ($-40$ to $125$\,\textdegree{}C). Pick based on your range and accuracy requirements first, then consider signal conditioning complexity. Chapter~6 of the MRD has the full selection table.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Every actuator needs a driver circuit.} No motor, solenoid, or heater connects directly to a microcontroller GPIO. Motors need H-bridges or ESCs. Solenoids need MOSFETs with flyback diodes. Heaters need SSRs or MOSFETs with current limiting. Forgetting the driver is the most common actuator integration mistake.
+\end{warnbox}
+
+\begin{protip}
+\textbf{Check sensor output compatibility before ordering.} Verify three things: (1) the output voltage range fits your ADC input range (a 10\,V sensor on a 3.3\,V ADC will saturate and may damage the ADC), (2) the output impedance is compatible ($>$100:1 ratio with your ADC input impedance), and (3) the response time is fast enough for your signal ($\tau_{\text{sensor}} < f_{\text{signal}}/5$). Chapter~6 has the sensor selection decision framework.
+\end{protip}
+
+%=============================================================================
+\section{Module 8C: Fluid Power Fundamentals}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Understand pressure, flow, and their relationship (Bernoulli, continuity).
+    \item Know how differential-pressure flow measurement works (orifice, Venturi, Pitot).
+    \item Distinguish hydraulic vs. pneumatic system tradeoffs.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: My project has a pump or flow control. Where do I start?]
+Start with Chapter~22 (Fluid Power) of the MRD. Determine your flow rate and pressure requirements. For precise metering of small flows ($<$5\,L/min), use a peristaltic or gear pump. For high-flow cooling or mixing ($>$10\,L/min), use a centrifugal pump. For pneumatic actuation, you need an FRL (filter-regulator-lubricator) unit upstream of any pneumatic cylinder or valve.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{Never check for hydraulic leaks with your hand.} A pinhole leak at 200\,bar produces a jet that can penetrate skin and inject fluid into tissue (fluid injection injury, a surgical emergency). Use a piece of cardboard to locate leaks. Always relieve pressure before disconnecting fittings.
+\end{warnbox}
+
+\begin{tipbox}
+\textbf{Flow measurement shortcut}: for clean water or air in pipes under 50\,mm, a small turbine flowmeter with pulse output is the easiest to interface with the ESP32. Count pulses with a hardware timer and convert to flow rate using the meter's K-factor (pulses per liter). The ThermoRig cooling loop example in Chapter~22 walks through the complete calculation.
+\end{tipbox}
+
+%=============================================================================
+\section{Module 8D: Systematic Debugging and Troubleshooting}
+%=============================================================================
+
+\begin{priorities}
+\begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
+    \item Always debug bottom-up: component $\to$ interface $\to$ subsystem $\to$ system.
+    \item Use the five-step protocol: reproduce, isolate, measure, hypothesize, fix and regression test.
+    \item Change only one variable between tests.
+\end{enumerate}
+\end{priorities}
+
+\begin{faqbox}[Q: I wired everything together and nothing works. Where do I start?]
+Disconnect everything. Go back to Level~1 of the debugging pyramid. Verify each component in isolation: does the sensor output the right voltage? Does the amplifier have the correct gain with a signal generator input? Does the MCU blink an LED? Does the motor spin with a direct battery connection? Only after every component passes individually do you begin reconnecting them, one interface at a time, testing after each connection. This feels slower, but it is 5--10$\times$ faster than staring at a fully assembled system that does not work. See Chapter~17 of the MRD for the full methodology.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{``I changed three things and now it works'' is not debugging.} If you swapped a component, changed the wiring, and edited the firmware simultaneously, you do not know which change fixed the problem. Worse, one of the other changes may have introduced a new latent fault. Always change one variable at a time, test, and record the result before making the next change.
+\end{warnbox}
+
+\begin{tipbox}
+\textbf{The Signal Walk is your most powerful debugging technique.} Start at the sensor with an oscilloscope probe. Measure the output. Move one stage downstream (after the divider, after the amplifier, at the ADC input). At each point, compare measured vs. expected. The first point where they diverge localizes the fault to that stage. Five minutes of signal walking saves hours of guessing.
+\end{tipbox}
+
+\begin{protip}
+\textbf{Keep a debug log.} Date, symptom, tests performed, measurements taken, hypothesis, fix applied, result. When the same failure appears two weeks later (it will), you will have the answer in 30 seconds instead of 2 hours. The debug log also demonstrates professional engineering practice in your final report.
+\end{protip}
+
+\begin{faqbox}[Q: My sensor readings are fine until the motor turns on. Then everything gets noisy.]
+Classic ground loop or EMI problem. The motor's switching current is coupling into the sensor signal path. Three fixes, in order of effectiveness: (1)~Star grounding: separate ground wires for sensor and motor circuits, joined at one point near the supply. (2)~Add a low-pass filter at the amplifier input to reject high-frequency motor noise. (3)~Route sensor wires physically away from motor power wires and use twisted-pair for the sensor leads. Chapter~17 covers the full integration debugging protocol.
+\end{faqbox}
 
 %=============================================================================
 \section{Module 9: Control Systems and PID}
@@ -299,11 +379,11 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{priorities}
 
 \begin{faqbox}[Q: My P-only controller has a steady-state offset. Why?]
-P-only control requires $e > 0$ to produce $u > 0$. If $e = 0$, the controller output is zero, and the process drifts. The system settles where the disturbance (heat loss, friction) exactly balances the control effort at some nonzero error. Only integral (I) action can drive the error to zero, because the integral accumulates error over time and keeps increasing the output until $e = 0$. See the Master Reference Document, Chapter~16, for the detailed explanation.
+P-only control requires $e > 0$ to produce $u > 0$. If $e = 0$, the controller output is zero, and the process drifts. The system settles where the disturbance (heat loss, friction) exactly balances the control effort at some nonzero error. Only integral (I) action can drive the error to zero, because the integral accumulates error over time and keeps increasing the output until $e = 0$. See the Master Reference Document, Chapter~20, for the detailed explanation.
 \end{faqbox}
 
 \begin{warnbox}
-\textbf{Integral windup is the \#1 PID debugging headache.} If your system overshoots massively after a large setpoint change, the integral term has ``wound up'' while the actuator was saturated. Enable anti-windup: stop accumulating the integral when the output hits its limit. The Master Reference Document, Chapter~16, has the discrete-time pseudocode with anti-windup clamping.
+\textbf{Integral windup is the \#1 PID debugging headache.} If your system overshoots massively after a large setpoint change, the integral term has ``wound up'' while the actuator was saturated. Enable anti-windup: stop accumulating the integral when the output hits its limit. The Master Reference Document, Chapter~20, has the discrete-time pseudocode with anti-windup clamping.
 \end{warnbox}
 
 \begin{protip}
@@ -398,12 +478,15 @@ Lab practicals test both theory and hands-on skills. You may be asked to: wire a
 \midrule
 1--2 & Measurement Fundamentals & Sensor terminology, calibration, bridge circuits & 1--2 \\
 3--4 & Dynamic Meas.\ \& Error & Time constants, frequency response, uncertainty propagation & 3--4 \\
-5--6 & Signals \& Digitization & ADC specs, aliasing, SNR, anti-alias filters & 5--6, 9 \\
-7--8 & Frequency Analysis & Fourier series, FFT, windowing, PSD & 7--8 \\
-9--10 & Filtering & Analog (RC, Sallen-Key), digital (FIR/IIR), LabVIEW filters & 10--11 \\
-11--12 & Signal Conditioning & Amplifiers, INA, high-power switches, PWM & 12--13 \\
-13--14 & Control Systems & Open/closed-loop, PID tuning, LabVIEW PID VI & 14--16 \\
-15--16 & Integration \& Exams & Complete system design, lab practicals & All \\
+5 & Statistics \& Sensors & Experimental data analysis, sensor/actuator selection & 5--6 \\
+6--7 & Signals \& Digitization & ADC specs, aliasing, SNR, anti-alias filters & 7--8, 11 \\
+8--9 & Frequency Analysis & Fourier series, FFT, windowing, PSD & 9--10 \\
+10--11 & Filtering & Analog (RC, Sallen-Key), digital (FIR/IIR), LabVIEW filters & 12--13 \\
+12 & Signal Conditioning & Amplifiers, INA, circuits, high-power switches, PWM & 14--16 \\
+12--13 & Debugging & Bottom-up methodology, signal walk, integration protocol & 17 \\
+13--14 & Control Systems & Open/closed-loop, PID tuning, LabVIEW PID VI & 18--20 \\
+15 & Engineering Science & Heat transfer, fluid power (if applicable) & 21--22 \\
+16 & Integration \& Exams & Complete system design, lab practicals & All \\
 \bottomrule
 \end{tabularx}
 \end{table}
