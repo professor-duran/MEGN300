@@ -94,6 +94,10 @@ Three documents work together:
 \textbf{The Master Reference Document has a LabVIEW appendix with a Signal Walk Debugging Protocol.} Before every lab, check the appendix for the DAQmx programming pattern, essential VIs, and the ``Common Mistakes'' checklist. Most LabVIEW grading deductions come from the six mistakes listed there.
 \end{protip}
 
+\begin{warnbox}
+\textbf{Read the AI Use Policy in the MRD before your first assignment.} The Master Reference Document contains a ``Modern Tools and AI Use Policy'' chapter with a Green/Yellow/Red traffic-light framework. AI tools are permitted for learning (Green) and with disclosure for scaffolding (Yellow), but submitting AI-generated work as your own is an academic integrity violation (Red). Apply the Mastery Test: can you do it without the AI?
+\end{warnbox}
+
 %=============================================================================
 \section{Module 1: Measurement Fundamentals and Static Calibration}
 %=============================================================================
@@ -106,8 +110,18 @@ Three documents work together:
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 1}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~1 (Fundamentals of Measurement Theory) and Chapter~2 (Static Measurements).
+\item Review the ``First Week Survival Guide'' in the MRD front matter.
+\item Watch the LabVIEW DAQmx tutorial video on Canvas.
+\item Familiarize yourself with the lab bench: locate the NI~USB-6001, bench supply, DMM, and component drawers.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{faqbox}[Q: What is the difference between accuracy and precision?]
-\textbf{Accuracy} is closeness to the true value (affected by systematic/bias errors). \textbf{Precision} is closeness of repeated measurements to each other (affected by random errors). A sensor can be precise but inaccurate (all readings cluster together but off-center). Calibration fixes accuracy. Averaging improves precision. You need both. The Master Reference Document, Chapter~1, has the dartboard analogy and worked examples.
+\textbf{Accuracy} is closeness to the true value (affected by systematic/bias errors). \textbf{Precision} is closeness of repeated measurements to each other (affected by random errors). A sensor can be precise but inaccurate (all readings cluster together but off-center). Calibration fixes accuracy. Averaging improves precision. You need both. The Master Reference Document, Chapter~1 (Fundamentals of Measurement Theory), has the dartboard analogy and worked examples.
 \end{faqbox}
 
 \begin{warnbox}
@@ -119,7 +133,7 @@ When writing your calibration report, always report: the calibration equation (w
 \end{tipbox}
 
 \begin{protip}
-\textbf{Learn the Wheatstone bridge now; it appears everywhere.} Strain gauges, RTDs, pressure sensors, and load cells all use bridge circuits. The Master Reference Document, Chapter~2, walks through quarter-, half-, and full-bridge configurations with the RTD ThermoRig example and self-heating calculations.
+\textbf{Learn the Wheatstone bridge now; it appears everywhere.} Strain gauges, RTDs, pressure sensors, and load cells all use bridge circuits. The Master Reference Document, Chapter~2 (Static Measurements), walks through quarter-, half-, and full-bridge configurations with the RTD ThermoRig example and self-heating calculations.
 \end{protip}
 
 %=============================================================================
@@ -134,8 +148,17 @@ When writing your calibration report, always report: the calibration equation (w
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 2}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~3 (Dynamic Measurements). Focus on the step response figure and the Rule of Five.
+\item Review the $5\tau$ derivation: $e^{-5} = 0.0067$, so $y(5\tau)/y_\infty = 99.3\%$.
+\item Prepare to measure a thermocouple step response in lab: boiling water, ice water, and a stopwatch.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{faqbox}[Q: How do I measure the time constant of a sensor?]
-Apply a step change (e.g., plunge a thermocouple from room temperature into boiling water). Record the output vs.\ time. The time constant $\tau$ is the time to reach 63.2\% of the final value. Or, plot $\ln(1 - y/y_\infty)$ vs.\ $t$; the slope is $-1/\tau$. See the Master Reference Document, Chapter~3, for the full procedure and the ThermoRig worked example.
+Apply a step change (e.g., plunge a thermocouple from room temperature into boiling water). Record the output vs.\ time. The time constant $\tau$ is the time to reach 63.2\% of the final value. Or, plot $\ln(1 - y/y_\infty)$ vs.\ $t$; the slope is $-1/\tau$. See the Master Reference Document, Chapter~3 (Dynamic Measurements), for the full procedure and the ThermoRig worked example.
 \end{faqbox}
 
 \begin{warnbox}
@@ -158,16 +181,33 @@ Apply a step change (e.g., plunge a thermocouple from room temperature into boil
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 3}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~4 (Error Analysis and Uncertainty).
+\item Review the RSS propagation formula and work through the ThermoRig heat flux example.
+\item Bring a calculator to lab; you will compute uncertainty in real time.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{faqbox}[Q: When do I use $n$ vs.\ $n-1$ in the standard deviation?]
 Use $n-1$ (Bessel's correction) for the \textbf{sample} standard deviation when your measurements are a sample of a larger population (this is almost always the case in MEGN~300). Use $n$ only when you have measured the \emph{entire} population.
 \end{faqbox}
 
 \begin{warnbox}
-\textbf{You cannot average away systematic error.} If your instrument has a 2\,\textdegree{}C calibration offset, averaging 1000 readings gives you a very precise number that is still 2\,\textdegree{}C wrong. Calibrate first, then average. The Master Reference Document, Chapter~4, has a warning box dedicated to this.
+\textbf{You cannot average away systematic error.} If your instrument has a 2\,\textdegree{}C calibration offset, averaging 1000 readings gives you a very precise number that is still 2\,\textdegree{}C wrong. Calibrate first, then average. The Master Reference Document, Chapter~4 (Error Analysis), has a warning box dedicated to this.
 \end{warnbox}
 
+\begin{faqbox}[Q: What is the RSS uncertainty propagation formula?]
+For a result $f(x_1, x_2, \ldots, x_n)$ with independent input uncertainties $u_{x_i}$:
+\[
+u_f = \sqrt{\left(\frac{\partial f}{\partial x_1}\right)^2 u_{x_1}^2 + \left(\frac{\partial f}{\partial x_2}\right)^2 u_{x_2}^2 + \cdots + \left(\frac{\partial f}{\partial x_n}\right)^2 u_{x_n}^2}
+\]
+Each $\partial f / \partial x_i$ is the sensitivity coefficient. The largest term dominates the total.
+\end{faqbox}
+
 \begin{protip}
-\textbf{After propagating uncertainty, identify the dominant contributor.} In the RSS formula, the term with the largest partial derivative times its uncertainty dominates the total. Improving that single measurement improves the overall result more than improving all others combined. The ThermoRig heat flux example in Chapter~4 shows how thickness ($L$) dominates even though it seems like the simplest measurement.
+\textbf{After propagating uncertainty, identify the dominant contributor.} In the RSS formula, the term with the largest partial derivative times its uncertainty dominates the total. Improving that single measurement improves the overall result more than improving all others combined. The ThermoRig heat flux example in Chapter~4 (Error Analysis) shows how thickness ($L$) dominates even though it seems like the simplest measurement.
 \end{protip}
 
 %=============================================================================
@@ -182,8 +222,17 @@ Use $n-1$ (Bessel's correction) for the \textbf{sample} standard deviation when 
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 4}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~7 (Analog vs.\ Digital Systems) and Chapter~11 (DSP Fundamentals).
+\item Calculate the LSB and temperature resolution for the NI~USB-6001 with your sensor before lab.
+\item Prepare an RC anti-alias filter: you will need a resistor and capacitor from the lab stock.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{warnbox}
-\textbf{Aliasing is the single most common data acquisition mistake.} If you sample at 1\,kS/s without an anti-alias filter, any noise above 500\,Hz folds into your measurement as a false lower-frequency signal. The NI~USB-6001 has \textbf{no built-in anti-alias filter}; you must add an external RC or active filter before the analog input. The Master Reference Document, Chapter~11, has the alias frequency formula and the ThermoRig switching-regulator example.
+\textbf{Aliasing is the single most common data acquisition mistake.} If you sample at 1\,kS/s without an anti-alias filter, any noise above 500\,Hz folds into your measurement as a false lower-frequency signal. The NI~USB-6001 has \textbf{no built-in anti-alias filter}; you must add an external RC or active filter before the analog input. The Master Reference Document, Chapter~11 (Digital Signal Processing), has the alias frequency formula and the ThermoRig switching-regulator example.
 \end{warnbox}
 
 \begin{tipbox}
@@ -191,7 +240,11 @@ Use $f_s \geq 10 \times f_{\max}$ in practice (not just $2\times$). This gives y
 \end{tipbox}
 
 \begin{faqbox}[Q: How many bits do I actually need?]
-Calculate the LSB: $\text{LSB} = V_{\text{range}} / 2^n$. Compare this to your sensor's output change per unit measurand. If your thermocouple produces 40\,$\mu$V/\textdegree{}C and your ADC LSB is 2.44\,mV (12-bit, 10\,V range), your temperature resolution is $2.44\,\text{mV} / 0.040\,\text{mV/\textdegree{}C} = 61$\,\textdegree{}C. That is useless. You need amplification (Chapter~15 of the MRD) to bring the signal into the ADC's usable range.
+Calculate the LSB: $\text{LSB} = V_{\text{range}} / 2^n$. Compare this to your sensor's output change per unit measurand. If your thermocouple produces 40\,$\mu$V/\textdegree{}C and your ADC LSB is 2.44\,mV (12-bit, 10\,V range), your temperature resolution is:
+\[
+\text{Temperature resolution} = \frac{\text{LSB}}{\text{Sensitivity}} = \frac{2.44\,\text{mV}}{0.040\,\text{mV/\textdegree{}C}} = 61\,\text{\textdegree{}C}
+\]
+That is useless. You need amplification (Chapter~15 (Amplifiers) of the MRD) to bring the signal into the ADC's usable range. With a gain of 100, the effective LSB becomes 24.4\,$\mu$V, giving 0.61\,\textdegree{}C resolution.
 \end{faqbox}
 
 %=============================================================================
@@ -206,8 +259,17 @@ Calculate the LSB: $\text{LSB} = V_{\text{range}} / 2^n$. Compare this to your s
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 5}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~9 (Fourier Series) and Chapter~10 (FFT).
+\item Open the LabVIEW FFT Power Spectrum VI example on Canvas and run it with a known signal.
+\item Know your three decisions before lab: $f_s$, $N$, and window type.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{faqbox}[Q: How do I choose FFT parameters in LabVIEW?]
-Three decisions: (1) \textbf{Sampling rate} $f_s$: at least $2.56 \times$ the highest frequency of interest (the ``2.56 rule'' provides anti-alias margin). (2) \textbf{Number of points} $N$: determines frequency resolution $\Delta f = f_s / N$. Use a power of 2 for computational efficiency. (3) \textbf{Window}: use Hanning for general analysis; flat-top for accurate amplitude of known tones; rectangular only if the signal is perfectly periodic in the window.
+Three decisions: (1) \textbf{Sampling rate} $f_s$: at least $2.56 \times$ the highest frequency of interest (the ``2.56 rule'': the factor 2.56 provides a 28\% guard band above Nyquist for anti-alias filter roll-off). (2) \textbf{Number of points} $N$: determines frequency resolution $\Delta f = f_s / N$. Use a power of 2 for computational efficiency. (3) \textbf{Window}: use Hanning for general analysis; flat-top for accurate amplitude of known tones; rectangular only if the signal is perfectly periodic in the window.
 \end{faqbox}
 
 \begin{warnbox}
@@ -230,8 +292,17 @@ Three decisions: (1) \textbf{Sampling rate} $f_s$: at least $2.56 \times$ the hi
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 6}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~12 (Analog Filter Design) and Chapter~13 (Digital Filter Design).
+\item Calculate an RC filter cutoff ($f_c = 1/2\pi RC$) for your anti-alias requirement.
+\item Locate the Sallen-Key op-amp circuit in the MRD; you may build one in lab.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{faqbox}[Q: Which filter type should I use?]
-\textbf{Butterworth} is the default. Use it unless you have a specific reason not to. \textbf{Chebyshev}: when you need a steeper cutoff with fewer components (accept passband ripple). \textbf{Bessel}: when preserving the shape of a pulse or transient is critical (linear phase). The Master Reference Document, Chapters~12--13, has design procedures for both analog and digital implementations.
+\textbf{Butterworth} is the default because it has a maximally flat magnitude response in the passband (no ripple). Use it unless you have a specific reason not to. \textbf{Chebyshev}: when you need a steeper cutoff with fewer components (accept passband ripple). \textbf{Bessel}: when preserving the shape of a pulse or transient is critical (linear phase). The Master Reference Document, Chapters~12--13, has design procedures for both analog and digital implementations.
 \end{faqbox}
 
 \begin{warnbox}
@@ -254,8 +325,17 @@ Three decisions: (1) \textbf{Sampling rate} $f_s$: at least $2.56 \times$ the hi
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 7}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~15 (Amplifiers). Pay close attention to Section~15.7 (``The Brutal Realities'').
+\item Calculate the gain you need: $G = V_{\text{ADC range}} / V_{\text{sensor max}}$.
+\item Locate the INA128 and TL072 op-amps in the lab component drawers.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{faqbox}[Q: Why can't I just connect the sensor directly to the ADC?]
-Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V; the ADC needs volts). (2) The sensor impedance is too high (the ADC loads it, changing the reading). (3) Noise rides on the signal (the amplifier rejects common-mode noise). The Master Reference Document, Chapter~15, covers the complete signal conditioning chain from bridge circuit through instrumentation amplifier to ADC.
+Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V; the ADC needs volts). (2) The sensor impedance is too high (the ADC loads it, changing the reading). (3) Noise rides on the signal (the amplifier rejects common-mode noise). The Master Reference Document, Chapter~15 (Amplifiers), covers the complete signal conditioning chain from bridge circuit through instrumentation amplifier to ADC.
 \end{faqbox}
 
 \begin{warnbox}
@@ -263,7 +343,7 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{warnbox}
 
 \begin{protip}
-\textbf{The INA128 is your best friend for bridge circuits.} It has $>$10\,G$\Omega$ balanced input impedance, $>$100\,dB CMRR, and gain set by a single resistor ($G = 1 + 50\text{k}/R_G$). Whenever you measure a Wheatstone bridge (strain gauge, RTD, load cell), reach for an instrumentation amplifier first.
+\textbf{The INA128 is your best friend for bridge circuits.} It has $>$10\,G$\Omega$ balanced input impedance, $>$100\,dB CMRR, and gain set by a single resistor ($G = 1 + 50\,\text{k}\Omega/R_G$. For $G=100$: $R_G = 50\,\text{k}\Omega/99 = 505\,\Omega$ (use 510\,$\Omega$ standard)). Whenever you measure a Wheatstone bridge (strain gauge, RTD, load cell), reach for an instrumentation amplifier first.
 \end{protip}
 
 %=============================================================================
@@ -278,8 +358,17 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 8}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~16 (High-Power Devices and Switches).
+\item Identify your actuator type and locate the appropriate driver (MOSFET, SSR, or H-bridge) in the lab stock.
+\item Always have a 1N5819 Schottky diode ready for any inductive load.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{warnbox}
-\textbf{Inductive loads (motors, solenoids, relays) will destroy your MOSFET without a flyback diode.} When you switch off an inductive load, the collapsing magnetic field generates a voltage spike of hundreds or thousands of volts. A 1N5819 Schottky diode across the load (cathode to positive) costs \$0.10 and prevents \$5--\$50 of damage. See the Master Reference Document, Chapter~16, for the spike calculation and circuit diagram.
+\textbf{Inductive loads (motors, solenoids, relays) will destroy your MOSFET without a flyback diode.} When you switch off an inductive load, the collapsing magnetic field generates a voltage spike of hundreds or thousands of volts. A 1N5819 Schottky diode across the load (cathode to positive) costs \$0.10 and prevents \$5--\$50 of damage. See the Master Reference Document, Chapter~16 (High-Power Devices), for the spike calculation and circuit diagram.
 \end{warnbox}
 
 \begin{tipbox}
@@ -299,7 +388,7 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{priorities}
 
 \begin{faqbox}[Q: How do I choose between a thermocouple, RTD, and thermistor?]
-\textbf{Thermocouple}: widest range ($-200$ to $1250$\,\textdegree{}C for Type K), fastest response, self-generating (no excitation needed), but lowest output ($\mu$V-level, needs amplifier). \textbf{RTD (Pt100)}: best accuracy ($\pm$0.1\,\textdegree{}C), excellent linearity, but slower and requires bridge excitation. \textbf{Thermistor}: highest sensitivity (10$\times$ TC), but highly nonlinear and limited range ($-40$ to $125$\,\textdegree{}C). Pick based on your range and accuracy requirements first, then consider signal conditioning complexity. Chapter~6 of the MRD has the full selection table.
+\textbf{Thermocouple}: widest range ($-200$ to $1250$\,\textdegree{}C for Type K), fastest response, self-generating (no excitation needed), but lowest output ($\mu$V-level, needs amplifier). \textbf{RTD (Pt100)}: best accuracy ($\pm$0.1\,\textdegree{}C), excellent linearity, but slower and requires bridge excitation. \textbf{Thermistor}: highest sensitivity (10$\times$ TC), but highly nonlinear and limited range ($-40$ to $125$\,\textdegree{}C). Pick based on your range and accuracy requirements first, then consider signal conditioning complexity. Chapter~6 (Sensors and Actuators) of the MRD has the full selection table.
 \end{faqbox}
 
 \begin{warnbox}
@@ -307,7 +396,7 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{warnbox}
 
 \begin{protip}
-\textbf{Check sensor output compatibility before ordering.} Verify three things: (1) the output voltage range fits your ADC input range (a 10\,V sensor on a 3.3\,V ADC will saturate and may damage the ADC), (2) the output impedance is compatible ($>$100:1 ratio with your ADC input impedance), and (3) the response time is fast enough for your signal ($\tau_{\text{sensor}} < f_{\text{signal}}/5$). Chapter~6 has the sensor selection decision framework.
+\textbf{Check sensor output compatibility before ordering.} Verify three things: (1) the output voltage range fits your ADC input range (a 10\,V sensor on a 3.3\,V ADC will saturate and may damage the ADC), (2) the output impedance is compatible ($>$100:1 ratio with your ADC input impedance), and (3) the response time is fast enough for your signal ($\tau_{\text{sensor}} < f_{\text{signal}}/5$). Chapter~6 (Sensors and Actuators) has the sensor selection decision framework.
 \end{protip}
 
 %=============================================================================
@@ -322,8 +411,12 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{enumerate}
 \end{priorities}
 
+\begin{warnbox}
+\textbf{This module is project-dependent.} Only read this section if your project involves pumps, valves, flow measurement, or hydraulic/pneumatic actuation.
+\end{warnbox}
+
 \begin{faqbox}[Q: My project has a pump or flow control. Where do I start?]
-Start with Chapter~22 (Fluid Power) of the MRD. Determine your flow rate and pressure requirements. For precise metering of small flows ($<$5\,L/min), use a peristaltic or gear pump. For high-flow cooling or mixing ($>$10\,L/min), use a centrifugal pump. For pneumatic actuation, you need an FRL (filter-regulator-lubricator) unit upstream of any pneumatic cylinder or valve.
+Start with Chapter~22 (Fluid Power Fundamentals) of the MRD. Determine your flow rate and pressure requirements. For precise metering of small flows ($<$5\,L/min), use a peristaltic or gear pump. For high-flow cooling or mixing ($>$10\,L/min), use a centrifugal pump. For pneumatic actuation, you need an FRL (filter-regulator-lubricator) unit upstream of any pneumatic cylinder or valve.
 \end{faqbox}
 
 \begin{warnbox}
@@ -347,7 +440,7 @@ Start with Chapter~22 (Fluid Power) of the MRD. Determine your flow rate and pre
 \end{priorities}
 
 \begin{faqbox}[Q: I wired everything together and nothing works. Where do I start?]
-Disconnect everything. Go back to Level~1 of the debugging pyramid. Verify each component in isolation: does the sensor output the right voltage? Does the amplifier have the correct gain with a signal generator input? Does the MCU blink an LED? Does the motor spin with a direct battery connection? Only after every component passes individually do you begin reconnecting them, one interface at a time, testing after each connection. This feels slower, but it is 5--10$\times$ faster than staring at a fully assembled system that does not work. See Chapter~17 of the MRD for the full methodology.
+Disconnect everything. Go back to Level~1 of the debugging pyramid. Verify each component in isolation: does the sensor output the right voltage? Does the amplifier have the correct gain with a signal generator input? Does the MCU blink an LED? Does the motor spin with a direct battery connection? Only after every component passes individually do you begin reconnecting them, one interface at a time, testing after each connection. This feels slower, but it is 5--10$\times$ faster than staring at a fully assembled system that does not work. See Chapter~17 (Systematic Debugging) of the MRD for the full methodology.
 \end{faqbox}
 
 \begin{warnbox}
@@ -355,7 +448,7 @@ Disconnect everything. Go back to Level~1 of the debugging pyramid. Verify each 
 \end{warnbox}
 
 \begin{tipbox}
-\textbf{The Signal Walk is your most powerful debugging technique.} Start at the sensor with an oscilloscope probe. Measure the output. Move one stage downstream (after the divider, after the amplifier, at the ADC input). At each point, compare measured vs. expected. The first point where they diverge localizes the fault to that stage. Five minutes of signal walking saves hours of guessing.
+\textbf{The Signal Walk is your most powerful debugging technique.} Start at the sensor with an oscilloscope probe. Measure the output. Move one stage downstream (after the divider, after the amplifier, at the ADC input). At each point, compare measured vs. expected. The first point where they diverge localizes the fault to that stage. For example: measure thermocouple output ($\sim$1\,mV), then INA output ($\sim$100\,mV at $G=100$), then filter output ($\sim$100\,mV, less noise), then ADC input pin. The first point where measured $\neq$ expected localizes the fault. Five minutes of signal walking saves hours of guessing.
 \end{tipbox}
 
 \begin{protip}
@@ -363,7 +456,7 @@ Disconnect everything. Go back to Level~1 of the debugging pyramid. Verify each 
 \end{protip}
 
 \begin{faqbox}[Q: My sensor readings are fine until the motor turns on. Then everything gets noisy.]
-Classic ground loop or EMI problem. The motor's switching current is coupling into the sensor signal path. Three fixes, in order of effectiveness: (1)~Star grounding: separate ground wires for sensor and motor circuits, joined at one point near the supply. (2)~Add a low-pass filter at the amplifier input to reject high-frequency motor noise. (3)~Route sensor wires physically away from motor power wires and use twisted-pair for the sensor leads. Chapter~17 covers the full integration debugging protocol.
+Classic ground loop or EMI problem. The motor's switching current is coupling into the sensor signal path. Three fixes, in order of effectiveness: (1)~Star grounding: separate ground wires for sensor and motor circuits, joined at one point near the supply. (2)~Add a low-pass filter at the amplifier input to reject high-frequency motor noise. (3)~Route sensor wires physically away from motor power wires and use twisted-pair for the sensor leads. Chapter~17 (Systematic Debugging) covers the full integration debugging protocol.
 \end{faqbox}
 
 %=============================================================================
@@ -378,16 +471,25 @@ Classic ground loop or EMI problem. The motor's switching current is coupling in
 \end{enumerate}
 \end{priorities}
 
+\begin{tcolorbox}[colback=minesblue!3, colframe=minesblue!40, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt, fonttitle=\small\bfseries\color{minesblue}, title={Before You Start: Module 9}]
+\small
+\begin{enumerate}[nosep,leftmargin=*]
+\item Read MRD Chapter~18 (Open-Loop), Chapter~19 (Closed-Loop), and Chapter~20 (PID Control).
+\item Open the LabVIEW PID VI example on Canvas and familiarize yourself with the gain inputs.
+\item Review the manual tuning sequence: P first, then I, then D.
+\end{enumerate}
+\end{tcolorbox}
+
 \begin{faqbox}[Q: My P-only controller has a steady-state offset. Why?]
-P-only control requires $e > 0$ to produce $u > 0$. If $e = 0$, the controller output is zero, and the process drifts. The system settles where the disturbance (heat loss, friction) exactly balances the control effort at some nonzero error. Only integral (I) action can drive the error to zero, because the integral accumulates error over time and keeps increasing the output until $e = 0$. See the Master Reference Document, Chapter~20, for the detailed explanation.
+P-only control requires $e > 0$ to produce $u > 0$. If $e = 0$, the controller output is zero, and the process drifts. The system settles where the disturbance (heat loss, friction) exactly balances the control effort at some nonzero error. Only integral (I) action can drive the error to zero, because the integral accumulates error over time and keeps increasing the output until $e = 0$. See the Master Reference Document, Chapter~20 (PID Control), for the detailed explanation.
 \end{faqbox}
 
 \begin{warnbox}
-\textbf{Integral windup is the \#1 PID debugging headache.} If your system overshoots massively after a large setpoint change, the integral term has ``wound up'' while the actuator was saturated. Enable anti-windup: stop accumulating the integral when the output hits its limit. The Master Reference Document, Chapter~20, has the discrete-time pseudocode with anti-windup clamping.
+\textbf{Integral windup is the \#1 PID debugging headache.} If your system overshoots massively after a large setpoint change, the integral term has ``wound up'' while the actuator was saturated. Enable anti-windup: stop accumulating the integral when the output hits its limit. The Master Reference Document, Chapter~20 (PID Control), has the discrete-time pseudocode with anti-windup clamping.
 \end{warnbox}
 
 \begin{protip}
-\textbf{Manual PID tuning sequence}: (1)~Start P-only; increase $K_p$ until the response is fast with $\sim$20\% overshoot. (2)~Add I; start $K_i$ small, increase until the steady-state error vanishes. If overshoot grows, reduce $K_i$. (3)~Add D; start $K_d$ small, increase to reduce overshoot. If the output becomes noisy, $K_d$ is too high. Tune $K_p$ first, then $K_i$, then $K_d$; never all three at once.
+\textbf{Manual PID tuning sequence}: (1)~Start P-only; increase $K_p$ until the response is fast with $\sim$20\% overshoot. (2)~Add I; start $K_i$ small, increase until the steady-state error vanishes. If overshoot grows, reduce $K_i$. (3)~Add D; start $K_d$ small, increase to reduce overshoot. If the output becomes noisy, $K_d$ is too high. Tune $K_p$ first, then $K_i$, then $K_d$; never all three at once. If the output becomes noisy when you add D, reduce $K_d$ or add a derivative filter (the LabVIEW PID VI has parameter $N$; set to 10--20).
 \end{protip}
 
 \begin{faqbox}[Q: My PID output is noisy and jerky. What is wrong?]
@@ -403,7 +505,7 @@ You forgot to wire \texttt{DAQmx Clear Task} outside your While Loop. When LabVI
 \end{faqbox}
 
 \begin{warnbox}
-\textbf{Six LabVIEW mistakes that cost 80\% of grading deductions} (from the Master Reference Document LabVIEW appendix):
+\textbf{Six LabVIEW mistakes that cost 80\% of grading deductions} (definitive list; see MRD LabVIEW appendix for detailed explanations):
 \begin{enumerate}[nosep,leftmargin=*]
 \item No loop timing (Wait function missing; loop runs at max speed).
 \item DAQ task not cleared (``resource reserved'' on next run).
@@ -454,6 +556,22 @@ Design Challenges are timed, in-class engineering problems. The key is structure
 The Quick Reference Tables in the Master Reference Document consolidate all of these.
 \end{protip}
 
+\begin{faqbox}[Quick Reference: Common Component Values]
+\small
+\begin{tabularx}{\textwidth}{@{} l X @{}}
+\toprule
+\textbf{Component} & \textbf{Key Values} \\
+\midrule
+Type K thermocouple & Sensitivity: $\sim$41\,$\mu$V/\textdegree{}C; Range: $-200$ to $1250$\,\textdegree{}C \\
+Pt100 RTD & 100\,$\Omega$ at 0\,\textdegree{}C; TCR: 0.385\,$\Omega$/\textdegree{}C \\
+NI USB-6001 & $\pm$10\,V input; 14-bit; 20\,kS/s; 8 AI (4 diff); no built-in anti-alias filter \\
+INA128 & $G = 1 + 50\text{k}\Omega/R_G$; CMRR $>$ 100\,dB; Input $Z > 10$\,G$\Omega$ \\
+IRLZ44N MOSFET & Logic-level gate; $R_{DS(on)} = 0.022\,\Omega$; $I_D = 47$\,A; $V_{DS} = 55$\,V \\
+1N5819 Schottky & $V_f = 0.3$\,V; $I_{\max} = 1$\,A; fast recovery for flyback protection \\
+\bottomrule
+\end{tabularx}
+\end{faqbox}
+
 %=============================================================================
 \section{Lab Practical Exam Preparation}
 %=============================================================================
@@ -465,6 +583,22 @@ Lab practicals test both theory and hands-on skills. You may be asked to: wire a
 \begin{tipbox}
 \textbf{Practice the physical skills.} Reading a resistor color code, wiring a Wheatstone bridge on a breadboard, connecting the NI~DAQ terminals, and using a multimeter and bench power supply are all skills that improve dramatically with practice. Do not wait until the exam to discover you cannot remember which DAQ terminal is AI0+.
 \end{tipbox}
+
+\begin{warnbox}
+\textbf{Common lab practical mistakes (avoid these):}
+\begin{enumerate}[nosep,leftmargin=*]
+\item Wiring the DMM current jacks across a voltage source (blows the fuse).
+\item Forgetting the DAQmx Clear Task (``resource reserved'' on the next run).
+\item Using RSE mode instead of Differential (doubles the noise).
+\item No anti-alias filter before the ADC (aliased data looks correct until you check the FFT).
+\item Connecting the oscilloscope ground clip to a non-ground node (creates a short through earth ground).
+\item Setting PID gains without first running P-only to understand the process response.
+\end{enumerate}
+\end{warnbox}
+
+\begin{protip}
+\textbf{Specific skills to practice:} (1)~Wire a non-inverting amplifier with a specified gain in under 5 minutes. (2)~Configure a DAQmx Read VI with correct channel, terminal config, and sample rate. (3)~Set up a bench supply with voltage and current limits. (4)~Measure V, I, and R with a DMM (current in series, voltage in parallel). (5)~Identify RC filter cutoff by sweeping a signal generator and measuring the $-3$\,dB point.
+\end{protip}
 
 %=============================================================================
 \section{Quick Reference: Module Checklist}

@@ -18,6 +18,12 @@
 \usepackage{textcomp}
 \usepackage{multicol}
 \usepackage{titletoc}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,decorations.pathmorphing,patterns,fit,backgrounds}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{imakeidx}
+\makeindex[intoc,title=Index]
 
 \newcommand{\degC}{\ensuremath{{}^{\circ}\text{C}}}
 \newcommand{\degF}{\ensuremath{{}^{\circ}\text{F}}}
@@ -34,6 +40,12 @@
 \newtcolorbox{warningbox}[1][]{enhanced,breakable,colback=WarnOrange!8,colframe=WarnOrange,fonttitle=\bfseries\sffamily,title={#1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
 \newtcolorbox{tipbox}[1][]{enhanced,breakable,colback=AccentTeal!8,colframe=AccentTeal,fonttitle=\bfseries\sffamily,title={#1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
 \newtcolorbox{examplebox}[1][]{enhanced,breakable,colback=AccentTeal!5,colframe=AccentTeal!70!black,fonttitle=\bfseries\sffamily,title={\textsf{WE}~#1},boxrule=1pt,arc=3pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\definecolor{MasteryPurple}{HTML}{6A1B9A}
+\definecolor{IndustryGold}{HTML}{F57F17}
+\newtcolorbox{masterycheckbox}[1][]{enhanced,breakable,colback=MasteryPurple!5,colframe=MasteryPurple!80,fonttitle=\bfseries\sffamily,title={\textsf{\checkmark}~Mastery Diagnostic: #1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{advancedbox}[1][]{enhanced,breakable,colback=MinesSilver!8,colframe=MinesSilver!60,fonttitle=\bfseries\sffamily,title={\textsf{$\bigstar$ Advanced Topic:}~#1},boxrule=0.6pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{industrybox}[1][]{enhanced,breakable,colback=IndustryGold!8,colframe=IndustryGold!80!black,fonttitle=\bfseries\sffamily,title={\textsf{Industry Insight:}~#1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
 
 \titleformat{\chapter}[display]{\normalfont\huge\bfseries\sffamily\color{MinesBlue}}{\chaptertitlename\ \thechapter}{20pt}{\Huge}[\vspace{-0.5em}\textcolor{MinesBlue}{\rule{\textwidth}{1pt}}]
 \titleformat{\section}{\Large\bfseries\sffamily\color{MinesBlue}}{\thesection}{1em}{}
@@ -94,6 +106,9 @@ This reference document accompanies the MEGN~300 lecture modules and lab exercis
 \textbf{Part~IV: Control Systems} covers the fundamentals of open-loop and closed-loop control, culminating in the PID controller that is the workhorse of industrial automation.
 
 
+\subsection*{Generative AI Policy}
+This document includes a ``Modern Tools and AI Use Policy'' (page~\pageref{ch:aipolicy}) with a Green/Yellow/Red traffic-light framework governing the use of ChatGPT, Copilot, and other generative AI tools in MEGN~300. Read it before your first assignment.
+
 \subsection*{About the Requirements Mapping Boxes}
 Throughout this document, blue-bordered \textbf{Requirements Mapping} boxes show how theoretical concepts translate directly into testable ``shall'' statements in a System Design Requirements Document (SDRD). This is the language of professional engineering: every measurement specification, filter design, and control performance target should trace to a formal requirement that can be verified by test, analysis, inspection, or demonstration. When you encounter a Requirements Mapping box, it is showing you how to write the engineering specification for the concept just discussed.
 
@@ -109,14 +124,14 @@ Throughout this document, teal-bordered \textsf{WE} boxes follow a single instru
 \subsection*{ThermoRig Worked Example Roadmap}
 The ThermoRig boxes are not random examples; they form a cumulative narrative of a complete measurement and control system:
 \begin{itemize}[nosep,leftmargin=1.5em]
-\item \textbf{Chapter 2}: We calibrate the Type~K thermocouple at known temperature points.
-\item \textbf{Chapter 3}: We measure the thermocouple's time constant and evaluate its bandwidth.
-\item \textbf{Chapter 4}: We propagate uncertainty through the heat flux calculation.
-\item \textbf{Chapter 6}: We diagnose 60\,Hz noise from the heater cable and fix it.
-\item \textbf{Chapter 9}: We discover aliasing from the 500\,kHz switching regulator.
-\item \textbf{Chapter 12}: We design the complete signal conditioning chain (bridge, INA, filter, ADC).
-\item \textbf{Chapter 13}: We drive the heater through an SSR with time-proportional PWM.
-\item \textbf{Chapter 16}: We tune the PID controller using Ziegler-Nichols and manual refinement.
+\item \textbf{Chapter~\ref{ch:static}} (Static Measurements): We calibrate the Type~K thermocouple at known temperature points.
+\item \textbf{Chapter~\ref{ch:dynamic}} (Dynamic Measurements): We measure the thermocouple's time constant and evaluate its bandwidth.
+\item \textbf{Chapter~\ref{ch:error}} (Error Analysis): We propagate uncertainty through the heat flux calculation.
+\item \textbf{Chapter~\ref{ch:snr}} (Signal-to-Noise Ratio): We diagnose 60\,Hz noise from the heater cable and fix it.
+\item \textbf{Chapter~\ref{ch:dsp}} (Digital Signal Processing): We discover aliasing from the 500\,kHz switching regulator.
+\item \textbf{Chapter~\ref{ch:amplifiers}} (Amplifiers): We design the complete signal conditioning chain (bridge, INA, filter, ADC).
+\item \textbf{Chapter~\ref{ch:highpower}} (High-Power Devices): We drive the heater through an SSR with time-proportional PWM.
+\item \textbf{Chapter~\ref{ch:pid}} (PID Control): We tune the PID controller using Ziegler-Nichols and manual refinement.
 \end{itemize}
 Read the boxes in sequence for a complete case study of instrumentation system design.
 
@@ -149,24 +164,24 @@ Read the boxes in sequence for a complete case study of instrumentation system d
 \toprule
 \textbf{If you are\ldots} & \textbf{Your problem} & \textbf{Go to} \\
 \midrule
-Just starting the course & Need the big picture & Ch.~1 (Measurement Theory) \\
-Calibrating a sensor & Need procedure and equations & Ch.~2 (Static Measurements) \\
-Sensor too slow for your signal & Dynamic response limiting you & Ch.~3 (Dynamic Measurements) \\
-Reporting a measurement & Need uncertainty and CI & Ch.~4 (Error Analysis) \\
-Selecting a sensor or actuator & Need transduction principles & Ch.~6 (Sensors \& Actuators) \\
+Just starting the course & Need the big picture & Ch.~\ref{ch:measurement_theory}, p.\,\pageref{ch:measurement_theory} \\
+Calibrating a sensor & Need procedure and equations & Ch.~\ref{ch:static}, p.\,\pageref{ch:static} \\
+Sensor too slow for your signal & Dynamic response limiting you & Ch.~\ref{ch:dynamic}, p.\,\pageref{ch:dynamic} \\
+Reporting a measurement & Need uncertainty and CI & Ch.~\ref{ch:error}, p.\,\pageref{ch:error} \\
+Selecting a sensor or actuator & Need transduction principles & Ch.~\ref{ch:sensors}, p.\,\pageref{ch:sensors} \\
 Choosing ADC settings & Bits, sample rate, range & Ch.~7 (Analog vs.\ Digital) \\
-Seeing noisy data & Need to improve SNR & Ch.~8 (SNR) + Ch.~12 (Filters) \\
-Running an FFT in LabVIEW & Need parameters and windows & Ch.~10 (FFT) \\
-Getting aliased data & False frequencies appearing & Ch.~11 (DSP Fundamentals) \\
-Designing an anti-alias filter & Need cutoff and order & Ch.~12 (Analog Filters) \\
-Need circuit fundamentals & Ohm's Law, KVL/KCL, dividers & Ch.~14 (Circuit Fundamentals) \\
-Signal too small for the ADC & Need amplification & Ch.~15 (Amplifiers) \\
-Driving a motor or heater & Need switching circuits & Ch.~16 (High-Power Devices) \\
-System not working after assembly & Need debugging methodology & Ch.~17 (Debugging) \\
-Control loop oscillating & PID gain too high & Ch.~20 (PID), Sec.~20.3 \\
-PID has steady-state offset & Missing integral action & Ch.~20 (PID), Sec.~20.2 \\
-PID overshoots massively & Integral windup & Ch.~20 (PID), Sec.~20.4 \\
-Working with fluid systems & Flow, pressure, hydraulics & Ch.~22 (Fluid Power) \\
+Seeing noisy data & Need to improve SNR & Ch.~\ref{ch:snr}, p.\,\pageref{ch:snr} \\
+Running an FFT in LabVIEW & Need parameters and windows & Ch.~\ref{ch:fft}, p.\,\pageref{ch:fft} \\
+Getting aliased data & False frequencies appearing & Ch.~\ref{ch:dsp}, p.\,\pageref{ch:dsp} \\
+Designing an anti-alias filter & Need cutoff and order & Ch.~\ref{ch:analog_filters}, p.\,\pageref{ch:analog_filters} \\
+Need circuit fundamentals & Ohm's Law, KVL/KCL, dividers & Ch.~\ref{ch:circuits}, p.\,\pageref{ch:circuits} \\
+Signal too small for the ADC & Need amplification & Ch.~\ref{ch:amplifiers}, p.\,\pageref{ch:amplifiers} \\
+Driving a motor or heater & Need switching circuits & Ch.~\ref{ch:highpower}, p.\,\pageref{ch:highpower} \\
+System not working after assembly & Need debugging methodology & Ch.~\ref{ch:debugging}, p.\,\pageref{ch:debugging} \\
+Control loop oscillating & PID gain too high & Ch.~\ref{ch:pid}, p.\,\pageref{ch:pid} \\
+PID has steady-state offset & Missing integral action & Ch.~\ref{ch:pid}, p.\,\pageref{ch:pid} \\
+PID overshoots massively & Integral windup & Ch.~\ref{ch:pid}, p.\,\pageref{ch:pid} \\
+Working with fluid systems & Flow, pressure, hydraulics & Ch.~\ref{ch:fluid}, p.\,\pageref{ch:fluid} \\
 LabVIEW VI broken & DAQ or code error & Appendix (LabVIEW Reference) \\
 Preparing for lab practical & Need formula summary & Quick Ref tables \\
 \bottomrule
@@ -207,6 +222,67 @@ Preparing for lab practical & Need formula summary & Quick Ref tables \\
 \textbf{PID:} $u = K_p e + K_i \int e\,dt + K_d\, de/dt$
 \end{multicols}
 
+\newpage
+\chapter*{First Week Survival Guide}
+\addcontentsline{toc}{chapter}{First Week Survival Guide}
+
+If this is your first day in MEGN~300, start here:
+
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Read Chapter~1} (Fundamentals of Measurement Theory). Focus on the five-block system and sensor terminology.
+\item \textbf{Read Chapter~\ref{ch:debugging}} (Systematic Debugging). Read it \emph{before} you build your first circuit, not after it fails.
+\item \textbf{Read the LabVIEW appendix}. Familiarize yourself with DAQmx, essential VIs, and the ``Common Mistakes'' checklist.
+\item \textbf{Review the Laboratory Safety chapter} (page~\pageref{ch:safety}). You cannot enter the lab without understanding electrical safety.
+\item \textbf{Practice}: open LabVIEW, drop a DAQmx Read VI, wire it to a Waveform Chart in a While Loop with a 100\,ms Wait, and run it with the NI~USB-6001. If you can read one voltage channel, you are ready for Lab~1.
+\end{enumerate}
+
+\begin{warningbox}[Do Not Read This Document Cover to Cover]
+This is a 200+ page reference. Use the ``What Should I Be Reading Right Now?'' triage guide to find exactly the section you need for each module.
+\end{warningbox}
+
+\begin{tipbox}[Also Read Before Your First Lab]
+The ``Why Instrumentation Projects Fail'' chapter (page~\pageref{ch:projects_fail}) consolidates the ten most common failure modes from six years of MEGN~300 projects. Ten minutes of reading it now saves hours of debugging later.
+\end{tipbox}
+
+\newpage
+\chapter*{Modern Tools and AI Use Policy}
+\addcontentsline{toc}{chapter}{Modern Tools and AI Use Policy}
+\label{ch:aipolicy}
+
+Generative AI tools (ChatGPT, GitHub Copilot, Claude, Gemini) are part of the modern engineering toolkit. MEGN~300 uses a tiered policy distinguishing AI as a learning accelerator from AI as an integrity violation.
+
+\subsection*{The Traffic Light Framework}
+
+\begin{center}
+\begin{tikzpicture}[
+    zone/.style={rounded corners=4pt, minimum width=14cm, minimum height=2.0cm, text width=13.2cm, align=left, font=\small\sffamily},
+]
+\node[zone, fill=AccentTeal!15, draw=AccentTeal, thick] (green) at (0,0) {
+\textbf{\textsf{\color{AccentTeal}GREEN --- Always permitted:}}\\[2pt]
+Asking AI to explain a concept. Asking for help interpreting an error message. Using AI to review your writing for grammar after you have written it. Asking AI to explain a datasheet parameter. Using AI-generated study questions to test your own knowledge.
+};
+\node[zone, fill=WarnOrange!15, draw=WarnOrange, thick] (yellow) at (0,-2.8) {
+\textbf{\textsf{\color{WarnOrange}YELLOW --- Permitted with disclosure:}}\\[2pt]
+Using AI to generate a code skeleton that you then modify, understand, and can explain line by line. Asking AI for a starting approach to a design problem. Using AI to debug code you wrote, provided you understand the fix. Note ``AI-assisted'' on any deliverable where AI contributed substantive content.
+};
+\node[zone, fill=red!10, draw=red!70!black, thick] (red) at (0,-5.6) {
+\textbf{\textsf{\color{red!70!black}RED --- Never permitted (academic integrity violation):}}\\[2pt]
+Submitting AI-generated code, analysis, or writing as your own. Having AI write your lab report, uncertainty analysis, or design justification. Copying AI-generated LabVIEW block diagrams without understanding them. Using AI to generate data or plots you did not collect. Using AI during exams or practicals unless explicitly authorized.
+};
+\end{tikzpicture}
+\end{center}
+
+\subsection*{The Mastery Test}
+
+The boundary between Green/Yellow and Red: \textbf{Can you do it without the AI?} If AI helped you write a PID controller, you should be able to rebuild it from a blank VI, explaining every wire. If you cannot, the AI did the learning, not you. The lab practical exams test exactly this.
+
+\begin{warningbox}[AI-Generated Code Is Not Verified Code]
+AI tools produce plausible code that may contain subtle errors: wrong DAQmx configurations, incorrect filter coefficients, PID gain signs causing positive feedback, or timing assumptions mismatched to your hardware. \textbf{Never trust AI-generated code without testing against known inputs.} Treat AI output like a colleague's suggestion: verify independently before using it in a system controlling real hardware.
+\end{warningbox}
+
+\subsection*{Why This Policy Exists}
+In professional practice, you will use AI tools. But you will be the engineer of record who signs the drawing and certifies the test result. If you cannot verify what the AI produced, you cannot take responsibility for it. MEGN~300 builds the foundational skills that let you use AI as a \emph{force multiplier} rather than a \emph{crutch}. The difference matters when the system you designed controls a 400\,V battery thermal management system and a faulty sensor reading could trigger a thermal runaway event.
+
 \mainmatter
 
 % ################################################################
@@ -215,6 +291,7 @@ Preparing for lab practical & Need formula summary & Quick Ref tables \\
 % ================================================================
 \chapter*{Laboratory Safety and Equipment Care}
 \addcontentsline{toc}{chapter}{Laboratory Safety and Equipment Care}
+\label{ch:safety}
 
 \section*{Your Safety Is Non-Negotiable}
 The MEGN~300 laboratory contains electrical equipment capable of causing injury, fire, and equipment damage. Every student must understand and follow the safety practices in this chapter before working with any equipment. No measurement, no deadline, and no grade justifies taking a safety shortcut.
@@ -308,6 +385,7 @@ The oscilloscope's ground clip is connected directly to earth ground through the
 \part{Measurement Fundamentals}
 
 \chapter{Fundamentals of Measurement Theory}
+\label{ch:measurement_theory}\index{measurement!definition}\index{measurand}\index{error!systematic}\index{error!random}
 
 \section{What Is a Measurement?}
 A measurement is the process of assigning a numerical value to a physical quantity by comparing it to a standard. Every measurement has three components: (1) a \textbf{measurand} (the physical quantity being measured; e.g., temperature, pressure, strain), (2) a \textbf{sensor} (the device that converts the measurand into a signal; e.g., thermocouple, strain gauge, LVDT), and (3) a \textbf{measurement system} (the complete chain from sensor through signal conditioning, data acquisition, and display or storage).
@@ -331,8 +409,38 @@ Every measurement system, from a mercury thermometer to a satellite telemetry ch
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_measurement_system.png}
-\caption{The five-block generalized measurement system. Every instrumentation chain follows this architecture.}
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                  minimum width=2.6cm, minimum height=1.6cm, align=center,
+                  font=\small\sffamily\bfseries},
+    arr/.style={-{Stealth[length=3mm]}, thick, MinesBlue},
+    note/.style={font=\scriptsize\sffamily, text=MinesSilver, align=center}
+]
+\node[block] (sens) at (0,0) {Sensing\\Element};
+\node[block] (cond) at (3.4,0) {Signal\\Conditioning};
+\node[block] (daq) at (6.8,0) {Data\\Acquisition};
+\node[block] (proc) at (10.2,0) {Data\\Processing};
+\node[block] (pres) at (13.6,0) {Data\\Presentation};
+\draw[arr] (sens) -- (cond);
+\draw[arr] (cond) -- (daq);
+\draw[arr] (daq) -- (proc);
+\draw[arr] (proc) -- (pres);
+\node[note] at (sens.north) [above=4pt] {Thermocouple\\Strain gauge\\Photodiode};
+\node[note] at (cond.north) [above=4pt] {Amplifier\\Filter\\Bridge};
+\node[note] at (daq.north) [above=4pt] {ADC\\NI USB-6001\\Sample \& hold};
+\node[note] at (proc.north) [above=4pt] {Calibration\\FFT\\Statistics};
+\node[note] at (pres.north) [above=4pt] {Display\\File\\Network};
+\draw[arr] (-2.2,0) -- (sens.west) node[midway, above, font=\small\sffamily] {Measurand};
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center] at (1.7,-1.4) {Loading\\error};
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center] at (5.1,-1.4) {Noise\\offset};
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center] at (8.5,-1.4) {Quantization\\aliasing};
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center] at (11.9,-1.4) {Rounding\\algorithm};
+\draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (1.7,-1.0) -- (1.7,-0.2);
+\draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (5.1,-1.0) -- (5.1,-0.2);
+\draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (8.5,-1.0) -- (8.5,-0.2);
+\draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (11.9,-1.0) -- (11.9,-0.2);
+\end{tikzpicture}
+\caption{The five-block generalized measurement system with error sources (orange, dashed) entering at each interface. The total system uncertainty is the RSS combination of all contributions.}
 \label{fig:meas_system}
 \end{figure}
 
@@ -346,10 +454,33 @@ Each block in the measurement chain generates testable requirements:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_accuracy_precision.png}
-\caption{Accuracy vs.\ precision: the dartboard analogy. High precision with low accuracy (center) indicates systematic bias correctable by calibration. Low precision (right) requires averaging.}
+\begin{tikzpicture}[dot/.style={circle, fill=MinesBlue, inner sep=1.2pt}]
+\foreach \cx/\lbl/\desc in {0/{High Accuracy, High Precision}/Ideal, 4.5/{Low Accuracy, High Precision}/{Systematic bias}, 9/{Low Accuracy, Low Precision}/{Random scatter}} {
+    \begin{scope}[shift={(\cx,0)}]
+        \draw[MinesSilver, thick] (0,0) circle (1.5);
+        \draw[MinesSilver] (0,0) circle (1.0);
+        \draw[MinesSilver] (0,0) circle (0.5);
+        \fill[AccentTeal!30] (0,0) circle (0.2);
+        \draw[AccentTeal, thick] (0,0) circle (0.2);
+        \node[font=\scriptsize\sffamily\bfseries, text=MinesBlue, below, align=center] at (0,-1.8) {\lbl};
+        \node[font=\scriptsize\sffamily\itshape, text=MinesSilver, below] at (0,-2.4) {\desc};
+    \end{scope}
+}
+\foreach \x/\y in {0.05/0.08, -0.07/0.03, 0.02/-0.06, -0.04/-0.02, 0.06/0.01}
+    {\node[dot] at (\x,\y) {};}
+\foreach \x/\y in {4.9/0.55, 5.05/0.6, 4.95/0.48, 5.02/0.55, 4.88/0.52}
+    {\node[dot] at (\x,\y) {};}
+\foreach \x/\y in {9.6/0.7, 8.5/-0.4, 9.2/0.9, 8.8/0.3, 9.4/-0.8}
+    {\node[dot] at (\x,\y) {};}
+\end{tikzpicture}
+\caption{Accuracy vs.\ precision: the dartboard analogy. High precision with low accuracy (center) indicates systematic bias correctable by calibration. Low precision (right) requires averaging or a better sensor.}
 \label{fig:accuracy_precision}
 \end{figure}
+\index{accuracy}\index{precision}
+
+\begin{industrybox}{From Lab Bench to Electric Vehicle Test Cell}
+The five-block measurement architecture is not an academic abstraction. In DOE vehicle energy analysis programs and NREL fleet testing, engineers instrument vehicles with hundreds of channels following exactly this architecture: CAN bus sensors feeding signal conditioning boards, high-speed DAQ systems, real-time processing pipelines, and terabyte-scale storage. The measurement system design principles you learn in MEGN~300 scale directly from the lab bench to a 400\,V EV powertrain test cell or a grid-scale battery energy storage system. The error budgets, grounding practices, and signal conditioning chains are identical in concept; only the voltage levels, channel counts, and safety requirements change.
+\end{industrybox}
 
 \section{Sensor Classification}
 
@@ -589,6 +720,42 @@ Based on a decade of MEGN~300 lab experience, the most frequent measurement mist
 
 % ================================================================
 \chapter{Static Measurements}
+\label{ch:static}\index{calibration!static}\index{Wheatstone bridge}\index{sensitivity}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    res/.style={draw=MinesBlue, thick, fill=LightBG, minimum width=0.8cm, minimum height=0.4cm, font=\small\sffamily},
+]
+\coordinate (top) at (0,2.5);
+\coordinate (left) at (-2.5,0);
+\coordinate (right) at (2.5,0);
+\coordinate (bot) at (0,-2.5);
+\node[res, rotate=45] (R1) at (-1.25,1.25) {$R_1$};
+\node[res, rotate=-45] (R2) at (1.25,1.25) {$R_2$};
+\node[res, rotate=-45] (R3) at (-1.25,-1.25) {$R_3$};
+\node[res, rotate=45] (R4) at (1.25,-1.25) {$R_4$};
+\draw[MinesBlue, thick] (top) -- (R1.north east);
+\draw[MinesBlue, thick] (R1.south west) -- (left);
+\draw[MinesBlue, thick] (top) -- (R2.north west);
+\draw[MinesBlue, thick] (R2.south east) -- (right);
+\draw[MinesBlue, thick] (left) -- (R3.north west);
+\draw[MinesBlue, thick] (R3.south east) -- (bot);
+\draw[MinesBlue, thick] (right) -- (R4.north east);
+\draw[MinesBlue, thick] (R4.south west) -- (bot);
+\draw[-{Stealth[length=2mm]}, MinesBlue, thick] (0,3.2) -- (top);
+\node[font=\small\sffamily, MinesBlue] at (0,3.5) {$V_{\text{ex}}$};
+\draw[MinesBlue, thick] (bot) -- (0,-3.0);
+\node[font=\small\sffamily, MinesSilver] at (0,-3.3) {GND};
+\draw[MinesBlue, thick, dashed] (left) -- (-3.5,0);
+\draw[MinesBlue, thick, dashed] (right) -- (3.5,0);
+\node[font=\small\sffamily\bfseries, AccentTeal] at (4.5,0) {$V_{\text{out}}$};
+\node[font=\scriptsize\sffamily, AccentTeal] at (0,-0.3) {To INA};
+\node[font=\scriptsize\sffamily\bfseries, WarnOrange] at (2.2,-2.2) {Sensor ($R_4$)};
+\end{tikzpicture}
+\caption{Wheatstone bridge circuit. $R_4$ is the sensor element (e.g., RTD or strain gauge). When balanced ($R_1 R_4 = R_2 R_3$), $V_{\text{out}} = 0$. A change in sensor resistance produces a differential output proportional to $\Delta R/R$, measured by an instrumentation amplifier.}
+\label{fig:wheatstone}
+\end{figure}
 
 \section{Static Calibration}
 Static calibration determines the relationship between the sensor input (measurand) and output (signal) under steady-state conditions, where the measurand is not changing with time. The calibration process produces a \textbf{calibration curve}: a plot or equation mapping input to output.
@@ -674,8 +841,42 @@ When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\D
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_wheatstone_bridge.png}
-\caption{Wheatstone bridge configurations. Sensitivity doubles with each step: quarter-bridge $\Delta V \approx V_{ex}(\Delta R/R)/4$, half-bridge $\Delta V \approx V_{ex}(\Delta R/R)/2$, full-bridge $\Delta V \approx V_{ex}(\Delta R/R)$. Full bridge also provides complete temperature compensation.}
+\begin{tikzpicture}[
+    rbox/.style={draw=MinesBlue, thick, fill=LightBG, minimum width=0.6cm, minimum height=0.3cm, font=\tiny\sffamily},
+    act/.style={draw=WarnOrange, thick, fill=WarnOrange!15, minimum width=0.6cm, minimum height=0.3cm, font=\tiny\sffamily\bfseries},
+    lbl/.style={font=\small\sffamily\bfseries, MinesBlue}
+]
+\foreach \xoff/\title/\sens/\actlist in {
+    0/{Quarter Bridge}/{$\Delta V \approx V_{ex}\frac{\Delta R}{R}/4$}/{4},
+    5/{Half Bridge}/{$\Delta V \approx V_{ex}\frac{\Delta R}{R}/2$}/{3,4},
+    10/{Full Bridge}/{$\Delta V \approx V_{ex}\frac{\Delta R}{R}$}/{1,2,3,4}} {
+    \begin{scope}[shift={(\xoff,0)}]
+        \draw[MinesBlue, thick] (0,1.5) -- (-1.5,0) -- (0,-1.5) -- (1.5,0) -- cycle;
+        \node[rbox] (r1) at (-0.75,0.75) {$R_1$};
+        \node[rbox] (r2) at (0.75,0.75) {$R_2$};
+        \node[rbox] (r3) at (-0.75,-0.75) {$R_3$};
+        \node[rbox] (r4) at (0.75,-0.75) {$R_4$};
+        \node[lbl] at (0,2.0) {\title};
+        \node[font=\scriptsize\sffamily, AccentTeal] at (0,-2.0) {\sens};
+    \end{scope}
+}
+% Highlight active elements: quarter=R4, half=R3+R4, full=all
+\begin{scope}[shift={(0,0)}]
+    \node[act] at (0.75,-0.75) {$R_4$};
+\end{scope}
+\begin{scope}[shift={(5,0)}]
+    \node[act] at (-0.75,-0.75) {$R_3$};
+    \node[act] at (0.75,-0.75) {$R_4$};
+\end{scope}
+\begin{scope}[shift={(10,0)}]
+    \node[act] at (-0.75,0.75) {$R_1$};
+    \node[act] at (0.75,0.75) {$R_2$};
+    \node[act] at (-0.75,-0.75) {$R_3$};
+    \node[act] at (0.75,-0.75) {$R_4$};
+\end{scope}
+\node[font=\scriptsize\sffamily\itshape, WarnOrange] at (7.5,-2.6) {Orange = active sensor elements; white = fixed reference resistors};
+\end{tikzpicture}
+\caption{Wheatstone bridge configurations. Sensitivity doubles with each step: quarter-bridge ($1$ active element), half-bridge ($2$), full-bridge ($4$). Full bridge also provides complete temperature compensation.}
 \label{fig:bridge}
 \end{figure}
 
@@ -874,7 +1075,49 @@ The transfer standard must be more stable than accurate: it does not need to hol
 
 
 % ================================================================
+
+\begin{masterycheckbox}{Static Measurements}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Perform a multi-point static calibration: collect $\geq$5 points, fit a curve, compute maximum residual.
+\item Calculate sensitivity ($S = \partial y/\partial x$) from calibration data.
+\item Configure and balance a Wheatstone bridge for a quarter-bridge RTD measurement.
+\item Report a calibrated measurement with uncertainty, reference traceability, and valid range.
+\item Identify systematic errors in a calibration procedure and explain mitigation.
+\end{enumerate}
+\end{masterycheckbox}
+
 \chapter{Dynamic Measurements}
+\label{ch:dynamic}\index{time constant}\index{dynamic response!first-order}\index{bandwidth}\index{rise time}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6.5cm,
+    xlabel={Time ($t/\tau$)}, ylabel={Normalized Response $y/y_\infty$},
+    xmin=0, xmax=6, ymin=0, ymax=1.15,
+    grid=major, grid style={MinesSilver!40}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\small\sffamily, at={(0.98,0.5)}, anchor=east},
+]
+\addplot[domain=0:6, samples=200, thick, MinesBlue] {1 - exp(-x)};
+\addlegendentry{$y(t) = y_\infty(1 - e^{-t/\tau})$}
+\addplot[dashed, WarnOrange, thin] coordinates {(0,0.632) (1,0.632)};
+\addplot[dashed, WarnOrange, thin] coordinates {(1,0) (1,0.632)};
+\addplot[dashed, AccentTeal, thin] coordinates {(0,0.993) (5,0.993)};
+\addplot[dashed, AccentTeal, thin] coordinates {(5,0) (5,0.993)};
+\addplot[only marks, mark=*, mark size=2.5pt, WarnOrange] coordinates {(1,0.632)};
+\addplot[only marks, mark=*, mark size=2.5pt, AccentTeal] coordinates {(5,0.993)};
+\node[font=\scriptsize\sffamily, WarnOrange, anchor=west] at (axis cs:1.15,0.632) {63.2\% at $t = \tau$};
+\node[font=\scriptsize\sffamily, AccentTeal, anchor=west] at (axis cs:5.1,0.95) {99.3\% at $t = 5\tau$};
+\addplot[dashed, MinesSilver, thin] coordinates {(0,1) (6,1)};
+\node[font=\scriptsize\sffamily, MinesSilver, anchor=west] at (axis cs:5.5,1.04) {$y_\infty$};
+\end{axis}
+\end{tikzpicture}
+\caption{First-order step response showing the time constant ($\tau$) at 63.2\% and the Rule of Five ($5\tau$) settling criterion at 99.3\%. Wait at least $5\tau$ before recording a steady-state measurement.}
+\label{fig:step_response}
+\end{figure}
 
 \section{Why Dynamic Response Matters}
 Static calibration tells you the sensor's input-output relationship when the measurand is constant. But in real systems, measurands change with time: a pressure pulse, a temperature transient, a vibrating structure. A sensor's \textbf{dynamic response} determines how faithfully it tracks a time-varying input. A sensor that responds too slowly will attenuate rapid changes and introduce phase delay.
@@ -902,8 +1145,39 @@ The $-3$\,dB bandwidth (where $M$ drops to $K/\sqrt{2}$) occurs at $\omega = 1/\
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_first_order_response.png}
-\caption{First-order system step response (left) and Bode magnitude plot (right). The time constant $\tau$ determines both the settling time ($5\tau$ to 99\%) and the bandwidth ($f_{-3\text{dB}} = 1/2\pi\tau$).}
+\begin{tikzpicture}
+\begin{axis}[
+    name=step, width=6.5cm, height=5cm,
+    xlabel={$t/\tau$}, ylabel={$y/y_\infty$},
+    xmin=0, xmax=6, ymin=0, ymax=1.1,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Step Response},
+]
+\addplot[domain=0:6, samples=200, thick, MinesBlue] {1 - exp(-x)};
+\addplot[dashed, WarnOrange, thin] coordinates {(0,0.632) (1,0.632) (1,0)};
+\addplot[only marks, mark=*, mark size=2pt, WarnOrange] coordinates {(1,0.632)};
+\node[font=\tiny\sffamily, WarnOrange] at (axis cs:2.2,0.55) {$\tau$: 63.2\%};
+\addplot[dashed, MinesSilver, thin] coordinates {(0,1) (6,1)};
+\end{axis}
+\begin{axis}[
+    at={(step.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={$f/f_{-3\text{dB}}$}, ylabel={Magnitude (dB)},
+    xmode=log, xmin=0.01, xmax=100, ymin=-40, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Bode Magnitude},
+]
+\addplot[domain=0.01:100, samples=200, thick, MinesBlue] {-10*log10(1+x^2)};
+\addplot[dashed, WarnOrange, thin] coordinates {(0.01,-3) (1,-3) (1,-40)};
+\addplot[only marks, mark=*, mark size=2pt, WarnOrange] coordinates {(1,-3)};
+\node[font=\tiny\sffamily, WarnOrange] at (axis cs:3,-6) {$-3$\,dB};
+\addplot[dashed, MinesSilver, thin] coordinates {(10,-10) (100,-30)};
+\node[font=\tiny\sffamily, MinesSilver, rotate=-22] at (axis cs:30,-22) {$-20$\,dB/dec};
+\end{axis}
+\end{tikzpicture}
+\caption{First-order system: step response (left) and Bode magnitude (right). The time constant $\tau$ determines both settling time ($5\tau$ to 99\%) and bandwidth ($f_{-3\text{dB}} = 1/2\pi\tau$).}
 \label{fig:first_order}
 \end{figure}
 
@@ -930,8 +1204,39 @@ M(\omega) = \frac{K}{\sqrt{[1 - (\omega/\omega_n)^2]^2 + [2\zeta\omega/\omega_n]
 \end{equation}
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_second_order_response.png}
-\caption{Second-order system step response for different damping ratios. The optimal range for most sensors is $\zeta = 0.6$--$0.7$, giving fast response with minimal overshoot.}
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={$\omega_n t$}, ylabel={$y/y_\infty$},
+    xmin=0, xmax=15, ymin=0, ymax=1.8,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\scriptsize\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (15,1)};
+% zeta=0.1 (very underdamped)
+\addplot[domain=0:15, samples=400, thick, red!70!black]
+    {1 - exp(-0.1*x)/sqrt(1-0.01)*sin(deg(sqrt(1-0.01)*x) + deg(acos(0.1)))};
+\addlegendentry{$\zeta = 0.1$}
+% zeta=0.3
+\addplot[domain=0:15, samples=400, thick, WarnOrange]
+    {1 - exp(-0.3*x)/sqrt(1-0.09)*sin(deg(sqrt(1-0.09)*x) + deg(acos(0.3)))};
+\addlegendentry{$\zeta = 0.3$}
+% zeta=0.7 (optimal)
+\addplot[domain=0:15, samples=400, thick, AccentTeal, line width=1.5pt]
+    {1 - exp(-0.7*x)/sqrt(1-0.49)*sin(deg(sqrt(1-0.49)*x) + deg(acos(0.7)))};
+\addlegendentry{$\zeta = 0.7$ (optimal)}
+% zeta=1.0 (critically damped)
+\addplot[domain=0:15, samples=300, thick, MinesBlue]
+    {1 - (1 + x)*exp(-x)};
+\addlegendentry{$\zeta = 1.0$ (critical)}
+% zeta=2.0 (overdamped)
+\addplot[domain=0:15, samples=300, thick, MinesSilver!70!black]
+    {1 - 1.333*exp(-0.382*x) + 0.333*exp(-2.618*x)};
+\addlegendentry{$\zeta = 2.0$}
+\end{axis}
+\end{tikzpicture}
+\caption{Second-order system step response for different damping ratios. The optimal range for most sensors is $\zeta = 0.6$--$0.7$ (thick teal), giving fast response with minimal overshoot ($\sim$5\%).}
 \label{fig:second_order}
 \end{figure}
 
@@ -1139,7 +1444,20 @@ Some measurement systems exhibit \textbf{anti-resonance}: a frequency at which t
 
 
 % ================================================================
+
+\begin{masterycheckbox}{Dynamic Measurements}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Measure $\tau$ from step response data using both the 63.2\% method and log-linear regression.
+\item Calculate the $-3$\,dB bandwidth from $\tau$ and apply the bandwidth-rise time product ($f_{-3\text{dB}} \times t_r \approx 0.35$).
+\item Determine amplitude attenuation and phase lag of a first-order sensor at a given signal frequency.
+\item Evaluate whether a sensor's dynamic response is adequate (the $5\times$ rule: $f_{\text{sensor}} \geq 5 f_{\text{signal}}$).
+\item Explain the difference between overdamped, critically damped, and underdamped second-order responses.
+\end{enumerate}
+\end{masterycheckbox}
+
 \chapter{Error Analysis and Uncertainty}
+\label{ch:error}\index{uncertainty!propagation}\index{RSS}\index{GUM}
 
 \section{Types of Error}
 
@@ -1219,8 +1537,24 @@ Before building a measurement system, estimate the total uncertainty from manufa
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_error_budget.png}
-\caption{RSS error budget for a temperature measurement system. The sensor dominates the total uncertainty; improving the ADC has diminishing returns. Always improve the dominant contributor first.}
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=5.5cm,
+    ybar, bar width=1.2cm,
+    ylabel={Uncertainty contribution (\degC{})},
+    symbolic x coords={Sensor,Conditioning,ADC,Processing,Total (RSS)},
+    xtick=data, xticklabel style={font=\small\sffamily, rotate=15, anchor=east},
+    ymin=0, ymax=0.65,
+    nodes near coords, nodes near coords style={font=\tiny\sffamily\bfseries, above},
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    grid=major, grid style={MinesSilver!20}, ymajorgrids=true, xmajorgrids=false,
+]
+\addplot[fill=WarnOrange!70, draw=WarnOrange] coordinates {(Sensor,0.40) (Conditioning,0.15) (ADC,0.10) (Processing,0.05) (Total (RSS),0.45)};
+\end{axis}
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center] at (2.0,-0.8) {Dominant contributor:\\improve this first};
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (2.0,-0.5) -- (2.0,0.1);
+\end{tikzpicture}
+\caption{RSS error budget for a temperature measurement system. The sensor dominates; improving the ADC has diminishing returns. Always improve the dominant contributor first.}
 \label{fig:error_budget}
 \end{figure}
 
@@ -1456,7 +1790,54 @@ The GUM-compliant uncertainty statement includes: (1) the measured value with ap
 % PART II: SIGNALS AND SIGNAL PROCESSING
 % ################################################################
 % ================================================================
+
+\begin{masterycheckbox}{Error Analysis and Uncertainty}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Classify error sources as systematic or random, and explain appropriate mitigation.
+\item Propagate uncertainty through a multi-variable equation using RSS, identifying sensitivity coefficients.
+\item Identify the dominant uncertainty contributor and justify where to invest improvement effort.
+\item Construct a complete uncertainty budget allocating error from sensor, conditioning, and DAQ.
+\item Report results in GUM format: $\bar{x} \pm U$ (95\% CI, $k=2$, $n = \ldots$).
+\end{enumerate}
+\end{masterycheckbox}
+
 \chapter{Statistics and Experimental Data Analysis}
+\label{ch:stats}\index{statistics!descriptive}\index{confidence interval}\index{hypothesis testing}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={Measurement Value}, ylabel={Probability Density},
+    xmin=-4, xmax=4, ymin=0, ymax=0.45,
+    axis lines=left, axis line style={MinesBlue},
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    xtick={-3,-2,-1,0,1,2,3},
+    xticklabels={$\bar{x}-3s$,$\bar{x}-2s$,$\bar{x}-s$,$\bar{x}$,$\bar{x}+s$,$\bar{x}+2s$,$\bar{x}+3s$},
+    xticklabel style={font=\tiny\sffamily},
+    ytick=\empty,
+]
+% Full normal curve
+\addplot[domain=-4:4, samples=200, thick, MinesBlue] {exp(-x^2/2)/sqrt(2*pi)};
+% 95% CI shading
+\addplot[domain=-1.96:1.96, samples=100, fill=AccentTeal!25, draw=none] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+% 68% CI shading (darker)
+\addplot[domain=-1:1, samples=100, fill=MinesBlue!20, draw=none] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+% Annotations
+\draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, AccentTeal, thick] (-1.96,-0.04) -- (1.96,-0.04);
+\node[font=\scriptsize\sffamily\bfseries, AccentTeal] at (0,-0.07) {95\% CI ($\pm 1.96s$)};
+\draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, MinesBlue, thick] (-1,-0.1) -- (1,-0.1);
+\node[font=\scriptsize\sffamily, MinesBlue] at (0,-0.13) {68\% ($\pm 1s$)};
+% Mean line
+\addplot[dashed, WarnOrange, thin] coordinates {(0,0) (0,0.4)};
+\node[font=\scriptsize\sffamily, WarnOrange] at (axis cs:0.5,0.42) {$\bar{x}$ (mean)};
+\end{axis}
+\end{tikzpicture}
+\caption{Normal (Gaussian) distribution showing the 68\% ($\pm 1s$) and 95\% ($\pm 1.96s$) confidence intervals. For MEGN~300 reporting, always use the 95\% CI: $\bar{x} \pm t_{0.025,\nu} \cdot s/\sqrt{n}$.}
+\label{fig:normal_dist}
+\end{figure}
 
 \section{Why Statistics Matters for Engineers}
 Every measurement contains noise. Every experiment has limited sample size. Every conclusion drawn from data carries a probability of being wrong. Statistics provides the mathematical framework for quantifying these realities, making honest claims about measurement quality, and designing experiments that efficiently answer engineering questions. This chapter covers the statistical tools most directly applicable to MEGN~300 laboratory work.
@@ -1673,6 +2054,39 @@ In MEGN~300: always report both the $p$-value (statistical significance) and the
 \item For two-sample $t$-test detecting $\delta = 0.1$\,mV ($20\% \times 0.5$) from $s = 0.5$\,mV: $N \approx 2(1.96 + 0.84)^2 \times 0.5^2 / 0.1^2 = 2 \times 7.84 \times 2.5 = 392$ per group. This is a large number because the effect (20\%) is small relative to the noise. If the expected improvement were 50\%, $N$ drops to approximately 63 per group.
 \end{enumerate}
 \chapter{Principles of Sensors and Actuators}
+\label{ch:sensors}\index{sensor!classification}\index{actuator}\index{transduction}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    decision/.style={diamond, draw=MinesBlue, thick, fill=LightBG, align=center,
+                     font=\scriptsize\sffamily, inner sep=2pt, aspect=2.2},
+    result/.style={draw=AccentTeal, thick, fill=AccentTeal!10, rounded corners=3pt,
+                   align=center, font=\scriptsize\sffamily\bfseries, minimum height=0.8cm, minimum width=1.8cm},
+    arr/.style={-{Stealth[length=2mm]}, thick, MinesBlue},
+    yn/.style={font=\tiny\sffamily\bfseries, MinesBlue}
+]
+\node[decision] (q1) at (0,0) {Measurand\\type?};
+\node[decision] (q2a) at (-4,-2.5) {Range\\$> 300$\,\degC{}?};
+\node[decision] (q2b) at (4,-2.5) {Strain or\\force?};
+\node[decision] (q3a) at (-6,-5) {Need\\$< \pm 0.5$\,\degC{}?};
+\node[result] (r1) at (-6,-7.5) {RTD\\(Pt100)};
+\node[result] (r2) at (-3,-7.5) {Thermocouple\\(Type K/T)};
+\node[result] (r3) at (-1.5,-5) {Thermocouple\\(Type K)};
+\node[result] (r4) at (2,-5) {Strain gauge\\+ bridge};
+\node[result] (r5) at (6,-5) {Load cell\\(pre-built)};
+\draw[arr] (q1) -- (q2a) node[midway, yn, above left] {Temperature};
+\draw[arr] (q1) -- (q2b) node[midway, yn, above right] {Mechanical};
+\draw[arr] (q2a) -- (q3a) node[midway, yn, left] {No};
+\draw[arr] (q2a) -- (r3) node[midway, yn, right] {Yes};
+\draw[arr] (q3a) -- (r1) node[midway, yn, left] {Yes};
+\draw[arr] (q3a) -- (r2) node[midway, yn, right] {No};
+\draw[arr] (q2b) -- (r4) node[midway, yn, left] {Strain};
+\draw[arr] (q2b) -- (r5) node[midway, yn, right] {Force};
+\end{tikzpicture}
+\caption{Simplified sensor selection decision tree for temperature and mechanical measurands. For pressure, flow, displacement, and other measurands, consult the full sensor selection tables later in this chapter.}
+\label{fig:sensor_decision}
+\end{figure}
 
 The previous chapters established how to characterize, calibrate, and quantify uncertainty in measurements. This chapter steps back to the physical level: how do sensors convert physical quantities into electrical signals, and how do actuators convert electrical commands into physical action? Understanding transduction principles allows you to select the right sensor or actuator for a given application, predict its limitations, and design the signal conditioning that bridges it to your DAQ or controller.
 
@@ -1680,6 +2094,10 @@ The previous chapters established how to characterize, calibrate, and quantify u
 A \textbf{transducer} converts energy from one domain to another. A \textbf{sensor} (input transducer) converts a physical quantity (temperature, pressure, strain, displacement, flow, light, acceleration) into an electrical signal (voltage, current, resistance, capacitance, frequency). An \textbf{actuator} (output transducer) converts an electrical command into a physical action (force, torque, displacement, heat, light, flow).
 
 The choice of transduction mechanism determines the sensor's sensitivity, range, linearity, bandwidth, and failure modes. There is no universal sensor; every mechanism involves tradeoffs.
+
+\begin{industrybox}{From Lab Bench to Electric Vehicle Test Cell}
+The five-block measurement architecture is not an academic abstraction. In DOE vehicle energy analysis programs and NREL fleet testing, engineers instrument vehicles with hundreds of channels following exactly this architecture: CAN bus sensors feeding signal conditioning boards, high-speed DAQ systems, real-time processing pipelines, and terabyte-scale storage. The measurement system design principles you learn in MEGN~300 scale directly from the lab bench to a 400\,V EV powertrain test cell or a grid-scale battery energy storage system. The error budgets, grounding practices, and signal conditioning chains are identical in concept; only the voltage levels, channel counts, and safety requirements change.
+\end{industrybox}
 
 \section{Sensor Classification}
 
@@ -1844,8 +2262,25 @@ Every ADC conversion introduces a rounding error of up to $\pm \frac{1}{2}$\,LSB
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_adc_process.png}
-\caption{The three critical aspects of analog-to-digital conversion: sampling rate, quantization resolution, and key specifications.}
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                  minimum width=2.4cm, minimum height=1.8cm, align=center, font=\scriptsize\sffamily\bfseries},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+    spec/.style={font=\tiny\sffamily, text=MinesSilver, align=center}
+]
+\node[block] (aa) at (0,0) {Anti-Alias\\Filter};
+\node[block] (sh) at (3.5,0) {Sample\\and Hold};
+\node[block] (quant) at (7,0) {Quantizer\\($2^n$ levels)};
+\node[block] (enc) at (10.5,0) {Digital\\Encoder};
+\draw[arr] (-2,0) -- (aa) node[midway, above, font=\scriptsize\sffamily] {$V_{\text{in}}(t)$};
+\draw[arr] (aa) -- (sh); \draw[arr] (sh) -- (quant); \draw[arr] (quant) -- (enc);
+\draw[arr] (enc) -- (12.5,0) node[midway, above, font=\scriptsize\sffamily] {$x[n]$};
+\node[spec, below=8pt] at (aa.south) {$f_c < f_s/2$\\Prevents aliasing};
+\node[spec, below=8pt] at (sh.south) {Rate: $f_s$\\Nyquist: $f_s > 2f_{\max}$};
+\node[spec, below=8pt] at (quant.south) {LSB $= V_{\text{range}}/2^n$\\Error: $\pm$LSB/2};
+\node[spec, below=8pt] at (enc.south) {Binary output\\$n$ bits/sample};
+\end{tikzpicture}
+\caption{The analog-to-digital conversion pipeline. Each stage introduces specific errors: the anti-alias filter must prevent frequency folding, the sample-and-hold sets the temporal resolution, and the quantizer determines amplitude resolution.}
 \label{fig:adc}
 \end{figure}
 
@@ -2084,7 +2519,24 @@ The accuracy of time-domain measurements (period, frequency, phase) depends on t
 
 
 % ================================================================
+
+\begin{masterycheckbox}{Analog vs.\ Digital Systems}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Calculate ADC resolution (LSB) and determine whether it is sufficient for a given measurement.
+\item Apply the Nyquist criterion and explain why practical sampling rates must exceed $10\times f_{\max}$.
+\item Design an anti-alias filter with appropriate cutoff for a given sampling rate.
+\item Select between RSE, differential, and NRSE input configurations.
+\item Calculate quantization error and its contribution to total measurement uncertainty.
+\end{enumerate}
+\end{masterycheckbox}
+
 \chapter{Signal-to-Noise Ratio}
+\label{ch:snr}\index{signal-to-noise ratio}\index{SNR}\index{noise!sources}
+
+\begin{industrybox}{EMI Shielding in EV Test Cells}
+In the Battery Workforce Challenge and EcoCAR Innovation Challenge, student teams instrument hybrid and electric vehicles with dozens of sensors operating alongside 400\,V traction inverters switching at 10--20\,kHz. The shielding, grounding, and filtering principles in this chapter are the difference between clean thermocouple data and a 60\,Hz artifact that makes thermal management analysis useless. Every cable routing decision and filter cutoff traces directly to an EMI requirement in the vehicle integration specification.
+\end{industrybox}
 
 \section{Defining SNR}
 The signal-to-noise ratio quantifies how much useful signal exists relative to unwanted noise:
@@ -2110,9 +2562,84 @@ A 20\,dB SNR means the signal is 10$\times$ the noise voltage. A 40\,dB SNR mean
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_noise_sources.png}
-\caption{Five noise sources in the measurement chain and five strategies to combat them. The key insight: amplify before noise enters the chain; noise added after amplification is divided by the gain.}
+\begin{tikzpicture}[
+    src/.style={draw=WarnOrange, fill=WarnOrange!10, thick, rounded corners=2pt,
+                minimum width=2.4cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily},
+    fix/.style={draw=AccentTeal, fill=AccentTeal!10, thick, rounded corners=2pt,
+                minimum width=2.4cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily},
+]
+% Noise sources
+\node[font=\small\sffamily\bfseries, WarnOrange] at (-2.5, 1.8) {Noise Sources};
+\node[src] (n1) at (0,1.2) {Thermal\\(Johnson)};
+\node[src] (n2) at (3,1.2) {60\,Hz\\(Mains)};
+\node[src] (n3) at (6,1.2) {EMI\\(Switching)};
+\node[src] (n4) at (9,1.2) {Quantization\\(ADC)};
+\node[src] (n5) at (12,1.2) {Ground\\Loops};
+% Fixes
+\node[font=\small\sffamily\bfseries, AccentTeal] at (-2.5, -0.7) {Countermeasures};
+\node[fix] (f1) at (0,-0.3) {Low-noise\\components};
+\node[fix] (f2) at (3,-0.3) {Shielding\\notch filter};
+\node[fix] (f3) at (6,-0.3) {Filtering\\cable routing};
+\node[fix] (f4) at (9,-0.3) {More bits\\averaging};
+\node[fix] (f5) at (12,-0.3) {Star\\grounding};
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n1) -- (f1);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n2) -- (f2);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n3) -- (f3);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n4) -- (f4);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n5) -- (f5);
+% Key insight box
+\node[draw=MinesBlue, thick, fill=MinesBlue!5, rounded corners=3pt, text width=12cm,
+      align=center, font=\small\sffamily\itshape, text=MinesBlue] at (6,-1.8)
+    {Key insight: amplify the signal \textbf{before} noise enters the chain. Noise added after amplification is divided by the gain, improving SNR.};
+\end{tikzpicture}
+\caption{Five noise sources in the measurement chain and their countermeasures. Amplify early to maximize SNR.}
 \label{fig:noise_sources}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    dev/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                minimum width=1.8cm, minimum height=0.8cm, align=center, font=\scriptsize\sffamily\bfseries},
+]
+% Bad: daisy chain
+\begin{scope}[shift={(-5,0)}]
+\node[font=\small\sffamily\bfseries, WarnOrange] at (1.5,2.8) {Daisy-Chain (BAD)};
+\node[dev] (s1) at (0,1.5) {Sensor};
+\node[dev] (a1) at (3,1.5) {Amp};
+\node[dev] (d1) at (0,0) {DAQ};
+\node[dev] (m1) at (3,0) {Motor};
+\draw[WarnOrange, thick] (s1.south) -- (0,0.9) -- (3,0.9) -- (a1.south);
+\draw[WarnOrange, thick] (0,0.9) -- (0,0.4) -- (d1.north);
+\draw[WarnOrange, thick] (3,0.9) -- (3,0.4) -- (m1.north);
+\node[font=\tiny\sffamily, WarnOrange] at (1.5,-0.6) {Motor current flows through};
+\node[font=\tiny\sffamily, WarnOrange] at (1.5,-0.9) {sensor ground wire!};
+\filldraw[WarnOrange] (1.5,0.9) circle (2pt);
+\draw[WarnOrange, thick] (1.5,0.9) -- (1.5,-0.2);
+\node[font=\tiny\sffamily, WarnOrange] at (2.2,-0.2) {GND bus};
+\end{scope}
+% Good: star ground
+\begin{scope}[shift={(5,0)}]
+\node[font=\small\sffamily\bfseries, AccentTeal] at (1.5,2.8) {Star Ground (GOOD)};
+\node[dev] (s2) at (0,1.5) {Sensor};
+\node[dev] (a2) at (3,1.5) {Amp};
+\node[dev] (d2) at (0,0) {DAQ};
+\node[dev] (m2) at (3,0) {Motor};
+% Star point
+\filldraw[AccentTeal] (1.5,-0.5) circle (3pt);
+\node[font=\tiny\sffamily\bfseries, AccentTeal] at (1.5,-0.9) {Star point};
+\draw[AccentTeal, thick] (s2.south) -- (0,0.9) -- (0,-0.5) -- (1.5,-0.5);
+\draw[AccentTeal, thick] (a2.south) -- (3,0.9) -- (3,-0.5) -- (1.5,-0.5);
+\draw[AccentTeal, thick] (d2.south) -- (0,-0.3) -- (0,-0.5);
+\draw[AccentTeal, thick] (m2.south) -- (3,-0.3) -- (3,-0.5);
+\draw[AccentTeal, thick] (1.5,-0.5) -- (1.5,-1.2);
+\draw[AccentTeal, thick] (1.2,-1.2) -- (1.8,-1.2);
+\draw[AccentTeal, thick] (1.3,-1.3) -- (1.7,-1.3);
+\draw[AccentTeal, thick] (1.4,-1.4) -- (1.6,-1.4);
+\end{scope}
+\end{tikzpicture}
+\caption{Grounding topologies. Daisy-chain grounding (left) allows motor return current to flow through the sensor ground wire, creating noise. Star grounding (right) gives each device a dedicated return path to a single common point, eliminating ground-loop noise.}
+\label{fig:star_ground}
 \end{figure}
 
 \section{Improving SNR}
@@ -2357,6 +2884,7 @@ While lock-in amplification is beyond the scope of MEGN~300 labs, understanding 
 
 % ================================================================
 \chapter{Fourier Series and Complex Signal Construction}
+\label{ch:fourier}\index{Fourier series}\index{harmonics}
 
 \section{The Fourier Principle}
 Any periodic signal $x(t)$ with period $T$ can be represented as a sum of sinusoids at the fundamental frequency $f_0 = 1/T$ and its integer harmonics:
@@ -2383,8 +2911,49 @@ Contains only odd harmonics. The amplitude of each harmonic decreases as $1/n$.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_fourier_decomposition.png}
-\caption{Fourier decomposition of a square wave. Left: individual harmonics (fundamental, 3rd, 5th). Right: their sum approaches the square wave. Removing harmonics (e.g., with a low-pass filter) rounds the edges.}
+\begin{tikzpicture}
+\begin{axis}[
+    name=harm, width=6.5cm, height=5cm,
+    xlabel={$t$ (cycles)}, ylabel={Amplitude},
+    xmin=0, xmax=2, ymin=-1.5, ymax=1.5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Individual Harmonics},
+    legend style={font=\tiny\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[domain=0:2, samples=300, thick, MinesBlue] {(4/pi)*sin(deg(2*pi*x))};
+\addlegendentry{Fundamental}
+\addplot[domain=0:2, samples=300, thick, AccentTeal] {(4/pi)*(1/3)*sin(deg(2*pi*3*x))};
+\addlegendentry{3rd harmonic}
+\addplot[domain=0:2, samples=300, thick, WarnOrange] {(4/pi)*(1/5)*sin(deg(2*pi*5*x))};
+\addlegendentry{5th harmonic}
+\end{axis}
+\begin{axis}[
+    at={(harm.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={$t$ (cycles)}, ylabel={Amplitude},
+    xmin=0, xmax=2, ymin=-1.5, ymax=1.5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Sum Approaches Square Wave},
+    legend style={font=\tiny\sffamily, at={(0.98,0.02)}, anchor=south east},
+]
+% 1 term
+\addplot[domain=0:2, samples=300, MinesSilver, thin] {(4/pi)*sin(deg(2*pi*x))};
+\addlegendentry{1 term}
+% 3 terms
+\addplot[domain=0:2, samples=300, AccentTeal, thin]
+    {(4/pi)*(sin(deg(2*pi*x)) + (1/3)*sin(deg(2*pi*3*x)) + (1/5)*sin(deg(2*pi*5*x)))};
+\addlegendentry{3 terms}
+% 9 terms
+\addplot[domain=0:2, samples=500, thick, MinesBlue]
+    {(4/pi)*(sin(deg(2*pi*x)) + (1/3)*sin(deg(6*pi*x)) + (1/5)*sin(deg(10*pi*x))
+    + (1/7)*sin(deg(14*pi*x)) + (1/9)*sin(deg(18*pi*x)) + (1/11)*sin(deg(22*pi*x))
+    + (1/13)*sin(deg(26*pi*x)) + (1/15)*sin(deg(30*pi*x)) + (1/17)*sin(deg(34*pi*x)))};
+\addlegendentry{9 terms}
+\end{axis}
+\end{tikzpicture}
+\caption{Fourier decomposition of a square wave. Left: individual odd harmonics. Right: as more terms are summed, the result approaches the square wave. Low-pass filtering removes high harmonics, rounding the edges.}
 \label{fig:fourier}
 \end{figure}
 
@@ -2597,6 +3166,9 @@ In practice, the achievable product is $\Delta t \cdot \Delta f \approx 1$ for m
 
 This tradeoff is not a limitation of the FFT algorithm; it is a fundamental property of signals. No analysis technique, no matter how sophisticated, can simultaneously achieve arbitrary time and frequency resolution.
 
+\begin{advancedbox}{Hilbert Transform and Envelope Analysis}
+The following section covers material beyond the core MEGN~300 curriculum. It is included for students whose projects require envelope or instantaneous frequency analysis. Skip this section on first reading.
+\end{advancedbox}
 \section{Hilbert Transform and Envelope Analysis}
 The \textbf{Hilbert transform} produces the analytic signal $z(t) = x(t) + j\hat{x}(t)$, where $\hat{x}(t)$ is the Hilbert transform of $x(t)$. The magnitude $|z(t)|$ is the \textbf{envelope} (instantaneous amplitude) and $\angle z(t)$ is the instantaneous phase. The time derivative of the instantaneous phase gives the instantaneous frequency.
 
@@ -2618,6 +3190,7 @@ In vibration analysis, envelope analysis detects amplitude-modulated signals pro
 
 % ================================================================
 \chapter{FFT and Complex Signal Decomposition}
+\label{ch:fft}\index{FFT}\index{spectral leakage}\index{windowing}
 
 \section{From Fourier Series to Fourier Transform}
 The Fourier series applies to periodic signals. For non-periodic or finite-duration signals, the \textbf{Fourier Transform} generalizes the concept to a continuous frequency spectrum:
@@ -2649,8 +3222,36 @@ Hanning (Hann): best general-purpose choice; good frequency resolution with mode
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_spectral_leakage.png}
-\caption{Spectral leakage: without windowing (left), a 60.5\,Hz signal that does not land on an FFT bin smears across many bins. With a Hanning window (right), the energy concentrates into a narrow peak. Always window unless the signal is exactly periodic in the acquisition window.}
+\begin{tikzpicture}
+\begin{axis}[
+    name=nowin, width=6.5cm, height=5cm,
+    xlabel={Frequency (Hz)}, ylabel={Magnitude (dB)},
+    xmin=40, xmax=80, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{WarnOrange} No Window (Rectangular)},
+]
+% Simulate leakage: sinc-like pattern around 60.5 Hz
+\addplot[domain=40:80, samples=400, thick, WarnOrange]
+    {-abs(60.5-x) < 0.3 ? 0 : 20*log10(abs(sin(deg(pi*(x-60.5)*10))/(pi*(x-60.5)*10))+0.001)};
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (axis cs:70,-15) {Energy smeared\\across bins};
+\end{axis}
+\begin{axis}[
+    at={(nowin.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={Frequency (Hz)}, ylabel={Magnitude (dB)},
+    xmin=40, xmax=80, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{AccentTeal} Hanning Window},
+]
+% Windowed: sharper peak with faster sidelobe decay
+\addplot[domain=40:80, samples=400, thick, AccentTeal]
+    {-abs(60.5-x) < 0.3 ? 0 : 20*log10(abs(sin(deg(pi*(x-60.5)*10))/(pi*(x-60.5)*10))^2+0.0001)};
+\node[font=\tiny\sffamily\itshape, AccentTeal] at (axis cs:70,-15) {Energy concentrated\\in narrow peak};
+\end{axis}
+\end{tikzpicture}
+\caption{Spectral leakage: without windowing (left), a 60.5\,Hz signal smears across many FFT bins. With a Hanning window (right), sidelobe energy is suppressed and the peak sharpens. Always window unless the signal is exactly periodic in the acquisition window.}
 \label{fig:leakage}
 \end{figure}
 
@@ -2834,6 +3435,9 @@ When a machine's speed varies (run-up, coast-down, load changes), the vibration 
 
 In LabVIEW: the Sound and Vibration Toolkit includes order analysis VIs. Without the toolkit: use the tachometer signal to compute instantaneous speed, resample the vibration signal at constant angle increments using interpolation, then compute the FFT normally.
 
+\begin{advancedbox}{Cepstral Analysis}
+Cepstral analysis is an advanced vibration diagnostics technique not covered in MEGN~300 exams. It is included for students whose projects involve rotating machinery fault detection.
+\end{advancedbox}
 \section{Cepstral Analysis (Overview)}
 The \textbf{cepstrum} is the inverse FFT of the log magnitude spectrum: $c[n] = \text{IFFT}(\log|X[k]|)$. It separates multiplicative effects in the frequency domain (which become additive in the log domain) into individual components. The cepstrum is particularly useful for detecting periodic patterns in the spectrum, such as harmonics of a fundamental frequency or sidebands around a carrier. In vibration analysis, cepstral analysis detects bearing defects (which produce a family of harmonics and sidebands) more reliably than spectral analysis alone.
 
@@ -2863,7 +3467,46 @@ The time-frequency resolution tradeoff: shorter FFT segments give better time re
 
 
 % ================================================================
+
+\begin{masterycheckbox}{FFT and Frequency Analysis}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Select FFT parameters ($f_s$, $N$, window type) and justify each choice.
+\item Interpret an FFT magnitude spectrum: identify signal peaks, noise floor, harmonics, and aliases.
+\item Explain spectral leakage and demonstrate how windowing mitigates it.
+\item Calculate frequency resolution ($\Delta f = f_s/N$) and evaluate sufficiency.
+\item Use RMS averaging to reduce FFT variance and calculate expected noise floor improvement.
+\end{enumerate}
+\end{masterycheckbox}
+
 \chapter{Fundamentals of Digital Signal Processing}
+\label{ch:dsp}\index{aliasing}\index{Nyquist theorem}\index{sampling}\index{oversampling}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=13cm, height=5.5cm,
+    xlabel={Time (ms)}, ylabel={Amplitude},
+    xmin=0, xmax=20, ymin=-1.3, ymax=1.3,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\scriptsize\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[domain=0:20, samples=500, thick, MinesBlue] {sin(deg(2*pi*0.15*x))};
+\addlegendentry{True signal: 150\,Hz}
+\addplot[domain=0:20, samples=500, thick, dashed, WarnOrange] {sin(deg(2*pi*0.05*x))};
+\addlegendentry{Aliased reconstruction: 50\,Hz}
+\addplot[only marks, mark=*, mark size=2.5pt, WarnOrange] coordinates {
+    (0,0) (5,{sin(deg(2*pi*0.15*5))}) (10,{sin(deg(2*pi*0.15*10))})
+    (15,{sin(deg(2*pi*0.15*15))}) (20,{sin(deg(2*pi*0.15*20))})
+};
+\addlegendentry{Samples at $f_s = 200$\,Hz}
+\end{axis}
+\end{tikzpicture}
+\caption{Aliasing demonstration. A 150\,Hz signal (blue) sampled at $f_s = 200$\,Hz violates Nyquist ($f_s < 2 \times 150$). The samples (orange dots) are consistent with a false 50\,Hz signal (orange dashed). \textbf{An anti-alias filter before the ADC is the only prevention.}}
+\label{fig:aliasing}
+\end{figure}
 
 \section{Sampling Theorem (Nyquist-Shannon)}
 A continuous signal with maximum frequency $f_{\max}$ can be perfectly reconstructed from discrete samples if the sampling rate satisfies:
@@ -2882,12 +3525,7 @@ If a frequency $f$ is sampled at $f_s$ where $f > f_s/2$, the alias appears at:
 f_{\text{alias}} = |f - n \cdot f_s| \quad \text{where } n \text{ is the nearest integer to } f/f_s
 \end{equation}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{fig_aliasing.png}
-\caption{Aliasing: an 800\,Hz noise component, sampled at 1\,kS/s, folds to 200\,Hz in the digital data. The alias is indistinguishable from a real 200\,Hz signal. Anti-alias filtering before the ADC is the only defense.}
-\label{fig:aliasing}
-\end{figure}
+% [Duplicate aliasing figure removed; see TikZ version fig:aliasing above]
 
 \begin{examplebox}[ThermoRig: Aliasing from a Switching Regulator]
 The ThermoRig uses a 500\,kHz switching regulator that injects noise at 500\,kHz onto the thermocouple signal. The DAQ samples at 1\,kS/s ($f_s/2 = 500$\,Hz). Without an anti-alias filter, the 500\,kHz noise aliases to $|500000 - 500 \times 1000| = 0$\,Hz; it appears as a DC offset. A 2nd-order anti-alias filter at 400\,Hz attenuates 500\,kHz by $> 100$\,dB, making the alias negligible.
@@ -2959,6 +3597,9 @@ In feedback control (Part IV), the controller must update fast enough that the d
 
 \section{Data File Management}
 Continuous acquisition at high sample rates generates large files. At 100\,kS/s with 16-bit resolution (2 bytes per sample): 200\,kB/s = 12\,MB/min = 720\,MB/hr. Plan storage accordingly. Use binary file formats (not text/CSV) for large datasets. LabVIEW's TDMS format provides efficient binary storage with metadata.
+\begin{advancedbox}{Z-Transform}
+The z-transform is the discrete-time counterpart of the Laplace transform. This section is included for reference; you do not need to design filters using the z-transform directly for MEGN~300.
+\end{advancedbox}
 \section{The Z-Transform and Digital System Analysis}
 Just as the Laplace transform ($s$-domain) is the analysis tool for continuous systems, the \textbf{z-transform} is the tool for discrete (sampled) systems. A discrete-time signal $x[n]$ has z-transform:
 \begin{equation}
@@ -2990,6 +3631,9 @@ Design an anti-aliasing system for measuring vibration from 0 to 500\,Hz:
 
 This example illustrates the fundamental tradeoff: sharper anti-alias filters allow lower sample rates, while higher sample rates allow simpler anti-alias filters.
 
+\begin{advancedbox}{Multirate Signal Processing}
+The following section on decimation and interpolation is beyond the scope of most MEGN~300 projects. It is included for reference when interfacing sensors at different sample rates.
+\end{advancedbox}
 \section{Multirate Signal Processing}
 Many practical systems use multirate processing: acquire at a high sample rate (to simplify anti-aliasing), then decimate digitally to the rate needed for analysis or control.
 
@@ -3087,6 +3731,9 @@ The total RMS noise in a measurement with bandwidth $B$ is:
 V_{n,\text{RMS}} = \sqrt{\int_0^B \text{PSD}(f)\,df}
 \end{equation}
 For white noise with PSD $= S_0$: $V_{n,\text{RMS}} = \sqrt{S_0 \cdot B}$. Halving $B$ reduces noise by $\sqrt{2}$ (3\,dB).
+\begin{advancedbox}{Z-Transform for Digital Control}
+This section connects the z-transform to digital PID implementation. It is advanced reference material not required for MEGN~300 exams.
+\end{advancedbox}
 \section{The Z-Transform: Bridge from Continuous to Digital}
 The Laplace transform ($s$-domain) describes continuous-time systems. The \textbf{z-transform} is its discrete-time counterpart. Understanding the $s$-to-$z$ mapping is essential for analyzing digital control loops (Chapter~16) and digital filters (Chapter~12).
 
@@ -3124,6 +3771,48 @@ For MEGN~300 thermal control systems ($f_{\text{bandwidth}} < 0.1$\,Hz, $f_s \ge
 
 % ================================================================
 \chapter{Analog Filter Design}
+\label{ch:analog_filters}\index{filter!low-pass}\index{filter!Butterworth}\index{filter!Chebyshev}\index{filter!Bessel}\index{cutoff frequency}\index{Sallen-Key}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{scope}[shift={(-4.5,0)}]
+\draw[MinesBlue, thick] (0,0) -- (0.5,0);
+\draw[MinesBlue, thick, fill=LightBG] (0.5,-0.25) rectangle (2.0,0.25);
+\node[font=\small\sffamily] at (1.25,0) {$R$};
+\draw[MinesBlue, thick] (2.0,0) -- (3.5,0);
+\draw[MinesBlue, thick] (3.0,0.3) -- (4.0,0.3);
+\draw[MinesBlue, thick] (3.0,0.45) -- (4.0,0.45);
+\draw[MinesBlue, thick] (3.5,0) -- (3.5,0.3);
+\draw[MinesBlue, thick] (3.5,0.45) -- (3.5,0.8);
+\node[font=\small\sffamily] at (4.3,0.38) {$C$};
+\draw[MinesBlue, thick] (3.2,0.8) -- (3.8,0.8);
+\draw[MinesBlue, thick] (3.3,0.9) -- (3.7,0.9);
+\draw[MinesBlue, thick] (3.4,1.0) -- (3.6,1.0);
+\node[font=\small\sffamily, MinesBlue] at (0,-0.5) {$V_{\text{in}}$};
+\node[font=\small\sffamily, AccentTeal] at (3.5,-0.5) {$V_{\text{out}}$};
+\node[font=\scriptsize\sffamily, MinesSilver] at (1.75,-1.0) {$f_c = 1/(2\pi RC)$};
+\end{scope}
+\begin{scope}[shift={(3.0,-1.5)}]
+\begin{axis}[
+    width=7.5cm, height=5cm,
+    xlabel={$f/f_c$}, ylabel={Magnitude (dB)},
+    xmode=log, xmin=0.1, xmax=100, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    legend style={font=\tiny\sffamily, at={(0.02,0.02)}, anchor=south west},
+]
+\addplot[domain=0.1:100, samples=200, thick, MinesBlue] {-10*log10(1+x^2)};
+\addlegendentry{1st order}
+\addplot[domain=0.1:100, samples=200, thick, AccentTeal] {-20*log10(1+x^2)};
+\addlegendentry{2nd order}
+\addplot[dashed, MinesSilver, thin] coordinates {(0.1,-3) (100,-3)};
+\end{axis}
+\end{scope}
+\end{tikzpicture}
+\caption{Left: first-order passive RC low-pass filter. Right: Bode magnitude response comparing 1st order ($-20$\,dB/dec) and 2nd order ($-40$\,dB/dec). A first-order filter is often insufficient for anti-aliasing.}
+\label{fig:rc_bode}
+\end{figure}
 
 \section{What Filters Do}
 A filter selectively passes or rejects frequency components of a signal. Four basic types:
@@ -3136,8 +3825,31 @@ A filter selectively passes or rejects frequency components of a signal. Four ba
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_filter_types.png}
-\caption{Four filter types (top) and three response characteristics (bottom). Butterworth is the default; Chebyshev for sharp cutoff; Bessel for pulse preservation.}
+\begin{tikzpicture}[
+    ftype/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                  minimum width=2.8cm, minimum height=1.6cm, align=center, font=\scriptsize\sffamily},
+]
+\node[ftype] (lp) at (0,0) {\textbf{Low-Pass}\\Passes $f < f_c$\\Blocks $f > f_c$};
+\node[ftype] (hp) at (3.8,0) {\textbf{High-Pass}\\Blocks $f < f_c$\\Passes $f > f_c$};
+\node[ftype] (bp) at (7.6,0) {\textbf{Band-Pass}\\Passes $f_L < f < f_H$\\Blocks outside};
+\node[ftype] (bs) at (11.4,0) {\textbf{Band-Stop}\\Blocks $f_L < f < f_H$\\Passes outside};
+% Iconic magnitude shapes below each
+\foreach \x/\shape in {0/lp, 3.8/hp, 7.6/bp, 11.4/bs} {
+    \begin{scope}[shift={(\x,-2.0)}]
+        \draw[MinesSilver, ->] (-1,0) -- (1.3,0) node[right, font=\tiny\sffamily] {$f$};
+        \draw[MinesSilver, ->] (-0.9,-0.1) -- (-0.9,1.0);
+    \end{scope}
+}
+% LP shape
+\draw[MinesBlue, thick] (-1,-2) -- (-0.2,-2) -- (0.1,-2.8) -- (1,-2.8);
+% HP shape
+\draw[MinesBlue, thick] (2.8,-2.8) -- (3.5,-2.8) -- (3.8,-2) -- (4.8,-2);
+% BP shape
+\draw[MinesBlue, thick] (6.6,-2.8) -- (7.2,-2.8) -- (7.4,-2) -- (7.8,-2) -- (8.0,-2.8) -- (8.6,-2.8);
+% BS shape
+\draw[MinesBlue, thick] (10.4,-2) -- (11.0,-2) -- (11.2,-2.8) -- (11.6,-2.8) -- (11.8,-2) -- (12.4,-2);
+\end{tikzpicture}
+\caption{Four filter types with idealized magnitude response shapes. Low-pass is the most common in MEGN~300 (anti-aliasing, noise reduction). Band-stop (notch) is used to remove specific interference frequencies (e.g., 60\,Hz mains hum).}
 \label{fig:filters}
 \end{figure}
 
@@ -3170,8 +3882,31 @@ Active filters use operational amplifiers to provide gain, buffering, and steepe
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_filter_comparison.png}
-\caption{Bode magnitude comparison of 4th-order Butterworth, Chebyshev, and Bessel low-pass filters. Chebyshev has the steepest rolloff but introduces passband ripple. Bessel has the gentlest rolloff but preserves pulse shape (linear phase).}
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={$f/f_c$}, ylabel={Magnitude (dB)},
+    xmode=log, xmin=0.1, xmax=10, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\small\sffamily, at={(0.98,0.5)}, anchor=east},
+]
+% 4th-order Butterworth: H = 1/sqrt(1+x^8)
+\addplot[domain=0.1:10, samples=300, thick, MinesBlue] {-10*log10(1+x^8)};
+\addlegendentry{Butterworth (flat)}
+% 4th-order Chebyshev (1 dB ripple approximation)
+\addplot[domain=0.1:10, samples=300, thick, WarnOrange]
+    {x<0.85 ? -0.5+0.5*cos(deg(8*x)) : -10*log10(1+x^10)-3};
+\addlegendentry{Chebyshev (sharp)}
+% 4th-order Bessel (gentler rolloff)
+\addplot[domain=0.1:10, samples=300, thick, AccentTeal] {-10*log10(1+x^4*0.5+x^8*0.1)};
+\addlegendentry{Bessel (linear phase)}
+% -3 dB line
+\addplot[dashed, MinesSilver, thin] coordinates {(0.1,-3) (10,-3)};
+\node[font=\tiny\sffamily, MinesSilver] at (axis cs:0.15,-5) {$-3$\,dB};
+\end{axis}
+\end{tikzpicture}
+\caption{Bode magnitude comparison of 4th-order Butterworth, Chebyshev, and Bessel low-pass filters. Chebyshev has the steepest rolloff but passband ripple. Bessel has the gentlest rolloff but preserves pulse shape (linear phase). Butterworth is the default.}
 \label{fig:filter_compare}
 \end{figure}
 
@@ -3385,6 +4120,7 @@ For the ThermoRig anti-alias filter (2nd-order Butterworth at 40\,Hz): group del
 
 % ================================================================
 \chapter{Digital Filter Design}
+\label{ch:digital_filters}\index{filter!digital}\index{FIR filter}\index{IIR filter}
 
 \section{Why Digital Filters?}
 Digital filters operate on sampled data in software or firmware. Advantages over analog: perfectly repeatable, easily modified by changing coefficients, no component drift, can implement filter shapes that are impractical in analog (e.g., linear phase, very high order).
@@ -3407,8 +4143,34 @@ IIR filters achieve sharper roll-off with fewer coefficients than FIR, but they 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_fir_vs_iir.png}
-\caption{FIR vs.\ IIR digital filters. FIR is always stable with linear phase; IIR achieves sharper cutoff with fewer coefficients but has nonlinear phase and stability risk. Use FIR when pulse shape matters; IIR when sharp cutoff matters.}
+\begin{tikzpicture}[
+    col/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                minimum width=5.5cm, minimum height=4.5cm, align=left, font=\scriptsize\sffamily,
+                inner sep=8pt, text width=5cm},
+]
+\node[col] (fir) at (0,0) {
+\textbf{\color{MinesBlue}FIR (Finite Impulse Response)}\\[4pt]
+$y[n] = \sum_{k=0}^{M} b_k x[n-k]$\\[4pt]
+\textcolor{AccentTeal}{\checkmark} Always stable\\
+\textcolor{AccentTeal}{\checkmark} Linear phase (symmetric)\\
+\textcolor{AccentTeal}{\checkmark} Easy to design\\
+\textcolor{WarnOrange}{$\times$} Many coefficients needed\\
+\textcolor{WarnOrange}{$\times$} Higher computational cost\\[2pt]
+\textit{Use for:} pulse shape preservation
+};
+\node[col] (iir) at (7,0) {
+\textbf{\color{MinesBlue}IIR (Infinite Impulse Response)}\\[4pt]
+$y[n] = \sum b_k x[n\!-\!k] - \sum a_k y[n\!-\!k]$\\[4pt]
+\textcolor{AccentTeal}{\checkmark} Sharp cutoff, few coefficients\\
+\textcolor{AccentTeal}{\checkmark} Lower computational cost\\
+\textcolor{AccentTeal}{\checkmark} Matches analog prototypes\\
+\textcolor{WarnOrange}{$\times$} Can be unstable\\
+\textcolor{WarnOrange}{$\times$} Nonlinear phase\\[2pt]
+\textit{Use for:} anti-aliasing, noise rejection
+};
+\node[font=\large\sffamily\bfseries, MinesSilver] at (3.5,0) {vs.};
+\end{tikzpicture}
+\caption{FIR vs.\ IIR digital filters. Choose FIR when signal shape must be preserved (linear phase). Choose IIR when sharp frequency selectivity is needed with low computational overhead.}
 \label{fig:fir_iir}
 \end{figure}
 
@@ -3598,6 +4360,9 @@ Advantages over windowed design: for a given filter order, the equiripple design
 
 In MATLAB: \texttt{b = firpm(M, [0 fp fs 1], [1 1 0 0])} where \texttt{fp} is the passband edge and \texttt{fs} is the stopband edge (both normalized to Nyquist). In LabVIEW: the ``Equiripple FIR'' VI in the Signal Processing palette.
 
+\begin{advancedbox}{Multirate Filter Structures and Adaptive Filtering}
+The following sections on multirate filters, adaptive LMS filtering, and Hilbert transform filters are advanced topics included for completeness. They are not required for MEGN~300 exams or lab reports.
+\end{advancedbox}
 \section{Multirate Filter Structures}
 \subsection{Polyphase Decomposition}
 For efficient decimation, the FIR filter can be decomposed into $M$ polyphase subfilters, each operating at the lower output rate. This reduces computation by exactly $M\times$ compared to filtering at the input rate and then discarding samples. The polyphase structure is the standard implementation in commercial DAQ systems and audio equipment.
@@ -3660,6 +4425,56 @@ Application in instrumentation: envelope detection for bearing fault diagnosis, 
 \part{Electronics for Instrumentation}
 
 \chapter{Circuit Fundamentals}
+\label{ch:circuits}\index{Ohm's law}\index{Kirchhoff's laws}\index{voltage divider}\index{Thevenin equivalent}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    comp/.style={draw=MinesBlue, thick, fill=LightBG, minimum width=0.7cm, minimum height=0.35cm, font=\scriptsize\sffamily},
+]
+% Unloaded divider
+\begin{scope}[shift={(0,0)}]
+\node[font=\small\sffamily\bfseries, MinesBlue] at (0,3.5) {Unloaded};
+\draw[MinesBlue, thick] (0,3) -- (0,2.5);
+\node[comp] (r1a) at (0,2) {$R_1$};
+\draw[MinesBlue, thick] (0,1.5) -- (0,1);
+\node[comp] (r2a) at (0,0.5) {$R_2$};
+\draw[MinesBlue, thick] (0,0) -- (0,-0.5);
+\node[font=\scriptsize\sffamily, MinesBlue] at (0,3.2) {$V_{\text{in}}$};
+\node[font=\scriptsize\sffamily, MinesSilver] at (0,-0.8) {GND};
+\draw[MinesBlue, thick, dashed] (0,1) -- (1.5,1);
+\node[font=\scriptsize\sffamily, AccentTeal] at (2.3,1) {$V_{\text{out}}$};
+\node[font=\tiny\sffamily, AccentTeal, align=center] at (2.3,0.5) {$= V_{\text{in}}\frac{R_2}{R_1+R_2}$};
+\end{scope}
+% Loaded divider
+\begin{scope}[shift={(6,0)}]
+\node[font=\small\sffamily\bfseries, MinesBlue] at (0,3.5) {With Load};
+\draw[MinesBlue, thick] (0,3) -- (0,2.5);
+\node[comp] (r1b) at (0,2) {$R_1$};
+\draw[MinesBlue, thick] (0,1.5) -- (0,1);
+\node[comp] (r2b) at (0,0.5) {$R_2$};
+\draw[MinesBlue, thick] (0,0) -- (0,-0.5);
+\node[font=\scriptsize\sffamily, MinesBlue] at (0,3.2) {$V_{\text{in}}$};
+\node[font=\scriptsize\sffamily, MinesSilver] at (0,-0.8) {GND};
+\draw[MinesBlue, thick] (0,1) -- (2,1);
+% Load resistor
+\node[comp, draw=WarnOrange, fill=WarnOrange!10] (rl) at (2,0.5) {$R_L$};
+\draw[WarnOrange, thick] (2,1) -- (2,0.75);
+\draw[WarnOrange, thick] (2,0.25) -- (2,-0.5);
+\draw[MinesBlue, thick] (0,-0.5) -- (2,-0.5);
+\node[font=\scriptsize\sffamily, WarnOrange] at (3.0,0.5) {Load};
+\node[font=\tiny\sffamily\itshape, WarnOrange, align=center, text width=3cm] at (4.5,1.5) {If $R_L \approx R_2$:\\$V_{\text{out}}$ drops by 50\%!\\[2pt]Rule: $R_L \geq 100 R_2$};
+\end{scope}
+% Arrow between
+\draw[-{Stealth[length=3mm]}, MinesSilver, thick] (3.5,1.5) -- (4.5,1.5);
+\end{tikzpicture}
+\caption{Voltage divider loading error. An unloaded divider (left) produces the expected $V_{\text{out}}$. Connecting a load $R_L$ comparable to $R_2$ (right) changes the output because $R_2 \| R_L < R_2$. The 100:1 impedance rule ensures loading error stays below 1\%.}
+\label{fig:divider_loading}
+\end{figure}
+
+\begin{industrybox}{Breadboards Are for Prototyping, Not for Production}
+The single most expensive mistake in student instrumentation projects is building the final circuit on a solderless breadboard. Breadboards introduce parasitic capacitance (2--25\,pF per row), intermittent contact resistance (up to 5\,$\Omega$), and are mechanically unreliable under vibration. In DOE vehicle programs, teams that prototype on breadboards but deploy on soldered protoboards or custom PCBs consistently produce more reliable systems. When your circuit works on the breadboard, transfer it to a soldered board before the final demonstration.
+\end{industrybox}
 
 This chapter reviews the core electrical concepts that underpin every topic in Parts~III and IV. If you are comfortable with Ohm's Law, Kirchhoff's Laws, and basic RC/RL transients, this chapter serves as a concise reference. If these ideas are new or rusty, work through the examples before moving on to amplifiers and power electronics.
 
@@ -3976,6 +4791,36 @@ Circuit analysis directly generates testable requirements. ``The input stage vol
 
 
 \chapter{Amplifiers}
+\label{ch:amplifiers}\index{amplifier!operational}\index{amplifier!instrumentation}\index{gain-bandwidth product}\index{CMRR}
+
+\begin{warningbox}[Op-Amp Non-Idealities: Required Reading]
+Section~\ref{sec:opamp_nonideal} in this chapter (``The Brutal Realities'') is one of the most important in the entire document. Read it before designing any amplifier circuit.
+\end{warningbox}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=1.2cm, align=center, font=\scriptsize\sffamily\bfseries},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+    vlabel/.style={font=\tiny\sffamily, AccentTeal, align=center}
+]
+\node[block] (bridge) at (0,0) {Bridge\\Circuit};
+\node[block] (ina) at (3,0) {INA\\($G=100$)};
+\node[block] (filt) at (6,0) {Anti-Alias\\Filter};
+\node[block] (adc) at (9,0) {ADC\\(NI DAQ)};
+\node[block] (sw) at (12,0) {LabVIEW\\Processing};
+\draw[arr] (-1.8,0) -- (bridge) node[midway, above, font=\tiny\sffamily] {$\Delta R$};
+\draw[arr] (bridge) -- (ina); \draw[arr] (ina) -- (filt);
+\draw[arr] (filt) -- (adc); \draw[arr] (adc) -- (sw);
+\node[vlabel] at (1.5,-1.0) {$\sim$2\,mV\\differential};
+\node[vlabel] at (4.5,-1.0) {$\sim$200\,mV\\single-ended};
+\node[vlabel] at (7.5,-1.0) {200\,mV\\filtered};
+\node[vlabel] at (10.5,-1.0) {12-bit\\digital};
+\end{tikzpicture}
+\caption{Complete signal conditioning chain for a bridge-based sensor. Verify signal levels at each stage using the Signal Walk debugging protocol (Chapter~\ref{ch:debugging}).}
+\label{fig:signal_chain}
+\end{figure}
 
 \section{Why Amplification?}
 Many sensors produce millivolt or microvolt signals (thermocouples: $\sim$40\,$\mu$V/\degC{}; strain gauges: $\sim$2\,mV/V at full scale). ADCs work best when the signal spans most of their input range. Amplification bridges this gap, improving resolution and SNR.
@@ -4013,8 +4858,21 @@ Common ICs: INA128, AD620, INA333. CMRR typically $>$100\,dB.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_amplifier_types.png}
-\caption{Four amplifier configurations for instrumentation. The instrumentation amplifier (INA) is the gold standard for sensor interfacing.}
+\begin{tikzpicture}[
+    amp/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                minimum width=3.0cm, minimum height=2.0cm, align=center, font=\scriptsize\sffamily},
+]
+\node[amp] (inv) at (0,0) {\textbf{Inverting}\\$G = -R_f/R_i$\\Phase: $180^\circ$\\Input $Z$: $R_i$};
+\node[amp] (noninv) at (4,0) {\textbf{Non-Inverting}\\$G = 1 + R_f/R_g$\\Phase: $0^\circ$\\Input $Z$: very high};
+\node[amp] (diff) at (8,0) {\textbf{Differential}\\$G = R_f/R_i$\\Rejects CM noise\\Input $Z$: $R_i$};
+\node[amp, draw=AccentTeal, fill=AccentTeal!8] (ina) at (12,0) {\textbf{INA}\\$G = 1 + 50\text{k}/R_G$\\Highest CMRR\\Input $Z$: $>$G$\Omega$};
+% Best for labels
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (0,-1.5) {Summing circuits};
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (4,-1.5) {General-purpose};
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (8,-1.5) {Differential signals};
+\node[font=\tiny\sffamily\itshape, AccentTeal\bfseries] at (12,-1.5) {Bridge circuits};
+\end{tikzpicture}
+\caption{Four amplifier configurations for instrumentation. The instrumentation amplifier (INA, teal) is the gold standard for bridge-based sensor interfacing due to its balanced high-impedance inputs and superior CMRR.}
 \label{fig:amps}
 \end{figure}
 
@@ -4218,6 +5076,7 @@ Before connecting the signal conditioning to the DAQ, verify each stage independ
 \item Common-mode rejection (for INA): apply the same voltage to both inputs. The output should remain near zero (within the specified CMRR).
 \end{enumerate}
 \section{Op-Amp Non-Idealities: The Brutal Realities}
+\label{sec:opamp_nonideal}
 The preceding sections treat the op-amp as ideal (infinite gain, infinite bandwidth, zero offset). In practice, non-idealities are what destroy measurement accuracy. Understanding three key limitations prevents the most common student design failures.
 
 \subsection{Gain-Bandwidth Product (GBW)}
@@ -4282,7 +5141,20 @@ The maximum rate at which the output voltage can change. For a TL072: 13\,V/$\mu
 
 
 % ================================================================
+
+\begin{masterycheckbox}{Amplifiers and Signal Conditioning}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Design a non-inverting amplifier with specified gain ($G = 1 + R_f/R_g$) and verify GBP sufficiency.
+\item Select and configure an INA128 for a bridge circuit ($G = 1 + 50\text{k}\Omega/R_G$).
+\item Identify and mitigate op-amp non-idealities: offset, bias current, finite CMRR, slew rate.
+\item Apply the 100:1 impedance rule and insert buffers where needed.
+\item Design a complete signal conditioning chain from sensor to ADC.
+\end{enumerate}
+\end{masterycheckbox}
+
 \chapter{High-Power Devices and Switches}
+\label{ch:highpower}\index{MOSFET}\index{relay}\index{SSR}\index{flyback diode}\index{PWM}\index{H-bridge}
 
 \section{The Problem: MCU Outputs Cannot Drive Loads}
 A microcontroller GPIO pin typically sources 10--20\,mA at 3.3\,V. A heater, motor, solenoid, or lamp draws 100\,mA to 30\,A at 12--120\,V. You need an electronic switch between the low-power control signal and the high-power load.
@@ -4305,8 +5177,44 @@ Motors, solenoids, and relays are inductive loads. When the switch opens, the in
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_mosfet_flyback.png}
-\caption{N-channel MOSFET switching an inductive load with flyback diode protection. Without the diode, the back-EMF spike from a 50\,mH coil can reach 25,000\,V. The Schottky diode clamps it to $V_{\text{supply}} + 0.3$\,V.}
+\begin{tikzpicture}[
+    comp/.style={font=\small\sffamily},
+]
+% Supply rail
+\draw[MinesBlue, thick] (0,5) -- (4,5);
+\node[comp, MinesBlue] at (0,5.3) {$V_{\text{supply}}$};
+% Inductive load (as box)
+\draw[MinesBlue, thick, fill=LightBG] (1.5,3.2) rectangle (2.5,4.8);
+\node[comp, MinesBlue] at (2,4.0) {Load};
+\node[font=\tiny\sffamily, MinesSilver] at (2,3.5) {(Motor)};
+\draw[MinesBlue, thick] (2,4.8) -- (2,5);
+\draw[MinesBlue, thick] (2,3.2) -- (2,2.5);
+% Flyback diode
+\draw[WarnOrange, thick] (3.5,3.2) -- (3.5,4.8);
+\draw[WarnOrange, thick, fill=WarnOrange!20] (3.2,3.8) -- (3.8,3.8) -- (3.5,4.3) -- cycle;
+\draw[WarnOrange, thick] (3.2,4.3) -- (3.8,4.3);
+\draw[WarnOrange, thick] (3.5,4.8) -- (3.5,5) -- (2,5);
+\draw[WarnOrange, thick] (3.5,3.2) -- (3.5,2.5) -- (2,2.5);
+\node[font=\scriptsize\sffamily\bfseries, WarnOrange] at (4.5,4.0) {Flyback\\diode};
+% MOSFET (simplified)
+\draw[MinesBlue, thick] (2,2.5) -- (2,1.5);
+\draw[MinesBlue, thick, fill=LightBG] (1.2,0.5) rectangle (2.8,1.5);
+\node[comp, MinesBlue] at (2,1.0) {MOSFET};
+\draw[MinesBlue, thick] (2,0.5) -- (2,0);
+% Gate
+\draw[AccentTeal, thick] (0.5,1.0) -- (1.2,1.0);
+\node[font=\scriptsize\sffamily, AccentTeal] at (0.0,1.0) {Gate};
+\node[font=\tiny\sffamily, AccentTeal] at (0.0,0.6) {(from MCU)};
+% Ground
+\draw[MinesBlue, thick] (2,0) -- (2,-0.2);
+\draw[MinesBlue, thick] (1.6,-0.2) -- (2.4,-0.2);
+\draw[MinesBlue, thick] (1.7,-0.35) -- (2.3,-0.35);
+\draw[MinesBlue, thick] (1.8,-0.5) -- (2.2,-0.5);
+% Annotation
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, text width=4cm, align=left]
+    at (7.5,3.5) {Without flyback diode:\\back-EMF spike can exceed\\thousands of volts.\\[4pt]With 1N5819 Schottky:\\clamped to $V_{\text{supply}} + 0.3$\,V.\\Cost: \$0.10.};
+\end{tikzpicture}
+\caption{N-channel MOSFET low-side switching an inductive load with flyback diode (Schottky 1N5819) protection. The diode clamps the inductive voltage spike to $V_{\text{supply}} + V_f$, preventing MOSFET destruction.}
 \label{fig:mosfet_flyback}
 \end{figure}
 
@@ -4580,6 +5488,35 @@ Every MEGN~300 project with actuators (heaters, motors, pumps, solenoids) shall 
 
 
 \chapter{Systematic Debugging and Troubleshooting}
+\label{ch:debugging}\index{debugging!methodology}\index{debugging!pyramid}\index{signal walk}
+
+\begin{warningbox}[Read This Chapter First]
+Read this chapter \textbf{before your first lab session}. The debugging methodology here will save you more time than any other single chapter in this document. Students who read this chapter first report spending 60--70\% less time on integration problems.
+\end{warningbox}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    level/.style={trapezium, draw=MinesBlue, thick, fill=LightBG,
+                  trapezium left angle=75, trapezium right angle=75,
+                  minimum width=#1, minimum height=1.1cm,
+                  align=center, font=\small\sffamily\bfseries, text=MinesBlue},
+    note/.style={font=\scriptsize\sffamily, text=MinesSilver, align=left, anchor=west}
+]
+\node[level=11cm] (L1) at (0,0) {Level 1: Component Verification};
+\node[level=8.5cm] (L2) at (0,1.5) {Level 2: Interface Testing};
+\node[level=6cm] (L3) at (0,3.0) {Level 3: Subsystem Integration};
+\node[level=3.5cm] (L4) at (0,4.5) {Level 4: System Validation};
+\node[note] at (6.2,0) {Does each component work alone?\\Power, sensor, amp, DAQ, actuator};
+\node[note] at (5.0,1.5) {Do connected pairs communicate?\\Sensor$\to$amp, amp$\to$ADC, DAQ$\to$motor};
+\node[note] at (3.8,3.0) {Does sensor-to-display work?\\Does control loop respond?};
+\node[note] at (2.5,4.5) {Full system under\\real conditions};
+\draw[-{Stealth[length=3mm]}, thick, WarnOrange] (-6.5,0) -- (-6.5,4.5);
+\node[font=\small\sffamily\bfseries, WarnOrange, rotate=90, anchor=south] at (-7.0,2.25) {Debug bottom-up};
+\end{tikzpicture}
+\caption{The debugging pyramid. Always start at Level~1 (component verification) and work upward. Skipping levels is the most common cause of wasted debugging time.}
+\label{fig:debug_pyramid}
+\end{figure}
 
 A working system is never assembled all at once. It is built in layers, verified at each layer, and only then combined into the full system. Debugging is not what you do when something goes wrong; it is the disciplined verification process you follow at every stage so that when something does go wrong, you can find it in minutes instead of hours. This chapter establishes the methodology: start at the lowest level, verify each component in isolation, then work upward through subsystems to the integrated system. Students who skip this process and assemble everything at once (``big-bang integration'') consistently spend 5--10$\times$ more time debugging than students who follow the bottom-up approach.
 
@@ -4782,9 +5719,87 @@ Effective debugging is a skill that improves with deliberate practice. Five prin
 % ################################################################
 % PART IV: CONTROL SYSTEMS
 % ################################################################
+\chapter*{Why Instrumentation Projects Fail}
+\label{ch:projects_fail}
+\addcontentsline{toc}{chapter}{Why Instrumentation Projects Fail}
+
+The following failure patterns are drawn from over a decade of observing student projects in instrumentation, controls, and capstone design courses. They are listed in approximate order of frequency.
+
+\section*{1. Aliasing from Insufficient Sampling or Missing Anti-Alias Filter}
+The most common technical failure. Students sample at a rate barely above the signal of interest, observe strange low-frequency artifacts in the data, and spend hours debugging the sensor when the problem is in the DAQ configuration. The fix is straightforward: sample at 5--10$\times$ the highest frequency of interest and place an analog low-pass filter before the ADC with $f_c$ at or below $f_s/2$.
+
+\section*{2. Ground Loops and Noise from Poor Wiring Practice}
+The second most common failure. Symptoms: noisy sensor readings that change when you touch the wires, 60\,Hz interference patterns in FFT plots, readings that shift when a motor turns on. The root cause is almost always daisy-chained ground connections or signal and power wires running in parallel. Star grounding, twisted-pair signal wiring, and physical separation of power and signal conductors eliminate most noise problems without expensive shielding.
+
+\section*{3. Sensor Selected Without Checking Output Compatibility}
+Students select a sensor from an online tutorial without verifying that the output voltage range matches the ADC input range, that the output impedance is compatible with the ADC input impedance, or that the sensor's response time is fast enough for the measurement. A 10\,V sensor connected to a 3.3\,V ADC saturates the reading and may damage the ADC. A high-impedance sensor connected to a low-impedance ADC input produces a severe loading error.
+
+\section*{4. PID Tuned Without Understanding the Process}
+Students type Z-N tuning parameters into a PID block, observe overshoot or oscillation, and respond by randomly adjusting gains without a systematic approach. The Z-N method produces aggressive starting parameters that are intended to be refined. Begin with proportional-only control to understand the process response, then add integral action slowly to eliminate steady-state error, and add derivative only if the process dynamics require damping.
+
+\section*{5. Uncertainty Analysis Omitted or Applied Incorrectly}
+Raw measurements reported without uncertainty bounds are scientifically meaningless, yet many students skip uncertainty analysis entirely or apply the formulas incorrectly (most commonly: adding uncertainties linearly instead of in quadrature, or confusing precision and accuracy). Every reported measurement should include an uncertainty estimate following the GUM framework.
+
+\section*{6. Filter Design Based on Rules of Thumb Instead of Requirements}
+Students apply a ``standard'' 10\,Hz low-pass filter to every signal without analyzing what frequencies are actually present, what the noise spectrum looks like, or what frequency content must be preserved. The result is either insufficient filtering (noise passes through) or excessive filtering (the signal of interest is attenuated or phase-shifted). Always start by examining the signal's frequency content (FFT), then design the filter to preserve the signal band and reject the noise band.
+
+\section*{7. Power Supply Inadequate for Actuator Loads}
+A bench supply or USB port that works fine with sensors alone browns out when a motor or heater activates, causing the MCU to reset. The fix: calculate total system current including actuator inrush, select a supply with 50\% margin, and separate the actuator power rail from the sensor/MCU rail with independent regulation.
+
+\section*{8. Documentation Insufficient for Reproduction}
+The system works on demo day, but the report lacks the wiring diagram, DAQ channel assignments, LabVIEW block diagram screenshots, calibration data, and sampling parameters needed for someone else to reproduce the results. If a competent peer cannot replicate your setup from your report alone, the documentation has failed.
+
+\section*{9. Safety Ignored Until Something Breaks}
+No fuse on the power input, no flyback diode on the relay coil, no current limit on the bench supply. The first failure destroys a component (or several). Adding protection after a failure costs time and money that prevention would have avoided. Design the protection circuit first, then add the functional circuit inside the protected envelope.
+
+\section*{10. Scope Creep and Feature Addition Without Requirements Traceability}
+Students add features (wireless data logging, color displays, additional sensors) that were not in the original requirements, consuming time that should have been spent on verification and documentation. Every addition should trace to a requirement; if there is no requirement, there should be no feature.
+
+
+% ================================================================
+% APPENDIX: ABET OUTCOME MAPPING
+% ================================================================
+
+
 \part{Control Systems}
 
 \chapter{Open-Loop Control}
+\label{ch:openloop}\index{control!open-loop}\index{feedforward control}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=0.9cm, align=center, font=\small\sffamily},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+]
+\node[font=\sffamily\bfseries, MinesBlue] at (-3, 1.5) {Open-Loop:};
+\node[block] (ctl1) at (0,1.5) {Controller};
+\node[block] (plant1) at (3.5,1.5) {Plant};
+\draw[arr] (-2,1.5) -- (ctl1) node[midway, above, font=\scriptsize\sffamily] {$r$};
+\draw[arr] (ctl1) -- (plant1) node[midway, above, font=\scriptsize\sffamily] {$u$};
+\draw[arr] (plant1) -- (5.5,1.5) node[midway, above, font=\scriptsize\sffamily] {$y$};
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (3.5,2.6) -- (3.5,2.05);
+\node[font=\scriptsize\sffamily, WarnOrange] at (3.5,2.85) {Disturbance $d$};
+\node[font=\scriptsize\sffamily\itshape, WarnOrange] at (6.8,1.5) {No correction};
+\node[font=\sffamily\bfseries, MinesBlue] at (-3, -1.0) {Closed-Loop:};
+\node[block] (ctl2) at (0,-1.0) {Controller};
+\node[block] (plant2) at (3.5,-1.0) {Plant};
+\node[draw=MinesBlue, thick, circle, minimum size=0.5cm, fill=LightBG, font=\scriptsize\sffamily] (sj) at (-1.5,-1.0) {$\Sigma$};
+\node[block, minimum width=1.5cm] (sens) at (1.75,-2.8) {Sensor};
+\draw[arr] (-3,-1.0) -- (sj) node[midway, above, font=\scriptsize\sffamily] {$r$};
+\draw[arr] (sj) -- (ctl2) node[midway, above, font=\scriptsize\sffamily] {$e$};
+\draw[arr] (ctl2) -- (plant2) node[midway, above, font=\scriptsize\sffamily] {$u$};
+\draw[arr] (plant2) -- (5.5,-1.0) node[midway, above, font=\scriptsize\sffamily] {$y$};
+\draw[MinesBlue, thick] (5.0,-1.0) -- (5.0,-2.8) -- (sens);
+\draw[arr] (sens) -| (sj);
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (3.5,0.2) -- (3.5,-0.45);
+\node[font=\scriptsize\sffamily, WarnOrange] at (3.5,0.45) {Disturbance $d$};
+\node[font=\scriptsize\sffamily\itshape, AccentTeal] at (6.8,-1.0) {Self-correcting};
+\end{tikzpicture}
+\caption{Open-loop vs.\ closed-loop control. In open-loop, disturbances cause uncorrected output errors. In closed-loop, the sensor feeds back the actual output, and the controller drives the error toward zero.}
+\label{fig:open_vs_closed}
+\end{figure}
 
 \section{Definition}
 In open-loop control, the controller sends a command to the actuator without measuring the output. There is no feedback; the controller has no way to know if the desired outcome was achieved.
@@ -4803,12 +5818,7 @@ In open-loop control, the controller sends a command to the actuator without mea
 \section{Feedforward Control}
 A refined form of open-loop control that measures the disturbance (not the output) and adjusts the command proactively. Example: measuring outdoor temperature and preemptively increasing heater power before the room cools down. Feedforward improves performance but still has no feedback on the actual output.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{fig_open_vs_closed.png}
-\caption{Open-loop vs.\ closed-loop control. Open-loop is simple but cannot detect or correct disturbances. Closed-loop uses sensor feedback to self-correct, enabling disturbance rejection and zero steady-state error with integral action.}
-\label{fig:open_closed}
-\end{figure}
+% [Duplicate open/closed figure removed; see TikZ version fig:open_vs_closed above]
 
 
 \section{Understanding Open-Loop Control}
@@ -4984,6 +5994,37 @@ The quantitative comparison: open-loop variation $= \pm$2\,\degC{}; closed-loop 
 
 % ================================================================
 \chapter{Closed-Loop Control}
+\label{ch:closedloop}\index{control!closed-loop}\index{feedback}\index{stability}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={Time (s)}, ylabel={Output $y(t)$},
+    xmin=0, xmax=8, ymin=0, ymax=1.6,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\scriptsize\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (8,1)};
+\addlegendentry{Setpoint $r$}
+\addplot[domain=0:8, samples=300, thick, MinesBlue]
+    {1 - exp(-1.5*x)*(cos(deg(3*x)) + 0.5*sin(deg(3*x)))};
+\addlegendentry{Underdamped ($\zeta = 0.3$)}
+\addplot[domain=0:8, samples=300, thick, AccentTeal]
+    {1 - (1 + 2*x)*exp(-2*x)};
+\addlegendentry{Critically damped ($\zeta = 1.0$)}
+\addplot[domain=0:8, samples=300, thick, WarnOrange]
+    {1 - 1.333*exp(-0.75*x) + 0.333*exp(-3*x)};
+\addlegendentry{Overdamped ($\zeta = 2.0$)}
+\draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, red!60!black, thick] (0.65,1.0) -- (0.65,1.45);
+\node[font=\tiny\sffamily, red!60!black, anchor=west] at (axis cs:0.75,1.25) {Overshoot};
+\end{axis}
+\end{tikzpicture}
+\caption{Closed-loop step response for different damping ratios. Underdamped ($\zeta < 1$) responds quickly but overshoots; critically damped ($\zeta = 1$) is the fastest without overshoot; overdamped ($\zeta > 1$) is slow but conservative.}
+\label{fig:step_damping}
+\end{figure}
 
 \section{Feedback Control}
 Closed-loop control measures the output (the \textbf{process variable}, PV), compares it to the desired value (the \textbf{setpoint}, SP), and adjusts the actuator based on the \textbf{error} ($e = \text{SP} - \text{PV}$). This feedback loop enables the system to self-correct.
@@ -4991,8 +6032,30 @@ Closed-loop control measures the output (the \textbf{process variable}, PV), com
 \section{Block Diagram}
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_feedback_loop.png}
-\caption{Standard feedback control loop. The summing junction computes $e = \text{SP} - \text{PV}$. The controller processes the error and outputs a control signal $u(t)$. Disturbances enter at the plant, but the feedback loop detects and corrects their effect.}
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=0.9cm, align=center, font=\small\sffamily},
+    sum/.style={draw=MinesBlue, thick, circle, minimum size=0.5cm, fill=LightBG, font=\sffamily},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+]
+\node[sum] (sj) at (0,0) {$\Sigma$};
+\node[font=\tiny\sffamily] at (-0.2,0.2) {$+$};
+\node[font=\tiny\sffamily] at (0,-0.3) {$-$};
+\node[block] (ctrl) at (2.5,0) {Controller};
+\node[sum] (dsum) at (5.5,0) {$\Sigma$};
+\node[block] (plant) at (8,0) {Plant};
+\node[block] (sens) at (5,-2.0) {Sensor};
+\draw[arr] (-2,0) -- (sj) node[midway, above, font=\small\sffamily] {SP};
+\draw[arr] (sj) -- (ctrl) node[midway, above, font=\scriptsize\sffamily] {$e$};
+\draw[arr] (ctrl) -- (dsum) node[midway, above, font=\scriptsize\sffamily] {$u$};
+\draw[arr] (dsum) -- (plant);
+\draw[arr] (plant) -- (10,0) node[midway, above, font=\small\sffamily] {PV};
+\draw[MinesBlue, thick] (9.5,0) -- (9.5,-2.0) -- (sens);
+\draw[arr] (sens) -| (sj);
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (5.5,1.2) -- (5.5,0.35);
+\node[font=\scriptsize\sffamily, WarnOrange] at (5.5,1.5) {Disturbance $d$};
+\end{tikzpicture}
+\caption{Standard feedback control loop. The summing junction computes error $e = \text{SP} - \text{PV}$. Disturbances enter at the plant but the feedback loop detects and corrects their effect.}
 \label{fig:feedback_loop}
 \end{figure}
 
@@ -5225,6 +6288,36 @@ For the ThermoRig ramping at 1\,\degC{}/s with PI control ($K_v = K_p K_i K_{\te
 
 % ================================================================
 \chapter{PID Control}
+\label{ch:pid}\index{PID control}\index{Ziegler-Nichols}\index{integral windup}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=0.9cm, align=center, font=\small\sffamily},
+    sum/.style={draw=MinesBlue, thick, circle, minimum size=0.5cm, fill=LightBG, font=\sffamily},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+]
+\node[sum] (sum) at (0,0) {$\Sigma$};
+\node[block, fill=AccentTeal!10] (kp) at (3.0, 1.0) {$K_p \cdot e$};
+\node[block, fill=AccentTeal!10] (ki) at (3.0, 0.0) {$K_i \!\int\! e\,dt$};
+\node[block, fill=AccentTeal!10] (kd) at (3.0,-1.0) {$K_d \frac{de}{dt}$};
+\node[sum] (sum2) at (5.5,0) {$\Sigma$};
+\node[block] (plant) at (8.0,0) {Plant $G(s)$};
+\node[block, minimum width=1.5cm] (sensor) at (5.5,-2.5) {Sensor $H(s)$};
+\draw[arr] (-2.0,0) -- (sum) node[midway, above, font=\small\sffamily] {$r(t)$};
+\draw[arr] (sum) -- (1.2,0) node[midway, above, font=\scriptsize\sffamily] {$e(t)$};
+\draw[MinesBlue, thick] (1.2,0) -- (1.2,1.0); \draw[MinesBlue, thick] (1.2,0) -- (1.2,-1.0);
+\draw[arr] (1.2,1.0) -- (kp); \draw[arr] (1.2,0) -- (ki); \draw[arr] (1.2,-1.0) -- (kd);
+\draw[arr] (kp) -| (sum2); \draw[arr] (ki) -- (sum2); \draw[arr] (kd) -| (sum2);
+\draw[arr] (sum2) -- (plant) node[midway, above, font=\scriptsize\sffamily] {$u(t)$};
+\draw[arr] (plant) -- (10.0,0) node[near end, above, font=\small\sffamily] {$y(t)$};
+\draw[MinesBlue, thick] (9.5,0) -- (9.5,-2.5) -- (sensor);
+\draw[arr] (sensor) -| (sum);
+\end{tikzpicture}
+\caption{PID controller block diagram. The error $e(t) = r(t) - y_{\text{measured}}(t)$ drives three parallel paths: proportional (speed), integral (accuracy), derivative (damping). The sensor feedback path introduces its own dynamics and noise.}
+\label{fig:pid_block}
+\end{figure}
 
 \section{The PID Controller}
 The Proportional-Integral-Derivative controller is the most widely used feedback controller in industry. The control output is:
@@ -5246,15 +6339,73 @@ $u_D = K_d \cdot de/dt$. Output is proportional to the rate of change of error. 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_pid_step_responses.png}
-\caption{Step response comparison: P-only (steady-state offset), PI (offset eliminated but overshoot), PID (fast settling, minimal overshoot). Tune P first for speed, add I for accuracy, add D for damping.}
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={Time (s)}, ylabel={Process Variable},
+    xmin=0, xmax=10, ymin=0, ymax=1.5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\small\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (10,1)};
+\addlegendentry{Setpoint}
+% P-only: reaches ~0.8 with offset
+\addplot[domain=0:10, samples=200, thick, WarnOrange]
+    {0.8*(1 - exp(-1.5*x))};
+\addlegendentry{P-only (offset)}
+% PI: overshoots then settles to 1.0
+\addplot[domain=0:10, samples=300, thick, AccentTeal]
+    {1 - exp(-0.8*x)*(cos(deg(1.5*x)) + 0.53*sin(deg(1.5*x)))};
+\addlegendentry{PI (overshoots)}
+% PID: fast, minimal overshoot
+\addplot[domain=0:10, samples=300, thick, MinesBlue, line width=1.5pt]
+    {1 - exp(-2*x)*(cos(deg(2*x)) + sin(deg(2*x)))};
+\addlegendentry{PID (optimal)}
+% Offset annotation
+\draw[{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, WarnOrange] (9,0.8) -- (9,1.0);
+\node[font=\tiny\sffamily, WarnOrange, anchor=west] at (axis cs:9.1,0.9) {offset};
+\end{axis}
+\end{tikzpicture}
+\caption{Step response comparison: P-only has steady-state offset, PI eliminates offset but overshoots, PID provides fast settling with minimal overshoot. Tune P first, then I, then D.}
 \label{fig:pid_steps}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_pid_terms.png}
-\caption{The three PID controller terms, their effects, risks, and the manual tuning sequence.}
+\begin{tikzpicture}[
+    term/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                 minimum width=4.2cm, minimum height=3.5cm, align=left, font=\scriptsize\sffamily,
+                 inner sep=6pt, text width=3.8cm},
+]
+\node[term] (P) at (0,0) {
+\textbf{\large\color{MinesBlue}P} -- Proportional\\[3pt]
+$u_P = K_p \cdot e(t)$\\[3pt]
+\textcolor{AccentTeal}{Effect:} Fast response\\
+\textcolor{WarnOrange}{Risk:} Steady-state offset\\
+\textcolor{MinesSilver}{Tune:} Increase until\\~20\% overshoot
+};
+\node[term] (I) at (5,0) {
+\textbf{\large\color{MinesBlue}I} -- Integral\\[3pt]
+$u_I = K_i \!\int\! e(t)\,dt$\\[3pt]
+\textcolor{AccentTeal}{Effect:} Zero offset\\
+\textcolor{WarnOrange}{Risk:} Windup, overshoot\\
+\textcolor{MinesSilver}{Tune:} Increase until\\offset vanishes
+};
+\node[term] (D) at (10,0) {
+\textbf{\large\color{MinesBlue}D} -- Derivative\\[3pt]
+$u_D = K_d \cdot \frac{de}{dt}$\\[3pt]
+\textcolor{AccentTeal}{Effect:} Damping\\
+\textcolor{WarnOrange}{Risk:} Noise amplification\\
+\textcolor{MinesSilver}{Tune:} Increase to reduce\\overshoot; filter if noisy
+};
+% Tuning sequence arrows
+\draw[-{Stealth[length=3mm]}, thick, MinesBlue!50] (P.east) -- (I.west) node[midway, above, font=\tiny\sffamily\bfseries] {Step 2};
+\draw[-{Stealth[length=3mm]}, thick, MinesBlue!50] (I.east) -- (D.west) node[midway, above, font=\tiny\sffamily\bfseries] {Step 3};
+\node[font=\tiny\sffamily\bfseries, MinesBlue!50] at (-1.2,1.8) {Step 1};
+\draw[-{Stealth[length=2mm]}, MinesBlue!50, thick] (-1.2,1.5) -- (-0.5,1.2);
+\end{tikzpicture}
+\caption{The three PID controller terms: their formulas, effects, risks, and the recommended manual tuning sequence (P first, then I, then D).}
 \label{fig:pid}
 \end{figure}
 
@@ -5321,8 +6472,42 @@ When the actuator saturates (e.g., heater at 100\% duty, valve fully open), the 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_integral_windup.png}
-\caption{Integral windup: without anti-windup (left), the integral term accumulates during actuator saturation, causing massive overshoot. With anti-windup (right), the integral is frozen during saturation, producing minimal overshoot.}
+\begin{tikzpicture}
+\begin{axis}[
+    name=noaw, width=6.5cm, height=5cm,
+    xlabel={Time (s)}, ylabel={Output},
+    xmin=0, xmax=10, ymin=0, ymax=2.0,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{WarnOrange} Without Anti-Windup},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (10,1)};
+% Massive overshoot from windup
+\addplot[domain=0:10, samples=300, thick, WarnOrange]
+    {x < 2 ? 0 : min(1.8, 1 + 0.8*exp(-0.5*(x-4))*sin(deg(2*(x-4))))};
+\draw[{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, red!70!black, thick]
+    (axis cs:4,1) -- (axis cs:4,1.75);
+\node[font=\tiny\sffamily, red!70!black, anchor=west] at (axis cs:4.2,1.4) {80\% OS};
+\end{axis}
+\begin{axis}[
+    at={(noaw.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={Time (s)}, ylabel={Output},
+    xmin=0, xmax=10, ymin=0, ymax=2.0,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{AccentTeal} With Anti-Windup},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (10,1)};
+% Minimal overshoot
+\addplot[domain=0:10, samples=300, thick, AccentTeal]
+    {x < 2 ? 0 : 1 - exp(-1.5*(x-2))*(cos(deg(2.5*(x-2))) + 0.6*sin(deg(2.5*(x-2))))};
+\draw[{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, AccentTeal, thick]
+    (axis cs:3.2,1) -- (axis cs:3.2,1.12);
+\node[font=\tiny\sffamily, AccentTeal, anchor=west] at (axis cs:3.4,1.08) {12\% OS};
+\end{axis}
+\end{tikzpicture}
+\caption{Integral windup: without anti-windup (left), the integral accumulates during saturation, causing 80\%+ overshoot. With anti-windup clamping (right), the integral is frozen during saturation, limiting overshoot to $\sim$12\%. Always enable anti-windup.}
 \label{fig:windup}
 \end{figure}
 
@@ -5537,7 +6722,68 @@ loop:
 \backmatter
 
 
+
+\begin{masterycheckbox}{PID Control}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Explain what each PID term does and predict the effect of increasing each gain.
+\item Tune a PID controller using Ziegler-Nichols and refine manually.
+\item Implement anti-windup clamping and explain why it is necessary.
+\item Diagnose common PID problems from time-domain response plots.
+\item Configure and tune the LabVIEW PID VI, including the derivative filter $N$.
+\end{enumerate}
+\end{masterycheckbox}
+
+\begin{tipbox}[Required Reading: Why Instrumentation Projects Fail]
+Before your first Design Challenge, read the ``Why Instrumentation Projects Fail'' appendix (page~\pageref{ch:projects_fail}). It consolidates the ten most common failure modes from six years of MEGN~300 projects.
+\end{tipbox}
+
 \chapter*{Appendix: LabVIEW Quick Reference for MEGN 300}
+\addcontentsline{toc}{chapter}{Appendix: LabVIEW Quick Reference for MEGN 300}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    step/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                 minimum width=3.0cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
+    loop/.style={draw=AccentTeal, fill=AccentTeal!8, thick, rounded corners=3pt,
+                 minimum width=3.0cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+    note/.style={font=\tiny\sffamily\itshape, text=MinesSilver, align=left, anchor=west},
+]
+\node[step] (create) at (0,0) {DAQmx\\Create Channel};
+\node[step] (timing) at (0,-1.8) {DAQmx Timing};
+\node[step] (start) at (0,-3.6) {DAQmx Start Task};
+\node[loop] (read) at (0,-5.4) {DAQmx Read\\(inside While Loop)};
+\node[step] (stop) at (0,-7.2) {DAQmx Stop Task};
+\node[step] (clear) at (0,-9.0) {DAQmx Clear Task};
+
+\draw[arr] (create) -- (timing);
+\draw[arr] (timing) -- (start);
+\draw[arr] (start) -- (read);
+\draw[arr] (read) -- (stop);
+\draw[arr] (stop) -- (clear);
+
+% Loop indicator
+\draw[AccentTeal, thick, dashed, rounded corners=5pt] (-2,-4.8) rectangle (2,-6.0);
+\node[font=\tiny\sffamily\bfseries, AccentTeal] at (1.5,-4.6) {While Loop};
+
+% Notes
+\node[note] at (2.2,0) {Channel type, physical channel,\\terminal config (Diff or RSE)};
+\node[note] at (2.2,-1.8) {Sample rate, samples/channel,\\continuous vs. finite};
+\node[note] at (2.2,-3.6) {Arms the acquisition\\(call once, outside loop)};
+\node[note] at (2.2,-5.4) {Read data each iteration\\Process, display, log here};
+\node[note] at (2.2,-7.2) {Stop acquisition\\(after loop exits)};
+\node[note] at (2.2,-9.0) {Release hardware resource\\(\textbf{omitting this = ``resource reserved''})};
+
+% Error wire
+\draw[WarnOrange, thick, decorate, decoration={snake, amplitude=1pt, segment length=5pt}]
+    (1.5,-0.4) -- (1.5,-8.6);
+\node[font=\tiny\sffamily\bfseries, WarnOrange, rotate=90, anchor=south] at (1.8,-4.5) {Error wire (thread all VIs)};
+\end{tikzpicture}
+\caption{The standard DAQmx programming pattern for MEGN~300. Every LabVIEW VI that reads from the NI DAQ should follow this sequence. The error wire (orange) must connect through every VI to ensure proper cleanup on failure.}
+\label{fig:daqmx_pattern}
+\end{figure}
 \addcontentsline{toc}{chapter}{Appendix: LabVIEW Quick Reference}
 
 This appendix provides a condensed reference for the LabVIEW programming patterns most commonly used in MEGN~300 labs.
@@ -5649,6 +6895,7 @@ This systematic isolation prevents the most common debugging failure: ``poking a
 \part{Engineering Science Reference}
 
 \chapter{Fundamentals of Heat Transfer}
+\label{ch:heat}\index{heat transfer!conduction}\index{heat transfer!convection}\index{thermal time constant}\index{lumped capacitance}
 
 \section{Why Heat Transfer Matters in Instrumentation}
 Temperature is the most commonly measured physical quantity in engineering. The ThermoRig system, which runs throughout this text, measures temperature and controls a heater. To design such systems intelligently, you must understand how heat moves through the system. Heat transfer determines: the sensor's time constant (how fast the thermocouple equilibrates with the medium), the heater's power requirement (how much energy is needed to maintain the setpoint), the steady-state temperature distribution (where to place the sensor for representative measurement), and the system's response to disturbances (how quickly the temperature changes when a door opens or a load changes).
@@ -5660,8 +6907,42 @@ Heat energy transfers by three mechanisms: conduction (through solid or stationa
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{fig_heat_transfer_modes.png}
-\caption{The three modes of heat transfer with typical coefficient values for laboratory conditions. Convection coefficient $h$ varies by three orders of magnitude depending on the fluid and flow conditions, making it the dominant design variable for sensor time constants.}
+\begin{tikzpicture}[
+    mode/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                 minimum width=4.0cm, minimum height=3.2cm, align=center, font=\scriptsize\sffamily,
+                 inner sep=6pt, text width=3.6cm},
+]
+\node[mode] (cond) at (0,0) {
+\textbf{\large\color{MinesBlue}Conduction}\\[3pt]
+$q = -kA\frac{dT}{dx}$\\[3pt]
+Through solid material\\
+$k$: 0.03 (insulation)\\to 400 (copper) W/m$\cdot$K
+};
+\node[mode] (conv) at (5.2,0) {
+\textbf{\large\color{MinesBlue}Convection}\\[3pt]
+$q = hA(T_s - T_\infty)$\\[3pt]
+Solid to fluid\\
+$h$: 5 (free air) to\\10,000 (boiling) W/m$^2\!\cdot$K
+};
+\node[mode] (rad) at (10.4,0) {
+\textbf{\large\color{MinesBlue}Radiation}\\[3pt]
+$q = \epsilon\sigma A(T_s^4 - T_\infty^4)$\\[3pt]
+Electromagnetic waves\\
+Dominant above $\sim$500\,\degC{}\\
+$\sigma = 5.67\times10^{-8}$
+};
+% Arrows showing heat flow
+\draw[-{Stealth[length=3mm]}, WarnOrange, thick, decorate, decoration={snake, amplitude=1.5pt, segment length=6pt}]
+    (0,-2.2) -- (0,-2.8);
+\draw[-{Stealth[length=3mm]}, WarnOrange, thick, decorate, decoration={snake, amplitude=1.5pt, segment length=6pt}]
+    (5.2,-2.2) -- (5.2,-2.8);
+\draw[-{Stealth[length=3mm]}, WarnOrange, thick, decorate, decoration={snake, amplitude=1.5pt, segment length=6pt}]
+    (10.4,-2.2) -- (10.4,-2.8);
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (0,-3.1) {through material};
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (5.2,-3.1) {to fluid};
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (10.4,-3.1) {EM emission};
+\end{tikzpicture}
+\caption{The three modes of heat transfer with governing equations and typical coefficient ranges. Convection coefficient $h$ varies by three orders of magnitude, making it the dominant design variable for sensor thermal time constants.}
 \label{fig:heat_modes}
 \end{figure}
 
@@ -5875,6 +7156,43 @@ The multi-node model reveals internal temperature gradients. The heater surface 
 
 
 \chapter{Fundamentals of Fluid Power}
+\label{ch:fluid}\index{fluid power}\index{Bernoulli equation}\index{flow measurement}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    comp/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                 minimum width=2.2cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
+    pipe/.style={MinesBlue, thick},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, AccentTeal},
+    sensor/.style={draw=WarnOrange, fill=WarnOrange!10, thick, rounded corners=2pt,
+                   minimum width=1.4cm, minimum height=0.7cm, align=center, font=\tiny\sffamily\bfseries},
+]
+\node[comp] (res) at (0,0) {Reservoir};
+\node[comp] (pump) at (3.5,0) {Pump};
+\node[comp] (valve) at (7,0) {Control\\Valve};
+\node[comp] (act) at (10.5,0) {Actuator\\(Cylinder)};
+
+\draw[arr] (res) -- (pump);
+\draw[arr] (pump) -- (valve);
+\draw[arr] (valve) -- (act);
+\draw[pipe] (act.south) -- (10.5,-1.5) -- (0,-1.5) -- (res.south);
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (5.25,-1.8) {Return line};
+\draw[arr] (5.25,-1.5) -- (3,-1.5);
+
+% Sensors
+\node[sensor] (ps) at (5.25,1.2) {Pressure\\sensor};
+\node[sensor] (fs) at (8.75,1.2) {Flow\\sensor};
+\draw[WarnOrange, thick, dashed] (ps) -- (5.25,0.5);
+\draw[WarnOrange, thick, dashed] (fs) -- (8.75,0.5);
+
+% FRL
+\node[font=\tiny\sffamily, AccentTeal, align=center] at (1.75,0.8) {Filter-Regulator-\\Lubricator (FRL)};
+\draw[AccentTeal, thick, ->] (1.75,0.5) -- (1.75,0.15);
+\end{tikzpicture}
+\caption{Basic hydraulic system schematic showing the flow path from reservoir through pump, control valve, and actuator, with return line. Pressure and flow sensors (orange) provide the measurement signals for monitoring and closed-loop control. Pneumatic systems follow the same topology but add a filter-regulator-lubricator (FRL) unit upstream.}
+\label{fig:hydraulic_system}
+\end{figure}
 
 Fluid power systems use pressurized liquids (hydraulics) or gases (pneumatics) to transmit force and motion. While MEGN~300 focuses on electrical instrumentation, many measurement and control systems interface with fluid systems: pressure sensors monitor hydraulic circuits, flow sensors meter process streams, and control valves regulate flow in response to PID commands. This chapter provides the fluid mechanics and system-level knowledge needed to instrument, model, and control fluid power systems.
 
@@ -6197,45 +7515,6 @@ Where $K_u$ is the ultimate gain and $P_u$ is the ultimate period. These are sta
 % ================================================================
 % APPENDIX: WHY PROJECTS FAIL
 % ================================================================
-\chapter*{Why Instrumentation Projects Fail}
-\addcontentsline{toc}{chapter}{Why Instrumentation Projects Fail}
-
-The following failure patterns are drawn from over a decade of observing student projects in instrumentation, controls, and capstone design courses. They are listed in approximate order of frequency.
-
-\section*{1. Aliasing from Insufficient Sampling or Missing Anti-Alias Filter}
-The most common technical failure. Students sample at a rate barely above the signal of interest, observe strange low-frequency artifacts in the data, and spend hours debugging the sensor when the problem is in the DAQ configuration. The fix is straightforward: sample at 5--10$\times$ the highest frequency of interest and place an analog low-pass filter before the ADC with $f_c$ at or below $f_s/2$.
-
-\section*{2. Ground Loops and Noise from Poor Wiring Practice}
-The second most common failure. Symptoms: noisy sensor readings that change when you touch the wires, 60\,Hz interference patterns in FFT plots, readings that shift when a motor turns on. The root cause is almost always daisy-chained ground connections or signal and power wires running in parallel. Star grounding, twisted-pair signal wiring, and physical separation of power and signal conductors eliminate most noise problems without expensive shielding.
-
-\section*{3. Sensor Selected Without Checking Output Compatibility}
-Students select a sensor from an online tutorial without verifying that the output voltage range matches the ADC input range, that the output impedance is compatible with the ADC input impedance, or that the sensor's response time is fast enough for the measurement. A 10\,V sensor connected to a 3.3\,V ADC saturates the reading and may damage the ADC. A high-impedance sensor connected to a low-impedance ADC input produces a severe loading error.
-
-\section*{4. PID Tuned Without Understanding the Process}
-Students type Z-N tuning parameters into a PID block, observe overshoot or oscillation, and respond by randomly adjusting gains without a systematic approach. The Z-N method produces aggressive starting parameters that are intended to be refined. Begin with proportional-only control to understand the process response, then add integral action slowly to eliminate steady-state error, and add derivative only if the process dynamics require damping.
-
-\section*{5. Uncertainty Analysis Omitted or Applied Incorrectly}
-Raw measurements reported without uncertainty bounds are scientifically meaningless, yet many students skip uncertainty analysis entirely or apply the formulas incorrectly (most commonly: adding uncertainties linearly instead of in quadrature, or confusing precision and accuracy). Every reported measurement should include an uncertainty estimate following the GUM framework.
-
-\section*{6. Filter Design Based on Rules of Thumb Instead of Requirements}
-Students apply a ``standard'' 10\,Hz low-pass filter to every signal without analyzing what frequencies are actually present, what the noise spectrum looks like, or what frequency content must be preserved. The result is either insufficient filtering (noise passes through) or excessive filtering (the signal of interest is attenuated or phase-shifted). Always start by examining the signal's frequency content (FFT), then design the filter to preserve the signal band and reject the noise band.
-
-\section*{7. Power Supply Inadequate for Actuator Loads}
-A bench supply or USB port that works fine with sensors alone browns out when a motor or heater activates, causing the MCU to reset. The fix: calculate total system current including actuator inrush, select a supply with 50\% margin, and separate the actuator power rail from the sensor/MCU rail with independent regulation.
-
-\section*{8. Documentation Insufficient for Reproduction}
-The system works on demo day, but the report lacks the wiring diagram, DAQ channel assignments, LabVIEW block diagram screenshots, calibration data, and sampling parameters needed for someone else to reproduce the results. If a competent peer cannot replicate your setup from your report alone, the documentation has failed.
-
-\section*{9. Safety Ignored Until Something Breaks}
-No fuse on the power input, no flyback diode on the relay coil, no current limit on the bench supply. The first failure destroys a component (or several). Adding protection after a failure costs time and money that prevention would have avoided. Design the protection circuit first, then add the functional circuit inside the protected envelope.
-
-\section*{10. Scope Creep and Feature Addition Without Requirements Traceability}
-Students add features (wireless data logging, color displays, additional sensors) that were not in the original requirements, consuming time that should have been spent on verification and documentation. Every addition should trace to a requirement; if there is no requirement, there should be no feature.
-
-
-% ================================================================
-% APPENDIX: ABET OUTCOME MAPPING
-% ================================================================
 \chapter*{ABET Student Outcome Mapping}
 \addcontentsline{toc}{chapter}{ABET Student Outcome Mapping}
 
@@ -6299,5 +7578,7 @@ MEGN~300 is designed to develop the following ABET student outcomes. The table b
 \item \textbf{Filter design}: Analog Devices Filter Wizard at \url{https://tools.analog.com/en/filterwizard/}
 \item \textbf{PCB/electronics}: EEVblog YouTube channel (practical electronics tutorials)
 \end{itemize}
+
+\printindex
 
 \end{document}
