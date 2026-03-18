@@ -1,83 +1,72 @@
-# MEGN 300: Instrumentation & Automation — Course Materials
+# MEGN 300 — Instrumentation & Automation
 
-[![Build MEGN 300 PDFs](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml/badge.svg)](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml)
+**Colorado School of Mines · Department of Mechanical Engineering**
 
-**Author:** Adam Duran, PE, PMP  
-**Institution:** Colorado School of Mines, Department of Mechanical Engineering  
-**Term:** Spring 2026  
+[![Build LaTeX PDFs](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml/badge.svg)](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml)
 
----
+## Latest Documents
 
-## Download PDFs
+| Document | Download |
+|----------|----------|
+| **Master Reference Document** | [📥 Download PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/megn300_master_reference.pdf) |
+| **Student Guide** | [📥 Download PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/MEGN300_Student_Guide.pdf) |
 
-| Document | Description | Link |
-|---|---|---|
-| **Master Reference Document** | 350+ page comprehensive reference covering measurement theory, signal processing, electronics, and PID control | [**Download PDF**](megn300_master_reference.pdf) |
-| **Student Guide** | 25-page companion with FAQ, tips, common pitfalls, and "Before You Start" checklists for each module | [**Download PDF**](MEGN300_Student_Guide.pdf) |
-
-PDFs are auto-compiled by GitHub Actions on every push and committed to this branch.
-
----
+> PDFs are automatically rebuilt on every push to `main` via GitHub Actions.
 
 ## Repository Structure
-
 ```
-MEGN300/
-├── mrd/                             Master Reference Document (modular)
-│   ├── main.tex                     Build entry point
-│   ├── preamble.tex                 Packages, colors, custom environments
-│   ├── .latexmkrc                   latexmk config (handles makeindex)
-│   ├── frontmatter/
-│   │   ├── titlepage.tex
-│   │   ├── preface.tex
-│   │   ├── triage.tex
-│   │   ├── survival_guide.tex
-│   │   ├── ai_policy.tex
-│   │   └── safety.tex
-│   ├── chapters/
-│   │   ├── ch01_measurement_theory.tex
-│   │   ├── ch02_static_measurements.tex
-│   │   ├── ...
-│   │   └── ch22_fluid_power.tex
-│   └── appendices/
-│       ├── projects_fail.tex
-│       ├── labview.tex
-│       ├── glossary.tex
-│       ├── quick_reference.tex
-│       ├── abet.tex
-│       └── references.tex
-├── student_guide/
-│   └── MEGN300_Student_Guide.tex
-├── .github/workflows/               GitHub Actions auto-build
-├── megn300_master_reference.pdf      ← auto-built by CI
-└── MEGN300_Student_Guide.pdf         ← auto-built by CI
+megn300_master_reference.tex         Master Reference Document (monolithic LaTeX)
+MEGN300_Student_Guide.tex            Student Guide
+
+figs/                                Pre-rendered figures (22 PNGs)
+├── fig_accuracy_precision.png
+├── fig_adc_process.png
+├── fig_aliasing.png
+├── ...
+└── fig_wheatstone_bridge.png
 ```
 
-## Editing Workflow
+## Document Structure
 
-Each chapter is a self-contained `.tex` file. Edit any file under `mrd/` or `student_guide/`, commit, push. GitHub Actions recompiles **both** PDFs automatically.
+### Laboratory Safety and Equipment Care
 
-**Fast local build of a single chapter:**
-```bash
-# Uncomment this line in mrd/main.tex:
-#   \includeonly{chapters/ch15_amplifiers}
-cd mrd && latexmk -pdf main.tex    # ~5 seconds instead of ~60
-```
+### Part I: Measurement Fundamentals
+1. Fundamentals of Measurement Theory
+2. Static Measurements
+3. Dynamic Measurements
+4. Error Analysis and Uncertainty
+5. Statistics and Experimental Data Analysis
 
-Re-comment `\includeonly` before pushing.
+### Part II: Signals and Signal Processing
+6. Analog vs. Digital Systems
+7. Signal-to-Noise Ratio
+8. Fourier Series and Complex Signal Construction
+9. FFT and Complex Signal Decomposition
+10. Fundamentals of Digital Signal Processing
+11. Analog Filter Design
+12. Digital Filter Design
+
+### Part III: Electronics for Instrumentation
+13. Amplifiers
+14. High-Power Devices and Switches
+
+### Part IV: Control Systems
+15. Open-Loop Control
+16. Closed-Loop Control
+17. PID Control
+
+### Part V: Engineering Science Reference
+18. Fundamentals of Heat Transfer
 
 ## Building Locally
-
-**Prerequisites:** TeX Live (full) or MacTeX, with `latexmk`
-
 ```bash
-# Build MRD
-cd mrd && latexmk -pdf main.tex
+# Master Reference Document (2-pass for TOC)
+pdflatex megn300_master_reference.tex && pdflatex megn300_master_reference.tex
 
-# Build Student Guide
-cd student_guide && latexmk -pdf MEGN300_Student_Guide.tex
+# Student Guide (2-pass)
+pdflatex MEGN300_Student_Guide.tex && pdflatex MEGN300_Student_Guide.tex
 ```
 
-## Zero Textbook Cost (ZTC)
+## Author
 
-All 42 figures are generated inline using TikZ/pgfplots. No external image files are required. The document compiles from source on any system with a standard TeX Live installation.
+**Adam Duran** · Assistant Teaching Professor · PE, PMP · March 2026
