@@ -25,16 +25,14 @@ jobs:
         with:
           working_directory: mrd
           root_file: main.tex
-          args: -pdf -interaction=nonstopmode -file-line-error
-          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol imakeidx microtype bookmark pgfplots
+          args: -pdf -f -interaction=nonstopmode -file-line-error
 
       - name: Build Student Guide
         uses: xu-cheng/latex-action@v3
         with:
           working_directory: student_guide
           root_file: MEGN300_Student_Guide.tex
-          args: -pdf -interaction=nonstopmode -file-line-error
-          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol microtype
+          args: -pdf -f -interaction=nonstopmode -file-line-error
 
       - name: Copy PDFs to repo root
         run: |

@@ -7,19 +7,19 @@
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-    step/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+    stepnode/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
                  minimum width=2.5cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
     dec/.style={diamond, draw=AccentTeal, thick, fill=AccentTeal!8, align=center,
                 font=\scriptsize\sffamily, inner sep=2pt, aspect=2.5},
     arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
     yn/.style={font=\tiny\sffamily\bfseries, MinesBlue}
 ]
-\node[step] (spec) at (0,0) {Define\\Specifications};
+\node[stepnode] (spec) at (0,0) {Define\\Specifications};
 \node[dec] (phase) at (3.5,0) {Linear phase\\required?};
-\node[step] (fir) at (7,1.2) {FIR Design\\(window method)};
-\node[step] (iir) at (7,-1.2) {IIR Design\\(Butterworth/Cheby)};
-\node[step] (impl) at (10.5,0) {Implement in\\LabVIEW};
-\node[step] (verify) at (13.5,0) {Verify with\\known signal};
+\node[stepnode] (fir) at (7,1.2) {FIR Design\\(window method)};
+\node[stepnode] (iir) at (7,-1.2) {IIR Design\\(Butterworth/Cheby)};
+\node[stepnode] (impl) at (10.5,0) {Implement in\\LabVIEW};
+\node[stepnode] (verify) at (13.5,0) {Verify with\\known signal};
 \draw[arr] (spec) -- (phase);
 \draw[arr] (phase) -- (fir) node[midway, yn, above] {Yes};
 \draw[arr] (phase) -- (iir) node[midway, yn, below] {No};

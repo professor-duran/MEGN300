@@ -7,19 +7,19 @@
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-    step/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+    stepnode/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
                  minimum width=3.0cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
     loop/.style={draw=AccentTeal, fill=AccentTeal!8, thick, rounded corners=3pt,
                  minimum width=3.0cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
     arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
     note/.style={font=\tiny\sffamily\itshape, text=MinesSilver, align=left, anchor=west},
 ]
-\node[step] (create) at (0,0) {DAQmx\\Create Channel};
-\node[step] (timing) at (0,-1.8) {DAQmx Timing};
-\node[step] (start) at (0,-3.6) {DAQmx Start Task};
+\node[stepnode] (create) at (0,0) {DAQmx\\Create Channel};
+\node[stepnode] (timing) at (0,-1.8) {DAQmx Timing};
+\node[stepnode] (start) at (0,-3.6) {DAQmx Start Task};
 \node[loop] (read) at (0,-5.4) {DAQmx Read\\(inside While Loop)};
-\node[step] (stop) at (0,-7.2) {DAQmx Stop Task};
-\node[step] (clear) at (0,-9.0) {DAQmx Clear Task};
+\node[stepnode] (stop) at (0,-7.2) {DAQmx Stop Task};
+\node[stepnode] (clear) at (0,-9.0) {DAQmx Clear Task};
 
 \draw[arr] (create) -- (timing);
 \draw[arr] (timing) -- (start);

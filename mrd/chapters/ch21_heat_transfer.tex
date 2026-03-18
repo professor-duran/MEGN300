@@ -8,7 +8,7 @@
 \centering
 \begin{tikzpicture}[
     res/.style={draw=MinesBlue, thick, fill=LightBG, minimum width=1.0cm, minimum height=0.4cm, font=\scriptsize\sffamily},
-    cap/.style={font=\scriptsize\sffamily, AccentTeal},
+    caplbl/.style={font=\scriptsize\sffamily, AccentTeal},
 ]
 % Thermal circuit
 \node[font=\small\sffamily\bfseries, MinesBlue] at (6,3.5) {Thermal Resistance Circuit};
@@ -21,19 +21,19 @@
 \draw[MinesBlue, thick] (rc.east) -- (4,2);
 % Node: sensor surface
 \filldraw[AccentTeal] (4,2) circle (2pt);
-\node[cap, above=3pt] at (4,2) {$T_{\text{surface}}$};
+\node[caplbl, above=3pt] at (4,2) {$T_{\text{surface}}$};
 % R_cond (through sensor body)
 \node[res] (rk) at (5.5,2) {$R_{\text{cond}}$};
 \draw[MinesBlue, thick] (4,2) -- (rk.west);
 \draw[MinesBlue, thick] (rk.east) -- (7,2);
 % Node: sensor core
 \filldraw[AccentTeal] (7,2) circle (2pt);
-\node[cap, above=3pt] at (7,2) {$T_{\text{sensor}}$};
+\node[caplbl, above=3pt] at (7,2) {$T_{\text{sensor}}$};
 % Thermal capacitance (to ground)
 \draw[AccentTeal, thick] (7,2) -- (7,0.8);
 \draw[AccentTeal, thick] (6.5,0.8) -- (7.5,0.8);
 \draw[AccentTeal, thick] (6.5,0.6) -- (7.5,0.6);
-\node[cap] at (8.3,0.7) {$C_{\text{th}}$};
+\node[caplbl] at (8.3,0.7) {$C_{\text{th}}$};
 \draw[AccentTeal, thick] (7,0.6) -- (7,0);
 % R_conv (to ambient)
 \node[res] (rh) at (9,2) {$R_{\text{conv}}$};
