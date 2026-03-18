@@ -1,0 +1,385 @@
+% Chapter 16: High-Power Devices and Switches
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{High-Power Devices and Switches}
+\label{ch:highpower}\index{MOSFET}\index{relay}\index{SSR}\index{flyback diode}\index{PWM}\index{H-bridge}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    name=pwm25, width=4.2cm, height=3.5cm,
+    xlabel={}, ylabel={$V$}, title={\scriptsize\sffamily 25\% Duty Cycle},
+    xmin=0, xmax=4, ymin=-0.3, ymax=1.5,
+    axis lines=left, xtick=\empty, ytick={0,1},
+    yticklabels={0,$V_s$}, tick label style={font=\tiny\sffamily},
+    every axis label/.style={font=\tiny\sffamily},
+    title style={font=\scriptsize\sffamily},
+]
+\addplot[const plot, thick, MinesBlue] coordinates {(0,1) (0.25,0) (1,1) (1.25,0) (2,1) (2.25,0) (3,1) (3.25,0) (4,0)};
+\addplot[dashed, WarnOrange, thick] coordinates {(0,0.25) (4,0.25)};
+\node[font=\tiny\sffamily, WarnOrange] at (axis cs:3.5,0.45) {$\bar{V}$};
+\end{axis}
+\begin{axis}[
+    at={(pwm25.east)}, anchor=west, xshift=0.8cm,
+    width=4.2cm, height=3.5cm,
+    xlabel={}, ylabel={}, title={\scriptsize\sffamily 50\% Duty Cycle},
+    xmin=0, xmax=4, ymin=-0.3, ymax=1.5,
+    axis lines=left, xtick=\empty, ytick={0,1},
+    yticklabels={0,$V_s$}, tick label style={font=\tiny\sffamily},
+    title style={font=\scriptsize\sffamily},
+    name=pwm50,
+]
+\addplot[const plot, thick, MinesBlue] coordinates {(0,1) (0.5,0) (1,1) (1.5,0) (2,1) (2.5,0) (3,1) (3.5,0) (4,0)};
+\addplot[dashed, WarnOrange, thick] coordinates {(0,0.5) (4,0.5)};
+\node[font=\tiny\sffamily, WarnOrange] at (axis cs:3.5,0.7) {$\bar{V}$};
+\end{axis}
+\begin{axis}[
+    at={(pwm50.east)}, anchor=west, xshift=0.8cm,
+    width=4.2cm, height=3.5cm,
+    xlabel={}, ylabel={}, title={\scriptsize\sffamily 75\% Duty Cycle},
+    xmin=0, xmax=4, ymin=-0.3, ymax=1.5,
+    axis lines=left, xtick=\empty, ytick={0,1},
+    yticklabels={0,$V_s$}, tick label style={font=\tiny\sffamily},
+    title style={font=\scriptsize\sffamily},
+]
+\addplot[const plot, thick, MinesBlue] coordinates {(0,1) (0.75,0) (1,1) (1.75,0) (2,1) (2.75,0) (3,1) (3.75,0) (4,0)};
+\addplot[dashed, WarnOrange, thick] coordinates {(0,0.75) (4,0.75)};
+\node[font=\tiny\sffamily, WarnOrange] at (axis cs:3.5,0.95) {$\bar{V}$};
+\end{axis}
+\end{tikzpicture}
+\caption{Pulse Width Modulation (PWM) at three duty cycles. The MOSFET switches rapidly between fully on ($V_s$) and fully off (0\,V). The average voltage $\bar{V} = D \times V_s$ (orange dashed) is proportional to the duty cycle $D$. An inductive load (motor coil) smooths the pulsed current into a nearly DC value proportional to $D$. The ThermoRig heater uses time-proportional PWM through an SSR.}
+\label{fig:pwm}
+\end{figure}
+
+\section{The Problem: MCU Outputs Cannot Drive Loads}
+A microcontroller GPIO pin typically sources 10--20\,mA at 3.3\,V. A heater, motor, solenoid, or lamp draws 100\,mA to 30\,A at 12--120\,V. You need an electronic switch between the low-power control signal and the high-power load.
+
+\section{Transistors as Switches}
+
+\subsection{BJT (Bipolar Junction Transistor)}
+A small base current ($I_B$) controls a large collector current ($I_C$). In switching mode: fully OFF (cutoff, $I_C \approx 0$) or fully ON (saturation, $V_{CE} \approx 0.2$--$0.7$\,V). The current gain $\beta = I_C / I_B$ determines the base current needed: $I_B = I_C / \beta$. Add a base resistor to limit current from the MCU pin.
+
+\subsection{MOSFET}
+A voltage on the gate controls the drain current. In switching mode: fully OFF ($V_{GS} < V_{th}$, no current) or fully ON ($V_{GS} \gg V_{th}$, drain-source acts as a low resistance $R_{DS(on)}$). Power dissipation $= I_D^2 \times R_{DS(on)}$.
+
+\textbf{N-channel} (most common): placed in the low side (between load and ground). Gate driven high to turn on. Logic-level gate MOSFETs (e.g., IRLZ44N, $V_{th} < 2.5$\,V) can be driven directly by a 3.3\,V MCU.
+
+\textbf{P-channel}: placed in the high side (between supply and load). Gate pulled low (relative to source) to turn on. Used for high-side switching and reverse-polarity protection.
+
+\begin{warningbox}[Inductive Load Protection]
+Motors, solenoids, and relays are inductive loads. When the switch opens, the inductor generates a voltage spike ($V = L \cdot dI/dt$) that can reach hundreds of volts and destroy the switch. \textbf{Always add a flyback diode} (Schottky preferred) across the load: cathode to positive, anode to negative. This clamps the spike to one diode drop.
+\end{warningbox}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    comp/.style={font=\small\sffamily},
+]
+% Supply rail
+\draw[MinesBlue, thick] (0,5) -- (4,5);
+\node[comp, MinesBlue] at (0,5.3) {$V_{\text{supply}}$};
+% Inductive load (as box)
+\draw[MinesBlue, thick, fill=LightBG] (1.5,3.2) rectangle (2.5,4.8);
+\node[comp, MinesBlue] at (2,4.0) {Load};
+\node[font=\tiny\sffamily, MinesSilver] at (2,3.5) {(Motor)};
+\draw[MinesBlue, thick] (2,4.8) -- (2,5);
+\draw[MinesBlue, thick] (2,3.2) -- (2,2.5);
+% Flyback diode
+\draw[WarnOrange, thick] (3.5,3.2) -- (3.5,4.8);
+\draw[WarnOrange, thick, fill=WarnOrange!20] (3.2,3.8) -- (3.8,3.8) -- (3.5,4.3) -- cycle;
+\draw[WarnOrange, thick] (3.2,4.3) -- (3.8,4.3);
+\draw[WarnOrange, thick] (3.5,4.8) -- (3.5,5) -- (2,5);
+\draw[WarnOrange, thick] (3.5,3.2) -- (3.5,2.5) -- (2,2.5);
+\node[font=\scriptsize\sffamily\bfseries, WarnOrange] at (4.5,4.0) {Flyback\\diode};
+% MOSFET (simplified)
+\draw[MinesBlue, thick] (2,2.5) -- (2,1.5);
+\draw[MinesBlue, thick, fill=LightBG] (1.2,0.5) rectangle (2.8,1.5);
+\node[comp, MinesBlue] at (2,1.0) {MOSFET};
+\draw[MinesBlue, thick] (2,0.5) -- (2,0);
+% Gate
+\draw[AccentTeal, thick] (0.5,1.0) -- (1.2,1.0);
+\node[font=\scriptsize\sffamily, AccentTeal] at (0.0,1.0) {Gate};
+\node[font=\tiny\sffamily, AccentTeal] at (0.0,0.6) {(from MCU)};
+% Ground
+\draw[MinesBlue, thick] (2,0) -- (2,-0.2);
+\draw[MinesBlue, thick] (1.6,-0.2) -- (2.4,-0.2);
+\draw[MinesBlue, thick] (1.7,-0.35) -- (2.3,-0.35);
+\draw[MinesBlue, thick] (1.8,-0.5) -- (2.2,-0.5);
+% Annotation
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, text width=4cm, align=left]
+    at (7.5,3.5) {Without flyback diode:\\back-EMF spike can exceed\\thousands of volts.\\[4pt]With 1N5819 Schottky:\\clamped to $V_{\text{supply}} + 0.3$\,V.\\Cost: \$0.10.};
+\end{tikzpicture}
+\caption{N-channel MOSFET low-side switching an inductive load with flyback diode (Schottky 1N5819) protection. The diode clamps the inductive voltage spike to $V_{\text{supply}} + V_f$, preventing MOSFET destruction.}
+\label{fig:mosfet_flyback}
+\end{figure}
+
+\section{Relays}
+An electromechanical switch operated by a coil. The coil is driven by a transistor or MOSFET; the contacts switch the load. \textbf{Advantages}: complete galvanic isolation between control and load, handles AC or DC, very low on-resistance. \textbf{Disadvantages}: slow (5--20\,ms switching), mechanical wear (rated for $10^5$--$10^6$ cycles), audible click, generates EMI from contact arcing.
+
+\subsection{Solid-State Relays (SSR)}
+Use a semiconductor (MOSFET or TRIAC) instead of mechanical contacts. No moving parts, no arcing, no audible noise, faster switching ($<$1\,ms), longer lifetime ($>10^8$ cycles). More expensive and have higher on-state voltage drop (generating more heat).
+
+\section{H-Bridge for Motor Direction Control}
+An H-bridge uses four switches (MOSFETs or BJTs) arranged so the motor can be driven in both directions. Two switches close at a time (diagonal pairs). PWM on one pair controls speed; switching pairs reverses direction. Common ICs: L298N, BTS7960, DRV8871. Always include flyback protection.
+
+
+\section{Pulse Width Modulation (PWM) for Power Control}
+PWM controls the average power delivered to a load by rapidly switching it on and off. The \textbf{duty cycle} ($D$) determines the fraction of time the load is powered:
+\begin{equation}
+V_{\text{avg}} = D \times V_{\text{supply}}, \qquad P_{\text{avg}} = D \times P_{\text{max}}
+\end{equation}
+For a heater or lamp: average power is proportional to duty cycle. For a DC motor: average voltage (and thus speed) is proportional to duty cycle; the motor's mechanical inertia smooths the pulsed current into quasi-continuous rotation.
+
+\textbf{PWM frequency selection}: high enough that the load integrates the pulses (no flicker in lamps, no audible buzz in motors). Typical: 1--25\,kHz for motors, 100\,Hz--1\,kHz for heaters. Too high: increased switching losses in the MOSFET.
+
+\section{Optocouplers and Galvanic Isolation}
+An optocoupler transmits a signal across an electrical isolation barrier using light (LED $\to$ phototransistor inside a single package). Provides complete galvanic isolation (typically 3--5\,kV) between the control circuit (MCU) and the power circuit (high-voltage load).
+
+Use optocouplers when: (1) switching AC mains (120/240\,VAC), (2) the power ground and signal ground must be kept separate for safety, or (3) ground loops between the controller and the load circuit must be eliminated.
+
+\begin{examplebox}[ThermoRig: Heater Control with SSR and PWM]
+The ThermoRig drives a 120\,VAC, 500\,W cartridge heater through a solid-state relay (SSR, Crydom D2425). The SSR's control input requires 3--32\,VDC at 10\,mA. The ESP32's 3.3\,V GPIO drives the SSR directly (3.3\,V is within the 3--32\,V control range; current draw is 10\,mA, within GPIO limits).
+
+PWM at 1\,Hz (slow PWM or ``time-proportional control''): the PID controller outputs a duty cycle (0--100\%). Each second, the heater is ON for $D \times 1$\,s and OFF for $(1-D) \times 1$\,s. This slow switching extends SSR life and avoids EMI from fast switching of AC loads. The thermal mass of the metal block smooths the pulsed heating into a quasi-continuous temperature rise.
+\end{examplebox}
+
+
+\section{Why High-Power Switching Matters}
+Sensors and signal conditioning operate at milliampere levels. Actuators (motors, heaters, solenoids, valves) require amperes. The MCU's GPIO pins cannot drive these loads directly; they provide at most 10--20\,mA at 3.3\,V. A power switching device acts as a gate between the low-power control signal and the high-power load, controlled by the MCU but powered by a separate supply.
+
+\section{MOSFET as a Switch}
+The N-channel enhancement MOSFET is the most common switching device in student projects. When gate voltage exceeds the threshold ($V_{GS(th)}$, typically 1--4\,V), the MOSFET conducts between drain and source. When gate is low, it is an open circuit.
+
+Key parameters: \textbf{$V_{GS(th)}$}: must be below the MCU's GPIO voltage. For 3.3\,V MCUs, use logic-level MOSFETs ($V_{GS(th)} < 2.5$\,V; e.g., IRLZ44N, IRL540N). Standard MOSFETs ($V_{GS(th)} \approx 4$\,V) will not fully turn on. \textbf{$R_{DS(on)}$}: drain-source resistance when on. Lower is better; dissipates $P = I^2 \times R_{DS(on)}$ as heat. The IRLZ44N has $R_{DS(on)} = 0.022\,\Omega$ at $V_{GS} = 5$\,V. \textbf{$V_{DS(max)}$}: maximum drain-source voltage when off. Must exceed supply voltage with margin. \textbf{$I_D(max)$}: maximum continuous drain current.
+
+\subsection{Gate Drive Circuit}
+The MCU GPIO connects to the MOSFET gate through a series resistor (100--330\,$\Omega$) that limits gate charge current. A pull-down resistor (10\,k$\Omega$) from gate to source ensures the MOSFET stays OFF during MCU reset or high-impedance states. For faster switching, a dedicated gate driver IC can be used.
+
+\section{BJT as a Switch}
+Bipolar Junction Transistors (NPN type: TIP120, 2N2222) are also used for switching. The base current controls the collector current: $I_C = \beta \cdot I_B$ where $\beta$ (current gain) is typically 50--200. For saturation (fully on), provide $I_B \geq I_C / \beta_{\min}$ with some margin. A base resistor limits current: $R_B = (V_{GPIO} - V_{BE})/I_B$ where $V_{BE} \approx 0.7$\,V.
+
+MOSFETs are generally preferred for student projects because they require no continuous base current (reducing MCU power) and have lower on-state losses. BJTs are useful for very low-cost applications and Darlington configurations (TIP120) that provide extremely high current gain ($\beta > 1000$).
+
+\section{Inductive Load Protection}
+Motors, solenoids, and relays contain inductors. When current through an inductor is suddenly interrupted (MOSFET turns off), the inductor's stored energy ($E = \frac{1}{2}LI^2$) generates a voltage spike:
+\begin{equation}
+V = L \frac{dI}{dt}
+\end{equation}
+For a 50\,mH coil carrying 0.5\,A interrupted in 1\,$\mu$s: $V = 0.05 \times 500{,}000 = 25{,}000$\,V. This spike destroys the MOSFET, the MCU, and potentially the DAQ.
+
+A \textbf{flyback diode} (Schottky type: 1N5819) placed across the inductive load (cathode to positive supply, anode to drain) clamps the spike to $V_{\text{supply}} + V_{\text{diode}} \approx V_{\text{supply}} + 0.3$\,V. This is safe. Every inductive load must have a flyback diode. No exceptions.
+
+\section{Relay and SSR Switching}
+\textbf{Electromechanical relays}: a coil creates a magnetic field that physically moves a switch contact. Advantages: complete galvanic isolation between control and load, can switch AC or DC, very high off-resistance. Disadvantages: slow (5--20\,ms), limited cycle life (100k--1M operations), generates EMI at contact bounce. The relay coil is itself an inductive load; drive it through a MOSFET or BJT with a flyback diode.
+
+\textbf{Solid-State Relays (SSR)}: semiconductor switches (triacs for AC, MOSFETs for DC) with optical isolation between control and load. Advantages: fast (microseconds), no contact bounce, unlimited cycle life, silent. Disadvantages: some leakage current when off, voltage drop when on (1--2\,V for triacs), requires heat sinking at high currents.
+
+\section{PWM for Proportional Control}
+Pulse-Width Modulation (PWM) rapidly switches the load on and off at a fixed frequency, with the ratio of on-time to total period (the \textbf{duty cycle}) controlling the average power delivered. At 50\% duty cycle, the load receives 50\% of the maximum power.
+
+PWM frequency selection: for DC motors, 1--25\,kHz (above audible range to avoid whine). For heaters with SSRs, 0.5--2\,Hz (slow PWM or time-proportional control, matched to the thermal time constant). For LEDs, $>$100\,Hz (above flicker perception).
+
+\section{H-Bridge for Bidirectional Motor Control}
+A full H-bridge uses four switching devices (MOSFETs or integrated H-bridge ICs like L298N, DRV8871) arranged so that current can flow through the motor in either direction. By controlling which diagonal pair conducts, the motor spins forward or reverse. PWM on the enable input controls speed. Integrated H-bridge modules include flyback diodes, current sensing, and thermal protection.
+
+\begin{warningbox}[Shoot-Through Protection]
+In an H-bridge, if both the high-side and low-side switches in the same leg turn on simultaneously, a short circuit (``shoot-through'') occurs, drawing massive current and potentially destroying the switches. Integrated H-bridge ICs include dead-time protection; if building a discrete H-bridge, add hardware dead-time between complementary gate signals.
+\end{warningbox}
+
+\section{Optocoupler Isolation}
+When the control circuit (MCU, DAQ) must be electrically isolated from the power circuit (high voltage, noisy motors), an \textbf{optocoupler} provides the link. An LED on the control side illuminates a phototransistor on the power side, transferring the signal across a galvanic barrier. Typical isolation: 2.5--5\,kV. This protects the MCU and DAQ from power-side faults, ground loops, and high-voltage transients.
+
+
+\section{Relay Selection Guide}
+When choosing between electromechanical relays and SSRs:
+
+\textbf{Use electromechanical when}: switching AC mains (the relay's galvanic isolation provides safety), switching infrequently ($<$1 time/second), cost is critical, or the contact resistance must be extremely low ($<$50\,m$\Omega$ for power relays).
+
+\textbf{Use SSR when}: fast switching is needed ($>$1\,Hz), the application requires millions of cycles (heating control, dimming), bounce-free switching is required (digital signal routing), or the system must be silent (laboratory, medical).
+
+\section{Level Shifting}
+When the MCU operates at 3.3\,V but the MOSFET gate driver, relay coil, or SSR control requires 5\,V or 12\,V, a level shifter is needed. Simple solutions: (1) NPN transistor with pull-up to the higher voltage (inverts the logic). (2) Dedicated level-shifter IC (TXB0104 for bidirectional, SN74LVC1T45 for unidirectional). (3) Logic-level MOSFET (BSS138) used as a level translator.
+
+\section{Current Sensing}
+Measuring the current through a load enables overcurrent protection, power monitoring, and closed-loop current control. Methods: (1) Shunt resistor: insert a small precision resistor ($0.01$--$1\,\Omega$) in series with the load. Measure the voltage drop: $V = I \cdot R_{\text{shunt}}$. Low-side placement (between load and ground) is simplest but shifts the ground reference. High-side placement (between supply and load) preserves the ground but requires a differential amplifier or dedicated high-side current sense IC (INA219, ACS712). (2) Hall-effect sensor: non-contact measurement. No insertion loss. Measures DC and AC. Lower accuracy than shunt but provides galvanic isolation.
+
+\section{Thermal Management}
+Power devices dissipate heat ($P = I^2 R_{DS(on)}$ for MOSFETs, $P = V_{CE(sat)} \times I_C$ for BJTs, $P = I^2 R_{\text{contact}}$ for relays). If the junction temperature exceeds the maximum rating ($T_{j,\max}$, typically 150--175\,\degC{} for silicon), the device fails. The thermal path from junction to ambient has a thermal resistance $R_{\theta,JA}$ (\degC{}/W): $T_j = T_{\text{ambient}} + P \times R_{\theta,JA}$. If $T_j$ exceeds limits, add a heatsink to reduce $R_{\theta,JA}$.
+\section{Power Budget and Wire Sizing}
+Before selecting any switching device, compute the power budget: total current, voltage, and power for each load. Size the wiring accordingly using the American Wire Gauge (AWG) table.
+
+For DC loads: $I = P/V$. A 200\,W heater at 12\,V draws $200/12 = 16.7$\,A. At this current, use 12\,AWG wire minimum (20\,A rating), with appropriately rated connectors and fuses.
+
+\textbf{Voltage drop in wiring}: $V_{\text{drop}} = I \times R_{\text{wire}}$. For 3\,m of 14\,AWG copper ($R = 8.28\,\text{m}\Omega/\text{m}$): $V_{\text{drop}} = 16.7 \times 2 \times 3 \times 0.00828 = 0.83$\,V. This is 7\% of the 12\,V supply, significant enough to affect heater power. Use heavier wire or higher supply voltage.
+
+\textbf{Fuse selection}: size the fuse at 125\% of the normal operating current. For 16.7\,A: use a 20\,A slow-blow fuse. Slow-blow tolerates motor inrush current ($5$--$10\times$ normal for the first 0.1--1\,s); fast-blow fuses trip on inrush.
+
+\section{Solid-State Relay (SSR) Detailed Design}
+For AC loads (heaters, lamps, fans powered from mains): the SSR is the standard switching element. It uses a triac (bidirectional thyristor) that turns on when triggered and stays on until the AC current crosses zero.
+
+\textbf{Zero-cross SSR}: triggers only at the next AC zero crossing after the control input is asserted. This prevents inrush current spikes and EMI from mid-cycle switching. Standard for resistive loads (heaters, incandescent lamps).
+
+\textbf{Random-fire SSR}: triggers immediately, regardless of the AC phase. Necessary for phase-angle control (dimming, speed control) but generates significant EMI. Requires an EMI filter.
+
+\textbf{Snubber circuit}: an RC network ($100\,\Omega$ + $0.1\,\mu$F) across the SSR output suppresses voltage transients from inductive loads and prevents false triggering from $dV/dt$ across the triac.
+
+\textbf{Heat sinking}: SSRs have $1$--$1.6$\,V forward drop. At 10\,A: $P = 16$\,W dissipation. Without a heatsink, the SSR overheats and fails. Mount the SSR on an aluminum heatsink with thermal compound; size the heatsink for $R_{\theta} < (T_{\max} - T_{\text{ambient}})/P$.
+
+\section{Motor Control Fundamentals}
+\textbf{DC motor speed control}: PWM duty cycle controls average voltage: $V_{\text{avg}} = D \times V_{\text{supply}}$. Speed is approximately proportional to voltage (for unloaded motors). Under load, speed drops due to armature resistance and back-EMF. Closed-loop speed control (tachometer feedback) compensates.
+
+\textbf{Brushless DC (BLDC) motor control}: requires electronic commutation (switching the correct phase winding at the right time). Use a dedicated BLDC driver IC (e.g., DRV8313) or an ESC (Electronic Speed Controller) module. Not practical to implement from discrete components in MEGN~300.
+
+\textbf{Stepper motor control}: moves in discrete angular steps (1.8\degC{}/step typical for a 200-step/revolution motor). Driven by a stepper driver IC (A4988, DRV8825) that converts step and direction signals into the correct coil energization sequence. Interface to MCU: one GPIO for step pulse, one for direction, one for enable.
+
+\section{Protection Circuits}
+\textbf{Overcurrent protection}: a fuse or resettable polyfuse in series with the load. For electronic protection: measure current through a shunt resistor and compare to a threshold; if exceeded, disable the MOSFET gate via a comparator circuit. Response time: $<$1\,ms for electronic, 10--100\,ms for fuses.
+
+\textbf{Overvoltage protection}: a TVS (Transient Voltage Suppressor) diode across the power bus clamps voltage spikes from inductive switching, ESD, or supply transients. Select a TVS with standoff voltage above the normal supply and clamping voltage below the maximum rating of the MOSFET and load.
+
+\textbf{Reverse polarity protection}: a MOSFET in the ground return (body diode blocks reverse current) or a series Schottky diode (simple but has 0.3\,V drop). The MOSFET method has negligible voltage drop and is preferred for high-current systems.
+\section{EMI from Power Switching}
+Every time a MOSFET or SSR switches, it generates electromagnetic interference. The fast voltage transitions ($dV/dt = 100$--$1000$\,V/$\mu$s) and current transitions ($dI/dt = 1$--$100$\,A/$\mu$s) create broadband noise that propagates through power wiring (conducted EMI) and radiates from current loops (radiated EMI). This noise can corrupt analog sensor measurements on the same board or through shared power supplies.
+
+\textbf{Mitigation strategies}: (1) keep power switching traces physically separated from analog signal traces (at least 2\,cm on a PCB, 10\,cm on a protoboard), (2) use a ground plane that separates the power and analog ground return paths, (3) add snubber circuits (RC across the switch) to slow the transitions and reduce $dV/dt$, (4) use gate resistors on MOSFETs to limit $dI/dt$ during turn-on, (5) decouple the analog power supply with LC filters to prevent conducted noise.
+
+\section{Inrush Current Management}
+Motors, incandescent lamps, and capacitive loads draw much higher current at turn-on than during steady-state operation:
+
+\textbf{DC motors}: inrush current $= V_{\text{supply}} / R_{\text{armature}}$, typically $5$--$10\times$ the running current. A motor that runs at 2\,A may draw 15\,A at startup. The MOSFET, wiring, and fuse must handle this inrush without tripping or failing.
+
+\textbf{Incandescent lamps}: cold filament resistance is $\sim$$1/10$ of hot resistance. A 100\,W lamp (0.83\,A at 120\,V running) draws $\sim$8\,A at turn-on for the first 100\,ms.
+
+\textbf{Capacitive loads}: charging a capacitor bank produces a current spike $I = V/R_{\text{wire}}$, limited only by the wiring resistance. A 1000\,$\mu$F capacitor charged through 0.1\,$\Omega$ of wiring from 12\,V: peak current $= 120$\,A for a few microseconds. This can weld relay contacts or blow fuses.
+
+\textbf{Solutions}: soft-start circuits (ramp the PWM duty cycle from 0 to target over 0.5--2\,s), NTC inrush limiters (thermistors that have high resistance when cold and low resistance when hot), pre-charge resistors (switched out after initial charging), and current-limiting gate drivers.
+
+\section{Safety Considerations for High-Power Circuits}
+\textbf{Stored energy}: capacitors store energy $E = \frac{1}{2}CV^2$. A 1000\,$\mu$F capacitor at 400\,V stores 80\,J, enough to cause serious injury. Capacitors in motor drives and power supplies retain lethal charge for minutes after power-off. Always verify discharge before touching.
+
+\textbf{Arc flash}: at voltages above 48\,V DC or 30\,V AC, an arc can sustain across a small gap (broken wire, relay contact). Arc flash releases intense heat and UV radiation. Use appropriate PPE (safety glasses minimum) when working with circuits above these thresholds.
+
+\textbf{Grounding and isolation}: all exposed metal enclosures must be grounded (connected to the safety ground conductor) to prevent electric shock if an internal fault energizes the enclosure. Use fuses or circuit breakers sized for the wiring, not just the load, to prevent fire from a short circuit.
+
+\textbf{MEGN~300 safety rule}: circuits operating above 48\,V DC or connected to AC mains must be reviewed by the instructor before energizing. All high-current circuits ($> 5$\,A) must include a fuse within 15\,cm of the power source.
+\section{Motor Selection for MEGN 300 Projects}
+\textbf{DC brushed motors}: simple (two wires), speed proportional to voltage, reversible by polarity swap, easily controlled by PWM through a single MOSFET (one direction) or H-bridge (both directions). Drawback: brushes wear, generate EMI, and limit speed. Use for: pumps, fans, linear actuators, and simple drive systems.
+
+\textbf{DC brushless (BLDC)}: higher efficiency, longer life, less EMI. Require electronic commutation (ESC or motor driver IC). Cannot be driven by a simple MOSFET. Use for: high-performance drives, drones, precision positioning.
+
+\textbf{Stepper motors}: precise angular positioning without feedback (open-loop). 200 steps/revolution (1.8\degC{}/step) standard. Driven by dedicated stepper driver (A4988, DRV8825). Low cost, high torque at low speed, easy position control. Use for: 3D printers, CNC motion, laboratory positioning stages.
+
+\textbf{Servo motors}: DC motor + encoder + PID controller in a closed-loop package. Precise position and speed control. Standard hobby servos accept a PWM signal (1--2\,ms pulse width at 50\,Hz). Industrial servos use CAN, EtherCAT, or analog $\pm$10\,V command. Use for: robotic joints, valve actuators, camera gimbals.
+
+\textbf{Selection criteria}: (1) required torque and speed (check the motor's torque-speed curve), (2) voltage and current (must match available power supply and switching devices), (3) size and weight, (4) control complexity (brushed DC is simplest; BLDC requires a driver), (5) lifetime requirement (brushed: 1000--5000 hours; brushless: 20{,}000+ hours).
+
+\section{Power Electronics Thermal Design}
+Every switching device dissipates power as heat. The thermal design must ensure the junction temperature stays below the maximum rating:
+
+\begin{equation}
+T_j = T_{\text{ambient}} + P_{\text{diss}} \times (R_{\theta,JC} + R_{\theta,CS} + R_{\theta,SA})
+\end{equation}
+where $R_{\theta,JC}$ is junction-to-case (from datasheet), $R_{\theta,CS}$ is case-to-sink (depends on thermal interface: $\sim$0.5\,\degC{}/W with thermal paste, $\sim$2\,\degC{}/W with bare contact), and $R_{\theta,SA}$ is sink-to-ambient (from heatsink datasheet).
+
+Example: IRLZ44N MOSFET ($R_{\theta,JC} = 1.5$\,\degC{}/W), thermal paste ($R_{\theta,CS} = 0.5$), switching 5\,A with $R_{DS(on)} = 0.022\,\Omega$: $P = 5^2 \times 0.022 = 0.55$\,W. Without heatsink ($R_{\theta,JA} = 62$\,\degC{}/W): $T_j = 25 + 0.55 \times 62 = 59$\,\degC{} (safe, $< 175$\,\degC{} limit). At 20\,A: $P = 8.8$\,W, $T_j = 25 + 8.8 \times 62 = 571$\,\degC{} (destroyed!). Need a heatsink: $R_{\theta,SA} < (175-25)/8.8 - 2 = 15$\,\degC{}/W.
+\section{DC-DC Converters: Buck and Boost Regulators}
+
+The switching transistors and PWM concepts covered earlier in this chapter have a direct application beyond motor control: DC-DC power conversion. Most instrumentation systems require multiple voltage rails (3.3\,V for the MCU, 5\,V for sensors, 12\,V or 24\,V for actuators) from a single source. Linear regulators (LDOs) can step voltage down, but they dissipate the voltage difference as heat: a 12\,V to 3.3\,V LDO wastes 72\% of the input power. Switching regulators solve this by rapidly chopping the input voltage and using an inductor to transfer energy efficiently, achieving 85--95\% efficiency.
+
+\subsection{Buck Converter (Step-Down)}
+A buck converter produces an output voltage lower than the input. The core circuit has four elements: a switching MOSFET, a diode (or synchronous MOSFET), an inductor, and an output capacitor. The MOSFET switches at 100\,kHz--2\,MHz with a duty cycle $D$. During the ON phase, current flows through the MOSFET and inductor to the load, storing energy in the inductor's magnetic field. During the OFF phase, the inductor's stored energy drives current through the diode to the load, maintaining continuous current flow.
+
+The output voltage is controlled by the duty cycle:
+\begin{equation}
+V_{\text{out}} = D \times V_{\text{in}}, \qquad D = \frac{V_{\text{out}}}{V_{\text{in}}}
+\end{equation}
+
+For a 12\,V to 3.3\,V conversion: $D = 3.3/12 = 0.275$ (27.5\% duty cycle). The MOSFET is ON for 27.5\% of each switching period and OFF for 72.5\%. Efficiency is typically 85--95\%, meaning only 5--15\% of the input power is wasted as heat, compared to 72\% for an LDO doing the same conversion.
+
+\textbf{Common buck converter ICs for student projects}: LM2596 (3\,A, adjustable, through-hole friendly), MP1584 (3\,A, compact module), LM3671 (600\,mA, ultra-compact for battery applications).
+
+\begin{tipbox}[When to Use a Buck vs. an LDO]
+Use an LDO when: (1) the voltage drop is small ($V_{\text{in}} - V_{\text{out}} < 2$\,V), (2) current is under 500\,mA, (3) you need very low output noise (analog sensor circuits, precision ADCs), or (4) simplicity matters (an LDO needs only two capacitors). Use a buck converter when: (1) the voltage drop is large ($>$2\,V), (2) current exceeds 500\,mA, (3) efficiency matters (battery-powered systems), or (4) the heat from an LDO would be problematic. Many systems use both: a buck to step 12\,V down to 5\,V efficiently, then an LDO to produce a clean 3.3\,V from that 5\,V rail.
+\end{tipbox}
+
+\subsection{Boost Converter (Step-Up)}
+A boost converter produces an output voltage higher than the input. The topology reverses the buck: the inductor is on the input side, the MOSFET shorts the inductor to ground during the ON phase (storing energy), and during the OFF phase the inductor's energy adds to the input voltage and charges the output capacitor through the diode.
+
+\begin{equation}
+V_{\text{out}} = \frac{V_{\text{in}}}{1 - D}
+\end{equation}
+
+For a 3.7\,V lithium cell boosted to 5\,V: $D = 1 - 3.7/5 = 0.26$ (26\% duty cycle). As duty cycle approaches 1.0, the theoretical output approaches infinity, but practical limits (inductor saturation, diode losses, parasitic resistance) restrict useful boost ratios to about 4:1.
+
+\textbf{Applications in MEGN~300}: powering a 5\,V sensor system from a single 3.7\,V lithium cell, generating a 12\,V rail for relay coils from a 5\,V USB supply, and driving LED strings that require higher voltage than the available supply.
+
+\subsection{Buck-Boost Converter}
+A buck-boost converter can produce an output voltage either higher or lower than the input. This is essential when the input varies across the output target: a lithium battery ranges from 4.2\,V (fully charged) to 3.0\,V (discharged). If the system needs 3.3\,V, neither a pure buck nor a pure boost works across the full range. A buck-boost handles both conditions seamlessly.
+
+The SEPIC (Single-Ended Primary-Inductor Converter) is a popular buck-boost topology that produces a non-inverted output with good regulation. Common ICs: TPS63000 series (Adjustable, 1.8--5.5\,V output, 96\% peak efficiency).
+
+\subsection{Switching Regulator Noise}
+The main disadvantage of all switching regulators is output ripple and electromagnetic interference (EMI). The rapid switching (100\,kHz+) generates noise at the switching frequency and its harmonics. This noise can corrupt sensitive analog measurements.
+
+Mitigation strategies: (1) add an LC output filter (extra inductor + capacitor) after the switching regulator, (2) use an LDO as a post-regulator to clean up the output for analog circuits, (3) keep switching regulator traces physically separated from analog signal traces on the PCB, and (4) use a continuous ground plane under the switching regulator with short, wide power traces. The Master Reference Document PCB Design chapter (Chapter~16) covers layout best practices for switching regulators.
+
+\begin{examplebox}[ThermoRig: Multi-Rail Power Architecture]
+The ThermoRig uses a 12\,V wall adapter as its primary source. A buck converter (LM2596 module) steps 12\,V down to 5\,V at up to 2\,A for the sensor power rail (85\% efficient, 0.3\,W waste heat vs. 2.6\,W for an LDO). An LDO (AMS1117-3.3) then produces 3.3\,V from the 5\,V rail for the ESP32 (66\% efficient, but only 300\,mA, so waste heat is 0.5\,W, manageable). The 12\,V rail directly powers the heater SSR control and the cooling fan. Total power architecture: three voltage rails from one input, with the high-current conversion handled by the switching regulator and the noise-sensitive MCU rail cleaned up by the LDO.
+\end{examplebox}
+
+\begin{keyconceptbox}[Requirements Mapping: Power Conversion]
+``The power supply system shall convert the 12\,VDC input to a regulated 5.0\,V $\pm$ 3\% rail at up to 2\,A continuous.'' ``The 3.3\,V MCU rail shall have output ripple less than 30\,mV peak-to-peak measured at the ESP32 power pins.'' ``The power supply system shall achieve a minimum overall efficiency of 80\% at full rated load.'' ``All switching regulator modules shall include input and output capacitors per the manufacturer's reference design.''
+\end{keyconceptbox}
+
+\section{Functional Safety: Fail-Safes and Emergency Stops}
+\subsection{What Happens When the Controller Fails?}
+Every automation system must answer this question: if the microcontroller crashes, the software enters an infinite loop, the communication link drops, or the power supply glitches, what happens to the actuators?
+
+If the heater stays ON at 100\% power because the MCU froze: the system overheats, potentially causing fire, burns, or property damage. If the motor continues running because the stop command was never sent: the mechanism can drive into a hard stop, destroying gears, bending shafts, or ejecting workpieces.
+
+\textbf{The fundamental principle}: the system must always transition to a safe state when control is lost. The safe state is application-specific: for a heater, safe means OFF. For a vehicle brake, safe means ENGAGED. For an emergency ventilation system, safe means ON. Define the safe state for every actuator in your system during the requirements phase.
+
+\subsection{Fail-Safe Design Patterns}
+\textbf{Normally-open (NO) relay/contactor}: the actuator is powered through a relay that is held closed by the controller's ``enable'' signal. If the controller loses power or crashes, the relay opens (spring-return), cutting power to the actuator. This is the Master Control Relay (MCR) pattern and is the standard for industrial safety circuits.
+
+Implementation for MEGN~300: connect the heater or motor power through a relay. The relay coil is driven by a GPIO pin through a MOSFET. The firmware keeps the relay energized during normal operation. If the MCU resets, the GPIO defaults to LOW (output disabled), the MOSFET turns OFF, the relay opens, and the heater is de-energized. The system fails safe without any software action.
+
+\textbf{Watchdog timer}: a hardware timer that must be periodically reset (``kicked'') by the firmware. If the firmware crashes or enters an infinite loop and stops kicking the watchdog, the timer expires and forces a system reset. The ESP32 has a built-in watchdog with configurable timeout (1--60\,s). After reset, the firmware initializes all outputs to the safe state before resuming normal operation.
+
+\textbf{Hardware E-Stop}: a physical emergency stop button (large, red, mushroom-head, per IEC~60947-5-5) that cuts power to all actuators independently of the controller. The E-Stop circuit is wired in series with the MCR and is always hardwired (never software-controlled). Pressing the E-Stop physically opens the relay, regardless of the controller state. The button latches in the pressed position; the operator must deliberately release it (twist to reset) before the system can restart.
+
+\begin{warningbox}[Software Cannot Be the Last Line of Defense]
+A software-only safety system is not a safety system. Software crashes, firmware has bugs, and communication links drop. The E-Stop, the MCR, and the watchdog timer are hardware mechanisms that function independently of software. In professional automation (IEC~61508, ISO~13849), the safety function must be implemented in hardware that is separate from and independent of the control system. For MEGN~300 projects: at minimum, include a physical power switch (toggle or E-Stop button) that cuts actuator power independently of the MCU.
+\end{warningbox}
+
+\subsection{Safety Integrity Levels (Conceptual)}
+The international standard IEC~61508 defines Safety Integrity Levels (SIL 1--4) that quantify the required reliability of safety functions. SIL~1: probability of dangerous failure $< 10^{-1}$ per demand ($<$10\% chance of the safety function failing when needed). SIL~4: $< 10^{-4}$ ($<$0.01\%). Higher SIL requires more rigorous design, redundancy, and testing.
+
+MEGN~300 projects do not require formal SIL assessment, but understanding the concept demonstrates professional awareness. A single E-Stop relay with no redundancy is approximately SIL~1. Adding a second, independent relay (both must be energized for the actuator to operate) approaches SIL~2.
+
+\subsection{Practical Implementation for GreenShield Projects}
+Every MEGN~300 project with actuators (heaters, motors, pumps, solenoids) shall include:
+
+(1) A physical power disconnect (switch, button, or E-Stop) that cuts power to all actuators independently of the MCU.
+
+(2) A watchdog timer (ESP32 built-in) that resets the system if firmware hangs for more than 5\,s.
+
+(3) Software current and temperature limits that de-energize actuators if readings exceed safe thresholds ($> 150\%$ of normal operating values).
+
+(4) A ``safe state'' initialization routine that sets all outputs to OFF on startup, before any control logic executes.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Your MCU (3.3\,V GPIO, 10\,mA max) must switch a 12\,V, 2\,A DC motor. Design the switching circuit using an N-channel MOSFET. Specify the MOSFET selection criteria and include flyback protection.
+\item Explain why you cannot connect a 120\,VAC heater directly to a MOSFET, and describe how you would control it instead.
+\item A solenoid draws 500\,mA at 24\,V. The control MOSFET opens in 1\,$\mu$s. If the solenoid inductance is 50\,mH, what voltage spike would occur without a flyback diode?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item Select a logic-level N-channel MOSFET (e.g., IRLZ44N: $V_{th} = 1.0$--$2.0$\,V, $R_{DS(on)} = 0.022\,\Omega$ at $V_{GS} = 4.5$\,V, $I_D = 47$\,A). Connect: drain to motor negative, source to ground, gate to MCU GPIO through a 100\,$\Omega$ resistor (limits gate charge current). Add a 10\,k$\Omega$ pull-down from gate to source (ensures MOSFET stays off when MCU is in reset). Flyback diode: 1N5819 Schottky (40\,V, 1\,A) across motor terminals (cathode to $+$12\,V, anode to drain). Power dissipation: $2^2 \times 0.022 = 0.088$\,W; no heatsink needed.
+\item MOSFETs switch DC only (they conduct in one polarity). For 120\,VAC, use: (a) an electromechanical relay with a MOSFET driving the coil, or (b) a solid-state relay (SSR) rated for the voltage and current. The SSR uses a TRIAC internally that handles AC polarity reversal. Ensure the SSR is rated for 120\,VAC and the full heater current with derating.
+\item $V = L \times dI/dt = 0.050 \times (0.500/0.000001) = 25{,}000$\,V. This 25\,kV theoretical spike (in practice clamped by parasitic capacitance and eventual breakdown) far exceeds any MOSFET's voltage rating. A flyback diode clamps it to approximately $24 + 0.3 = 24.3$\,V.
+\end{enumerate}
+
+

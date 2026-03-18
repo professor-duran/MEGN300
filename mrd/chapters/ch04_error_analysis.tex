@@ -1,0 +1,373 @@
+% Chapter 4: Error Analysis and Uncertainty
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Error Analysis and Uncertainty}
+\label{ch:error}\index{uncertainty!propagation}\index{RSS}\index{GUM}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=5.5cm,
+    xbar, bar width=0.7cm,
+    xlabel={Variance Contribution (\%)},
+    symbolic y coords={ADC noise, Amp gain, Bridge excitation, Calibration, Sensor},
+    ytick=data, yticklabel style={font=\small\sffamily},
+    xmin=0, xmax=60,
+    nodes near coords, nodes near coords style={font=\scriptsize\sffamily\bfseries, anchor=west},
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    grid=major, grid style={MinesSilver!20}, xmajorgrids=true, ymajorgrids=false,
+    legend style={font=\scriptsize\sffamily, at={(0.98,0.02)}, anchor=south east},
+]
+\addplot[fill=WarnOrange!70, draw=WarnOrange] coordinates {(52,Sensor) (22,Calibration) (14,Bridge excitation) (9,Amp gain) (3,ADC noise)};
+\end{axis}
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center, text width=5cm] at (10.5,0.8)
+    {Sensor dominates: invest\\improvement effort here first};
+\end{tikzpicture}
+\caption{Variance contribution breakdown for the ThermoRig temperature measurement. Each bar shows the fraction of total variance $u_c^2$ attributable to each source. The sensor contributes 52\% of the total variance; improving the ADC (3\%) has negligible effect. Always identify and improve the dominant contributor.}
+\label{fig:variance_breakdown}
+\end{figure}
+
+\section{Types of Error}
+
+\subsection{Systematic Error (Bias)}
+Systematic errors shift all measurements in one direction by a consistent amount. They arise from calibration errors, environmental effects (temperature, humidity), sensor nonlinearity, loading effects, and installation errors. Systematic errors are \textbf{correctable} through calibration, environmental compensation, and improved technique. They do \textbf{not} decrease with repeated measurements.
+
+\subsection{Random Error (Precision Error)}
+Random errors cause scatter around the mean value due to inherent variability in the measurement process (electronic noise, vibration, turbulence, human reading variation). Random errors follow a statistical distribution (usually Gaussian) and \textbf{decrease with averaging}: the standard error of the mean $= \sigma / \sqrt{n}$.
+
+\subsection{Gross Errors (Blunders)}
+Mistakes: wrong wiring, reading the wrong scale, recording errors, equipment malfunction. Detected and eliminated by inspection, redundancy, and outlier analysis (Chauvenet's criterion or Grubbs' test).
+
+\begin{warningbox}[You Cannot Average Away Systematic Error]
+If your thermometer reads 2\,\degC{} high due to a calibration offset, taking 1000 measurements and averaging them will give you a very precise number that is still 2\,\degC{} wrong. Calibrate first, then average.
+\end{warningbox}
+
+\section{Statistical Foundations}
+
+\subsection{Mean, Standard Deviation, and Standard Error}
+For $n$ measurements $\{x_1, x_2, \ldots, x_n\}$:
+\begin{align}
+\bar{x} &= \frac{1}{n} \sum_{i=1}^{n} x_i \quad \text{(sample mean)} \\
+s &= \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2} \quad \text{(sample standard deviation)} \\
+s_{\bar{x}} &= \frac{s}{\sqrt{n}} \quad \text{(standard error of the mean)}
+\end{align}
+Use $n-1$ (Bessel's correction) in the denominator for sample standard deviation. The standard error quantifies the uncertainty of the mean itself; the standard deviation quantifies the spread of individual measurements.
+
+\subsection{Confidence Intervals}
+The true value lies within $\bar{x} \pm t_{\nu,P} \cdot s_{\bar{x}}$ with probability $P$, where $t_{\nu,P}$ is the Student's $t$-value for $\nu = n-1$ degrees of freedom at confidence level $P$.
+
+Common values: for 95\% confidence and large $n$: $t \approx 2.0$. For $n = 5$: $t_{4,95\%} = 2.776$. For $n = 10$: $t_{9,95\%} = 2.262$.
+
+\begin{tipbox}[Report Uncertainty Correctly]
+Always report measurements as: $\bar{x} \pm U$ (95\% confidence, $n$ = [sample size]). For example: ``$T = 25.3 \pm 0.4$\,\degC{} (95\% CI, $n = 10$).'' This gives the reader everything needed to evaluate the quality of your measurement.
+\end{tipbox}
+
+\section{Uncertainty Propagation}
+
+When a result $R$ is calculated from measured quantities $x_1, x_2, \ldots, x_n$:
+\begin{equation}
+R = f(x_1, x_2, \ldots, x_n)
+\end{equation}
+the uncertainty in $R$ propagates from the uncertainties in each $x_i$:
+\begin{equation}
+u_R = \sqrt{\sum_{i=1}^{n} \left(\frac{\partial f}{\partial x_i}\right)^2 u_{x_i}^2}
+\end{equation}
+This is the \textbf{RSS (root-sum-square)} method, valid when the $x_i$ errors are independent and random.
+
+\subsection{Special Cases}
+\textbf{Addition/Subtraction}: $R = x_1 \pm x_2 \Rightarrow u_R = \sqrt{u_{x_1}^2 + u_{x_2}^2}$.
+
+\textbf{Multiplication/Division}: $R = x_1 \cdot x_2 / x_3 \Rightarrow u_R/R = \sqrt{(u_{x_1}/x_1)^2 + (u_{x_2}/x_2)^2 + (u_{x_3}/x_3)^2}$.
+
+\textbf{Power}: $R = x^n \Rightarrow u_R/R = |n| \cdot u_x / x$.
+
+\begin{examplebox}[ThermoRig: Uncertainty Propagation for Heat Flux]
+Heat flux through a wall: $q = k \cdot \Delta T / L$, where $k = 0.50 \pm 0.02$\,W/(m$\cdot$K), $\Delta T = 20.0 \pm 0.8$\,\degC{}, $L = 0.010 \pm 0.0005$\,m.
+\[
+\frac{u_q}{q} = \sqrt{\left(\frac{0.02}{0.50}\right)^2 + \left(\frac{0.8}{20.0}\right)^2 + \left(\frac{0.0005}{0.010}\right)^2} = \sqrt{0.0016 + 0.0016 + 0.0025} = 0.0755 = 7.55\%
+\]
+$q = 0.50 \times 20.0 / 0.010 = 1000$\,W/m$^2$. $u_q = 75.5$\,W/m$^2$. Report: $q = 1000 \pm 76$\,W/m$^2$.
+
+The thickness measurement ($L$) dominates the uncertainty. To improve the result, improve the length measurement first.
+\end{examplebox}
+
+\section{Design-Stage Uncertainty Estimation}
+
+Before building a measurement system, estimate the total uncertainty from manufacturer specifications:
+
+\begin{enumerate}[leftmargin=1.5em]
+\item List all error sources in the measurement chain (sensor accuracy, signal conditioning gain error, ADC quantization, noise).
+\item Convert each to the same units (typically the measurand's engineering units).
+\item Classify each as systematic (bias) or random.
+\item RSS the random components. Add the worst-case systematic components algebraically.
+\item Compare to the measurement requirement. If the total exceeds the requirement, identify the dominant contributor and improve it.
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=5.5cm,
+    ybar, bar width=1.2cm,
+    ylabel={Uncertainty contribution (\degC{})},
+    symbolic x coords={Sensor,Conditioning,ADC,Processing,Total (RSS)},
+    xtick=data, xticklabel style={font=\small\sffamily, rotate=15, anchor=east},
+    ymin=0, ymax=0.65,
+    nodes near coords, nodes near coords style={font=\tiny\sffamily\bfseries, above},
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    grid=major, grid style={MinesSilver!20}, ymajorgrids=true, xmajorgrids=false,
+]
+\addplot[fill=WarnOrange!70, draw=WarnOrange] coordinates {(Sensor,0.40) (Conditioning,0.15) (ADC,0.10) (Processing,0.05) (Total (RSS),0.45)};
+\end{axis}
+\node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center] at (2.0,-0.8) {Dominant contributor:\\improve this first};
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (2.0,-0.5) -- (2.0,0.1);
+\end{tikzpicture}
+\caption{RSS error budget for a temperature measurement system. The sensor dominates; improving the ADC has diminishing returns. Always improve the dominant contributor first.}
+\label{fig:error_budget}
+\end{figure}
+
+\begin{keyconceptbox}[Requirements Mapping: Uncertainty to Shall-Statements]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item ``Measure temperature to $\pm$1.0\,\degC{} at 95\% confidence'' $\to$ MEAS-REQ: Total expanded uncertainty $U_{95} \leq 1.0$\,\degC{}, verified by calibration against a NIST-traceable standard.
+\item The error budget allocates this across the sensor, conditioning, and DAQ stages. Each stage becomes a subsystem requirement.
+\end{itemize}
+\end{keyconceptbox}
+
+
+\section{The Philosophy of Uncertainty}
+Every measured value is an estimate accompanied by a range within which the true value is believed to lie. A reading of ``23.5\,\degC{}'' is meaningless without knowing whether the uncertainty is $\pm$0.1\,\degC{} or $\pm$5\,\degC{}.
+
+\section{Type A and Type B Evaluation}
+\textbf{Type A (statistical)}: from repeated measurements. Standard uncertainty of the mean: $u_A = s/\sqrt{N}$. As $N$ increases, $u_A$ decreases (but doubling $N$ only reduces by $\sqrt{2}$).
+
+\textbf{Type B (non-statistical)}: from datasheets, calibration certificates, engineering judgment. For $\pm a$ specification with rectangular distribution: $u_B = a/\sqrt{3}$. Normal distribution (95\%): $u_B = a/2$.
+
+\section{Combined Standard Uncertainty (RSS)}
+For $R = f(x_1, x_2, \ldots)$:
+\begin{equation}
+u_c(R) = \sqrt{\sum_{i}\left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i)}
+\end{equation}
+Each $(\partial f/\partial x_i)^2 u^2(x_i)$ is a variance contribution. The partial derivative is the sensitivity coefficient.
+
+\textbf{Sums/differences}: $u_c = \sqrt{u_1^2 + u_2^2}$. \textbf{Products/quotients}: relative uncertainties add in quadrature. \textbf{Powers} $R = x^n$: $u_c/R = |n| \cdot u_x/x$. Velocity uncertainty of 5\% means kinetic energy uncertainty of 10\%.
+
+\begin{examplebox}[ThermoRig: Uncertainty in Heat Flux]
+$q = k \Delta T / L$. Given: $k = 1.05 \pm 0.03$\,W/mK, $T_1 = 80.2 \pm 0.4$\,\degC{}, $T_2 = 23.1 \pm 0.4$\,\degC{}, $L = 0.0100 \pm 0.0002$\,m.
+
+$\Delta T = 57.1$\,\degC{}, $u_{\Delta T} = \sqrt{0.4^2+0.4^2} = 0.566$\,\degC{}. $q = 5995.5$\,W/m$^2$.
+
+Relative: $u_k/k = 2.86\%$, $u_{\Delta T}/\Delta T = 0.99\%$, $u_L/L = 2.00\%$.
+
+$u_q/q = \sqrt{2.86^2+0.99^2+2.00^2}\% = 3.63\%$. $u_q = 218$\,W/m$^2$.
+
+Result: $q = 6000 \pm 220$\,W/m$^2$. Thermal conductivity dominates (62\% of variance).
+\end{examplebox}
+
+\section{Expanded Uncertainty and Confidence Intervals}
+$U = k \cdot u_c$. Coverage factor $k = 2$ for 95\% confidence (standard in engineering), $k = 3$ for 99.7\%. Always report: ``$T = 23.5 \pm 0.8$\,\degC{} ($k = 2$).'' For small samples ($N < 30$), use Student's $t$-distribution with Welch-Satterthwaite effective degrees of freedom.
+
+\section{Systematic Error Sources and Corrections}
+\textbf{Sensor bias}: calibrate and apply correction. \textbf{Environmental effects}: characterize sensitivity coefficients. \textbf{Loading effects}: use higher-impedance instruments (Ch.\ 1). \textbf{Operator bias}: use digital readout. \textbf{Algorithmic bias}: use double-precision throughout.
+
+\begin{warningbox}[Accuracy vs.\ Precision]
+Accuracy $=$ total uncertainty (systematic + random). Precision $=$ repeatability (random only). Precision is always better than accuracy. After calibration, accuracy improves toward precision but never exceeds it. Datasheet ``accuracy: $\pm$1\%'' $\neq$ ``repeatability: $\pm$0.1\%.''
+\end{warningbox}
+
+\section{Designing the Error Budget}
+(1) Start with system requirement. (2) Identify all sources. (3) Estimate each from datasheets/calibration. (4) Compute RSS total. (5) Verify meets requirement. (6) If not, improve the dominant contributor.
+
+The dominant contributor determines the total. A 10\% improvement in the largest source has more impact than 50\% improvement in all minor sources combined.
+
+\begin{tipbox}[The 80/20 Rule]
+In most systems, 80\% of total uncertainty comes from one or two sources. Find them first. Display the error budget as a pie chart of variance contributions; the largest slice is where you invest effort.
+\end{tipbox}
+
+\section{Reporting Measurements}
+Never report more significant figures than the uncertainty justifies. If uncertainty is $\pm$0.5\,\degC{}, report ``23.5 $\pm$ 0.5\,\degC{},'' not ``23.472\,\degC{}.'' Match decimal places in value and uncertainty.
+
+
+\section{Monte Carlo Uncertainty Analysis}
+When the measurement equation is complex (nonlinear, conditional, or involves lookup tables), the analytical RSS formula becomes difficult or impossible to apply. Monte Carlo simulation provides a general alternative:
+
+(1) Assign a probability distribution to each input variable (normal, rectangular, triangular, etc.) based on the available uncertainty information. (2) Generate $N$ random samples of each input ($N \geq 10{,}000$). (3) For each set of input samples, compute the output using the measurement equation. (4) Analyze the distribution of the $N$ output values: mean, standard deviation, percentiles.
+
+The 2.5th and 97.5th percentiles of the output distribution provide the 95\% coverage interval directly, without assuming a normal distribution. This is especially valuable when the output distribution is asymmetric (which can occur with nonlinear measurement equations).
+
+\begin{examplebox}[ThermoRig: Monte Carlo vs.\ RSS for Heat Flux]
+For the heat flux calculation $q = k\Delta T/L$, we compare analytical RSS and Monte Carlo results. RSS (from the earlier example): $q = 6000 \pm 218$\,W/m$^2$ (3.6\%). Monte Carlo ($N = 100{,}000$, all inputs normal): mean $= 5998$\,W/m$^2$, std $= 215$\,W/m$^2$, 95\% interval $= [5577, 6428]$\,W/m$^2$. The agreement is excellent because the measurement equation is approximately linear over the uncertainty ranges. For this problem, the simpler RSS method is adequate. Monte Carlo becomes essential for equations involving powers, exponentials, or conditional logic.
+\end{examplebox}
+
+\section{Correlation Between Inputs}
+The RSS formula assumes all input uncertainties are independent (uncorrelated). If two inputs are correlated (e.g., two temperatures measured by the same type of sensor, which share the same calibration bias), the combined uncertainty must include cross-terms:
+\begin{equation}
+u_c^2 = \sum_i c_i^2 u_i^2 + 2\sum_{i<j} c_i c_j u_i u_j r_{ij}
+\end{equation}
+where $r_{ij}$ is the correlation coefficient ($-1 \leq r_{ij} \leq 1$). Positive correlation ($r > 0$) increases the combined uncertainty; negative correlation ($r < 0$) decreases it. In the ThermoRig, $T_1$ and $T_2$ are measured by different thermocouples, so they are independent ($r = 0$). If they shared one thermocouple (e.g., measuring the same point at different times), they would be correlated.
+
+\section{Degrees of Freedom and Student's t-Distribution}
+When the number of measurements is small ($N < 30$), the normal distribution underestimates the uncertainty. The Student's $t$-distribution, which has heavier tails, provides more conservative (and more accurate) coverage intervals.
+
+For $N$ measurements, the degrees of freedom $\nu = N - 1$. The coverage factor for 95\% confidence: $k = t_{0.975, \nu}$. For $N = 5$: $k = 2.78$ (vs.\ 2.00 for normal). For $N = 10$: $k = 2.26$. For $N = 30$: $k = 2.04$ (approaching the normal value). This is why small sample sizes produce wider confidence intervals: there is less statistical evidence for the true mean and standard deviation.
+
+\section{Systematic Error Discovery}
+Systematic errors are insidious because they affect every measurement consistently but invisibly. Techniques for discovering them:
+
+\textbf{Comparison with independent methods}: measure the same quantity with two fundamentally different sensors (e.g., thermocouple and RTD, or optical and contact displacement). If the results disagree beyond the combined uncertainty, at least one has a systematic error.
+
+\textbf{Swap test}: interchange two sensors (swap channel connections). If the discrepancy follows the sensor, it is a sensor bias. If it follows the channel, it is a DAQ or wiring error.
+
+\textbf{Substitution test}: replace the sensor with a known reference signal (precision voltage source). Compare the DAQ reading to the known value. Any difference is a systematic error in the signal conditioning or DAQ chain.
+
+\textbf{Reversal test}: for sensors with a directional property (strain gauges, force sensors), reverse the direction of the measurand. The average of forward and reverse readings cancels hysteresis and reveals the true zero.
+
+\section{Uncertainty in Derived Quantities}
+Many engineering measurements compute a derived quantity from multiple measured inputs. Examples:
+
+\textbf{Flow rate} from differential pressure: $Q = C_d A \sqrt{2\Delta P/\rho}$. The square root means that $u_Q/Q = 0.5 \times u_{\Delta P}/\Delta P$. Flow measurement uncertainty is half the pressure measurement uncertainty (a favorable leverage).
+
+\textbf{Power} from voltage and current: $P = VI$. Relative uncertainty: $u_P/P = \sqrt{(u_V/V)^2 + (u_I/I)^2}$.
+
+\textbf{Efficiency}: $\eta = P_{\text{out}}/P_{\text{in}}$. Since this is a ratio, relative uncertainties add in quadrature. A system with 3\% uncertainty in both input and output power has $\sqrt{3^2 + 3^2} = 4.2\%$ uncertainty in efficiency.
+
+\textbf{Strain from bridge voltage}: $\epsilon = (4V_o)/(V_{ex} \cdot GF)$. Three uncertainty sources multiply: excitation voltage, gauge factor, and output voltage. A 0.1\% excitation uncertainty, 1\% gauge factor uncertainty, and 0.5\% voltage measurement uncertainty give $\sqrt{0.1^2 + 1.0^2 + 0.5^2} = 1.1\%$ strain uncertainty. The gauge factor dominates.
+\section{Uncertainty in Curve-Fit Calibrations}
+When a calibration curve is fitted to data points, the calibration uncertainty includes: (1)~the uncertainty of each reference point (from the reference standard), (2)~the scatter of repeated measurements at each point (Type A), (3)~the fit residuals (difference between data and fitted curve), and (4)~the interpolation uncertainty (between calibration points).
+
+For a linear fit $y = mx + b$ to $N$ calibration points: the uncertainty of a predicted value $\hat{y}$ at input $x_0$ is:
+\begin{equation}
+u(\hat{y}) = s_{\text{resid}} \sqrt{\frac{1}{N} + \frac{(x_0 - \bar{x})^2}{\sum(x_i - \bar{x})^2}}
+\end{equation}
+where $s_{\text{resid}} = \sqrt{\sum(y_i - \hat{y}_i)^2/(N-2)}$ is the residual standard error. The uncertainty is smallest at the center of the calibration range ($x_0 = \bar{x}$) and grows toward the edges. This is another reason not to extrapolate beyond the calibration range.
+
+\section{Measurement Uncertainty in Standards and Regulations}
+ISO~17025 (laboratory accreditation) requires that calibration certificates report expanded uncertainty with coverage factor $k$. ISO~9001 (quality management) requires that all measurement equipment used in production be calibrated with documented traceability. IATF~16949 (automotive) requires Measurement System Analysis (MSA) using Gauge R\&R studies to quantify measurement variation.
+
+In MEGN~300 projects, applying these standards is excellent preparation for industry. At minimum: (1)~report all measurements with uncertainty, (2)~document the calibration procedure and reference standards, (3)~compute the error budget and identify the dominant contributor.
+
+\section{Common Uncertainty Analysis Mistakes}
+(1)~\textbf{Adding uncertainties linearly}: $u_{\text{total}} = u_1 + u_2 + u_3$ is overly conservative. Use RSS: $u_{\text{total}} = \sqrt{u_1^2 + u_2^2 + u_3^2}$, which assumes independence.
+
+(2)~\textbf{Confusing resolution with uncertainty}: a digital display showing 0.01\,\degC{} resolution does not mean the measurement is accurate to 0.01\,\degC{}. The uncertainty includes sensor accuracy, calibration error, noise, and drift, which are typically 10--100$\times$ larger than the display resolution.
+
+(3)~\textbf{Forgetting correlated sources}: if two inputs share the same calibration bias (e.g., two thermocouples from the same batch), their errors are correlated and do not cancel in RSS. They must be treated as systematic.
+
+(4)~\textbf{Reporting excessive significant figures}: ``$T = 23.4721 \pm 0.5$\,\degC{}'' is wrong. Correct: ``$T = 23.5 \pm 0.5$\,\degC{}.''
+\section{Propagation Through Common Engineering Functions}
+\subsection{Trigonometric Functions}
+For $y = \sin(x)$: $u_y = |\cos(x)| \cdot u_x$. Near $x = 0$ or $\pi$: $|\cos(x)| \approx 1$, so $u_y \approx u_x$. Near $x = \pi/2$: $|\cos(x)| \approx 0$, so $u_y \ll u_x$ (favorable). This is why inclinometers are most accurate near horizontal (where $\sin(\theta) \approx \theta$) and least accurate near vertical.
+
+\subsection{Logarithmic Functions}
+For $y = \ln(x)$: $u_y = u_x / x$. The absolute uncertainty decreases as $x$ increases, but the relative uncertainty $u_y$ in the log domain equals the relative uncertainty $u_x/x$ of the input. This is why decibel measurements (which use logarithms) have constant relative accuracy regardless of signal level.
+
+\subsection{Exponential Functions}
+For $y = e^x$: $u_y = e^x \cdot u_x = y \cdot u_x$. The absolute uncertainty grows exponentially with $x$. This is why Arrhenius-type calculations (reaction rates, diffusion coefficients) where $k = A e^{-E_a/RT}$ are extremely sensitive to temperature uncertainty: a 1\,\degC{} uncertainty at 300\,K produces approximately 3--5\% uncertainty in $k$ for typical activation energies.
+
+\section{Gauge Repeatability and Reproducibility (Gauge R\&R)}
+In manufacturing and quality control, the uncertainty of the measurement system itself is quantified using a Gauge R\&R study. \textbf{Repeatability} is the variation when the same operator measures the same part multiple times with the same instrument. \textbf{Reproducibility} is the variation when different operators measure the same part.
+
+The total measurement system variation $\sigma_{\text{MS}} = \sqrt{\sigma_{\text{repeat}}^2 + \sigma_{\text{repro}}^2}$. For the measurement system to be ``acceptable,'' $\sigma_{\text{MS}}$ should be less than 10\% of the total part-to-part variation (or less than 10\% of the specification tolerance). If $\sigma_{\text{MS}} > 30\%$ of the tolerance, the measurement system is incapable and must be improved before it can be used for quality decisions.
+
+While a full Gauge R\&R study is beyond MEGN~300 scope, understanding the concept prepares you for industry practice. In your projects, you can demonstrate the principle by having two team members independently measure the same quantity and comparing results.
+
+\section{Bayesian Uncertainty (Conceptual)}
+The GUM framework treats uncertainty as a property of the measurement procedure. An alternative approach, gaining traction in metrology, is \textbf{Bayesian uncertainty}: uncertainty represents the degree of belief about the true value given the data and prior knowledge. The posterior distribution $p(\mu | \text{data})$ combines the likelihood (from the measurements) with the prior (from previous knowledge, datasheets, physics).
+
+Bayesian methods are particularly powerful when: (1) you have informative prior knowledge (e.g., the temperature cannot be negative), (2) the data is limited (small $N$), or (3) the measurement equation is highly nonlinear. While MEGN~300 uses the classical GUM approach, awareness of Bayesian methods is valuable for advanced metrological work.
+\section{Variance, Covariance, and Correlation}
+\subsection{Variance}
+The variance of a set of $N$ measurements $\{x_1, x_2, \ldots, x_N\}$ with mean $\bar{x}$ is:
+\begin{equation}
+s^2 = \frac{1}{N-1}\sum_{i=1}^{N}(x_i - \bar{x})^2
+\end{equation}
+The factor $N-1$ (Bessel's correction) accounts for the fact that the sample mean $\bar{x}$ is estimated from the data, consuming one degree of freedom. The standard deviation $s = \sqrt{s^2}$ has the same units as the original measurements and represents the typical scatter of individual measurements around the mean.
+
+For a measurement system, variance has a direct physical interpretation: it quantifies the random noise power. If you measure a constant temperature 100 times and get $s = 0.3$\,\degC{}, the variance $s^2 = 0.09$\,\degC{}$^2$ represents the noise power in your measurement. Reducing the variance by a factor of 4 (halving $s$) requires either a $4\times$ better sensor, a $4\times$ reduction in bandwidth, or averaging $4\times$ as many samples.
+
+\subsection{Variance of Functions}
+When a derived quantity $y = f(x_1, x_2, \ldots, x_n)$ depends on several measured inputs, the variance of $y$ is:
+\begin{equation}
+\text{Var}(y) = \sum_{i=1}^{n}\left(\frac{\partial f}{\partial x_i}\right)^2 \text{Var}(x_i) + 2\sum_{i<j}\frac{\partial f}{\partial x_i}\frac{\partial f}{\partial x_j}\text{Cov}(x_i, x_j)
+\end{equation}
+When all inputs are independent (uncorrelated), the covariance terms vanish and this reduces to the familiar RSS formula. When inputs are correlated, the covariance terms can either increase or decrease the total variance.
+
+\subsection{Covariance}
+The covariance between two variables $x$ and $y$ measured simultaneously:
+\begin{equation}
+\text{Cov}(x, y) = \frac{1}{N-1}\sum_{i=1}^{N}(x_i - \bar{x})(y_i - \bar{y})
+\end{equation}
+Positive covariance means $x$ and $y$ tend to increase together. Negative covariance means when $x$ increases, $y$ tends to decrease. Zero covariance means no linear relationship (but does not exclude nonlinear relationships).
+
+In instrumentation, covariance arises when two measurements share a common error source. Two thermocouples from the same manufacturing batch share the same calibration bias: when one reads high, the other likely reads high too (positive covariance). Two strain gauges on opposite sides of a bending beam have opposite strain: when one increases, the other decreases (negative covariance, which the half-bridge exploits to double sensitivity).
+
+\subsection{Correlation Coefficient}
+The Pearson correlation coefficient normalizes covariance to the range $[-1, +1]$:
+\begin{equation}
+r_{xy} = \frac{\text{Cov}(x, y)}{s_x \cdot s_y}
+\end{equation}
+$r = +1$: perfect positive linear relationship. $r = -1$: perfect negative linear relationship. $r = 0$: no linear relationship. In practice, $|r| > 0.8$ indicates strong correlation; $|r| < 0.3$ indicates weak correlation.
+
+\subsection{Practical Impact of Correlation on Uncertainty}
+Consider measuring temperature difference $\Delta T = T_1 - T_2$ where both sensors have uncertainty $u = 0.5$\,\degC{}. If uncorrelated ($r = 0$): $u_{\Delta T} = \sqrt{0.5^2 + 0.5^2} = 0.71$\,\degC{}. If perfectly correlated ($r = 1$, same bias in both): $u_{\Delta T} = \sqrt{0.5^2 + 0.5^2 - 2(0.5)(0.5)(1)} = 0$\,\degC{}. The common bias cancels in the difference. This is why differential measurements are powerful: correlated errors cancel.
+
+Conversely, if measuring the sum $T_1 + T_2$ with $r = 1$: $u_{\text{sum}} = \sqrt{0.5^2 + 0.5^2 + 2(0.5)(0.5)(1)} = 1.0$\,\degC{}. Correlated errors add constructively in sums. The general formula:
+\begin{equation}
+u_{x \pm y}^2 = u_x^2 + u_y^2 \pm 2\,r_{xy}\,u_x\,u_y
+\end{equation}
+
+\begin{warningbox}[When to Worry About Correlation]
+In most MEGN~300 measurements, inputs are independent (different sensor types, different physical quantities) and correlation can be ignored. However, when two inputs share a common calibration source, a common environmental condition, or a common electronic circuit, correlation exists and must be included. The most common case: two sensors calibrated with the same reference standard share its calibration uncertainty as a correlated component.
+\end{warningbox}
+
+\subsection{Covariance Matrix}
+For a system with $n$ correlated inputs, the uncertainties and correlations are compactly represented by the \textbf{covariance matrix} $\mathbf{C}$, an $n \times n$ symmetric matrix where the diagonal elements are the variances $\text{Var}(x_i)$ and the off-diagonal elements are the covariances $\text{Cov}(x_i, x_j)$:
+\begin{equation}
+\mathbf{C} = \begin{pmatrix} u_1^2 & r_{12}u_1 u_2 & \cdots \\ r_{12}u_1 u_2 & u_2^2 & \cdots \\ \vdots & \vdots & \ddots \end{pmatrix}
+\end{equation}
+The combined uncertainty of a derived quantity $y = f(x_1, \ldots, x_n)$ is then:
+\begin{equation}
+u_y^2 = \mathbf{J} \, \mathbf{C} \, \mathbf{J}^T
+\end{equation}
+where $\mathbf{J} = [\partial f/\partial x_1, \ldots, \partial f/\partial x_n]$ is the Jacobian (row vector of sensitivity coefficients). This matrix formulation is the foundation of the GUM framework and is implemented in commercial uncertainty analysis software.
+
+\begin{examplebox}[ThermoRig: Correlated Thermocouple Uncertainty]
+Two Type~K thermocouples from the same spool measure $T_1$ and $T_2$ across a thermal specimen. Both share the thermocouple wire's Seebeck coefficient uncertainty ($\pm$0.4\,\degC{}, correlated, $r = 1$). Each also has independent random noise ($\pm$0.2\,\degC{}, uncorrelated). The heat flux $q \propto (T_1 - T_2)$. For the difference: the correlated component cancels (0.4\,\degC{} $-$ 0.4\,\degC{} $= 0$ for the shared bias), leaving only the uncorrelated noise: $u_{\Delta T} = \sqrt{0.2^2 + 0.2^2} = 0.28$\,\degC{}. Without recognizing the correlation, you would compute $u_{\Delta T} = \sqrt{(0.4^2+0.2^2) + (0.4^2+0.2^2)} = 0.63$\,\degC{}, overstating the uncertainty by $2.3\times$. Correlation analysis matters.
+\end{examplebox}
+\section{Reporting Uncertainty: International Standards}
+The GUM-compliant uncertainty statement includes: (1) the measured value with appropriate significant figures, (2) the expanded uncertainty $U$ with coverage factor $k$ and confidence level, (3) a description of how the uncertainty was evaluated (Type A, Type B, or combined), and (4) the effective degrees of freedom if using the $t$-distribution.
+
+\textbf{Correct format}: ``The temperature was measured as $T = 80.2 \pm 0.6$\,\degC{} ($k = 2$, 95\% confidence). The uncertainty was evaluated by combining Type~A evaluation (10 repeated measurements, $s = 0.18$\,\degC{}) with Type~B evaluation of the calibration uncertainty ($u_{\text{cal}} = 0.28$\,\degC{}, normal distribution).''
+
+\textbf{Incorrect format}: ``$T = 80.2347 \pm 0.6$\,\degC{}'' (excessive significant figures). ``$T = 80.2$\,\degC{}, accurate to $\pm$1\%'' (ambiguous: 1\% of what? no confidence level stated).
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Ten measurements of a voltage: 2.51, 2.48, 2.53, 2.49, 2.52, 2.50, 2.47, 2.54, 2.51, 2.50\,V. Calculate the mean, sample standard deviation, standard error, and the 95\% confidence interval.
+\item You measure the density of a cylinder: $\rho = 4m / (\pi d^2 L)$. Measured values: $m = 150.0 \pm 0.5$\,g, $d = 25.00 \pm 0.05$\,mm, $L = 100.0 \pm 0.1$\,mm. Calculate $\rho$ and its uncertainty.
+\item A measurement system has three error sources: sensor bias $\pm$0.5\,\degC{}, amplifier gain error $\pm$0.2\,\degC{} (systematic), and noise $\pm$0.3\,\degC{} (random, $1\sigma$). What is the total uncertainty at 95\% confidence?
+\item You are designing a strain measurement system. The requirement is $\pm$5\,$\mu\epsilon$ at 95\% confidence. Your strain gauge has $\pm$2\,$\mu\epsilon$ accuracy, your bridge amplifier has $\pm$1.5\,$\mu\epsilon$ equivalent input noise, and your DAQ quantization contributes $\pm$1\,$\mu\epsilon$. Does the design meet the requirement?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $\bar{x} = 2.505$\,V. $s = 0.0222$\,V. $s_{\bar{x}} = 0.0222/\sqrt{10} = 0.00702$\,V. $t_{9,95\%} = 2.262$. CI $= 2.505 \pm 2.262 \times 0.00702 = 2.505 \pm 0.016$\,V. Report: $V = 2.505 \pm 0.016$\,V (95\% CI, $n = 10$).
+\item $\rho = 4 \times 150 / (\pi \times 25^2 \times 100) = 600 / (49087.4) = 0.03056$\,g/mm$^3 = 30.56$\,kg/m$^3$... wait, let me recalculate in consistent units. $m = 0.1500$\,kg, $d = 0.02500$\,m, $L = 0.1000$\,m. $V = \pi d^2 L / 4 = \pi \times 0.000625 \times 0.1 / 4 = 4.909 \times 10^{-5}$\,m$^3$. $\rho = 0.1500 / 4.909 \times 10^{-5} = 3056$\,kg/m$^3$. Fractional uncertainties: $u_m/m = 0.5/150 = 0.00333$, $u_d/d = 0.05/25 = 0.002$ (but $d$ is squared: contribution $= 2 \times 0.002 = 0.004$), $u_L/L = 0.1/100 = 0.001$. $u_\rho / \rho = \sqrt{0.00333^2 + 0.004^2 + 0.001^2} = \sqrt{0.0000272} = 0.00522 = 0.52\%$. $u_\rho = 15.9$\,kg/m$^3$. Report: $\rho = 3056 \pm 16$\,kg/m$^3$.
+\item Systematic: $0.5 + 0.2 = 0.7$\,\degC{} (worst-case addition for biases). Random at 95\%: $2 \times 0.3 = 0.6$\,\degC{}. Total: $\sqrt{0.7^2 + 0.6^2} = 0.92$\,\degC{} if combining RSS, or $0.7 + 0.6 = 1.3$\,\degC{} worst-case. (Note: combining systematic and random is debated; the GUM method treats all as uncertainty components and RSS-combines them: $U_{95} = \sqrt{0.5^2 + 0.2^2 + (2 \times 0.3)^2} = \sqrt{0.25 + 0.04 + 0.36} = 0.81$\,\degC{}.)
+\item RSS $= \sqrt{2^2 + 1.5^2 + 1^2} = \sqrt{4 + 2.25 + 1} = \sqrt{7.25} = 2.69\,\mu\epsilon$. At 95\%: $U_{95} \approx 2 \times 2.69 = 5.39\,\mu\epsilon$. This slightly exceeds the $\pm$5\,$\mu\epsilon$ requirement. The design needs improvement; the strain gauge accuracy ($\pm$2\,$\mu\epsilon$) is the dominant contributor. Options: use a higher-accuracy gauge, improve the bridge excitation stability, or relax the requirement.
+\end{enumerate}
+
+% ################################################################
+% PART II: SIGNALS AND SIGNAL PROCESSING
+% ################################################################
+% ================================================================
+
+\begin{masterycheckbox}{Error Analysis and Uncertainty}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Classify error sources as systematic or random, and explain appropriate mitigation.
+\item Propagate uncertainty through a multi-variable equation using RSS, identifying sensitivity coefficients.
+\item Identify the dominant uncertainty contributor and justify where to invest improvement effort.
+\item Construct a complete uncertainty budget allocating error from sensor, conditioning, and DAQ.
+\item Report results in GUM format: $\bar{x} \pm U$ (95\% CI, $k=2$, $n = \ldots$).
+\end{enumerate}
+\end{masterycheckbox}
+

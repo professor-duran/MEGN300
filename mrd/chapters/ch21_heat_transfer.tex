@@ -1,0 +1,312 @@
+% Chapter 21: Fundamentals of Heat Transfer
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Fundamentals of Heat Transfer}
+\label{ch:heat}\index{heat transfer!conduction}\index{heat transfer!convection}\index{thermal time constant}\index{lumped capacitance}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    res/.style={draw=MinesBlue, thick, fill=LightBG, minimum width=1.0cm, minimum height=0.4cm, font=\scriptsize\sffamily},
+    cap/.style={font=\scriptsize\sffamily, AccentTeal},
+]
+% Thermal circuit
+\node[font=\small\sffamily\bfseries, MinesBlue] at (6,3.5) {Thermal Resistance Circuit};
+% Heat source
+\node[font=\scriptsize\sffamily, WarnOrange] at (0,2) {$T_{\text{heater}}$};
+\draw[WarnOrange, thick] (0.8,2) -- (1.5,2);
+% R_contact
+\node[res] (rc) at (2.5,2) {$R_{\text{contact}}$};
+\draw[MinesBlue, thick] (1.5,2) -- (rc.west);
+\draw[MinesBlue, thick] (rc.east) -- (4,2);
+% Node: sensor surface
+\filldraw[AccentTeal] (4,2) circle (2pt);
+\node[cap, above=3pt] at (4,2) {$T_{\text{surface}}$};
+% R_cond (through sensor body)
+\node[res] (rk) at (5.5,2) {$R_{\text{cond}}$};
+\draw[MinesBlue, thick] (4,2) -- (rk.west);
+\draw[MinesBlue, thick] (rk.east) -- (7,2);
+% Node: sensor core
+\filldraw[AccentTeal] (7,2) circle (2pt);
+\node[cap, above=3pt] at (7,2) {$T_{\text{sensor}}$};
+% Thermal capacitance (to ground)
+\draw[AccentTeal, thick] (7,2) -- (7,0.8);
+\draw[AccentTeal, thick] (6.5,0.8) -- (7.5,0.8);
+\draw[AccentTeal, thick] (6.5,0.6) -- (7.5,0.6);
+\node[cap] at (8.3,0.7) {$C_{\text{th}}$};
+\draw[AccentTeal, thick] (7,0.6) -- (7,0);
+% R_conv (to ambient)
+\node[res] (rh) at (9,2) {$R_{\text{conv}}$};
+\draw[MinesBlue, thick] (7,2) -- (rh.west);
+\draw[MinesBlue, thick] (rh.east) -- (10.5,2);
+% Ambient
+\node[font=\scriptsize\sffamily, MinesSilver] at (11.2,2) {$T_\infty$};
+% Ground
+\draw[MinesBlue, thick] (7,0) -- (10.5,0) -- (10.5,2);
+% Analogy table
+\node[font=\scriptsize\sffamily, MinesSilver, align=left] at (5.5,-1.0) {%
+Analogy: $\dot{Q} = \Delta T / R_{\text{th}}$ (cf.\ $I = \Delta V / R$)\quad
+$\tau = R_{\text{th}} \cdot C_{\text{th}}$ (cf.\ $\tau = RC$)};
+\end{tikzpicture}
+\caption{Thermal resistance circuit for a sensor mounted on a heated surface. $R_{\text{contact}}$ is the contact resistance (reduced by thermal paste), $R_{\text{cond}}$ is conduction through the sensor body, $R_{\text{conv}}$ is convection to ambient, and $C_{\text{th}}$ is the thermal mass of the sensor. The sensor time constant $\tau = R_{\text{th}} \cdot C_{\text{th}}$ follows exactly the same mathematics as an electrical RC circuit.}
+\label{fig:thermal_circuit}
+\end{figure}
+
+\section{Why Heat Transfer Matters in Instrumentation}
+Temperature is the most commonly measured physical quantity in engineering. The ThermoRig system, which runs throughout this text, measures temperature and controls a heater. To design such systems intelligently, you must understand how heat moves through the system. Heat transfer determines: the sensor's time constant (how fast the thermocouple equilibrates with the medium), the heater's power requirement (how much energy is needed to maintain the setpoint), the steady-state temperature distribution (where to place the sensor for representative measurement), and the system's response to disturbances (how quickly the temperature changes when a door opens or a load changes).
+
+This chapter provides the minimum heat transfer background needed for MEGN~300 instrumentation and control projects.
+
+\section{Modes of Heat Transfer}
+Heat energy transfers by three mechanisms: conduction (through solid or stationary fluid), convection (between a surface and a moving fluid), and radiation (electromagnetic waves, no medium required). In most engineering systems, all three occur simultaneously, but one typically dominates.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    mode/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                 minimum width=4.0cm, minimum height=3.2cm, align=center, font=\scriptsize\sffamily,
+                 inner sep=6pt, text width=3.6cm},
+]
+\node[mode] (cond) at (0,0) {
+\textbf{\large\color{MinesBlue}Conduction}\\[3pt]
+$q = -kA\frac{dT}{dx}$\\[3pt]
+Through solid material\\
+$k$: 0.03 (insulation)\\to 400 (copper) W/m$\cdot$K
+};
+\node[mode] (conv) at (5.2,0) {
+\textbf{\large\color{MinesBlue}Convection}\\[3pt]
+$q = hA(T_s - T_\infty)$\\[3pt]
+Solid to fluid\\
+$h$: 5 (free air) to\\10,000 (boiling) W/m$^2\!\cdot$K
+};
+\node[mode] (rad) at (10.4,0) {
+\textbf{\large\color{MinesBlue}Radiation}\\[3pt]
+$q = \epsilon\sigma A(T_s^4 - T_\infty^4)$\\[3pt]
+Electromagnetic waves\\
+Dominant above $\sim$500\,\degC{}\\
+$\sigma = 5.67\times10^{-8}$
+};
+% Arrows showing heat flow
+\draw[-{Stealth[length=3mm]}, WarnOrange, thick, decorate, decoration={snake, amplitude=1.5pt, segment length=6pt}]
+    (0,-2.2) -- (0,-2.8);
+\draw[-{Stealth[length=3mm]}, WarnOrange, thick, decorate, decoration={snake, amplitude=1.5pt, segment length=6pt}]
+    (5.2,-2.2) -- (5.2,-2.8);
+\draw[-{Stealth[length=3mm]}, WarnOrange, thick, decorate, decoration={snake, amplitude=1.5pt, segment length=6pt}]
+    (10.4,-2.2) -- (10.4,-2.8);
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (0,-3.1) {through material};
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (5.2,-3.1) {to fluid};
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (10.4,-3.1) {EM emission};
+\end{tikzpicture}
+\caption{The three modes of heat transfer with governing equations and typical coefficient ranges. Convection coefficient $h$ varies by three orders of magnitude, making it the dominant design variable for sensor thermal time constants.}
+\label{fig:heat_modes}
+\end{figure}
+
+
+\section{Conduction}
+Conduction is heat transfer through a material by molecular vibration and free electron transport, without bulk motion of the material. Fourier's law for one-dimensional steady-state conduction through a flat plate:
+\begin{equation}
+\dot{Q} = -kA\frac{dT}{dx} = kA\frac{T_1 - T_2}{L}
+\end{equation}
+where $\dot{Q}$ is the heat transfer rate (W), $k$ is the thermal conductivity (W/m$\cdot$K), $A$ is the cross-sectional area (m$^2$), $L$ is the thickness (m), and $T_1 - T_2$ is the temperature difference across the plate. The heat flux (per unit area) is $q = \dot{Q}/A = k(T_1 - T_2)/L$ (W/m$^2$).
+
+\subsection{Thermal Conductivity}
+Thermal conductivity varies enormously across materials: copper $k = 385$\,W/m$\cdot$K, aluminum $k = 205$, steel $k = 50$, glass $k = 1.0$, wood $k = 0.15$, polystyrene foam $k = 0.035$, air $k = 0.026$. Metals conduct well (free electrons); insulators conduct poorly (no free electrons, heat transfers by lattice vibrations only).
+
+\subsection{Thermal Resistance}
+By analogy to Ohm's law ($V = IR$), define thermal resistance $R_{\text{th}} = L/(kA)$ (K/W). Then $\dot{Q} = \Delta T / R_{\text{th}}$. For layers in series (a wall with insulation): $R_{\text{total}} = R_1 + R_2 + \cdots$. For layers in parallel (fins): $1/R_{\text{total}} = 1/R_1 + 1/R_2 + \cdots$. The thermal resistance analogy allows you to analyze complex heat transfer paths using circuit analysis techniques.
+
+\subsection{Composite Walls}
+For a wall with $n$ layers of different materials:
+\begin{equation}
+\dot{Q} = \frac{T_{\text{hot}} - T_{\text{cold}}}{\sum_{i=1}^{n} L_i/(k_i A)}
+\end{equation}
+The layer with the highest $R_{\text{th}}$ (lowest $k$ or greatest thickness) dominates the total resistance and limits the heat flow. This is analogous to the dominant contributor in an error budget.
+
+\begin{examplebox}[ThermoRig: Conduction Through the Test Specimen]
+The ThermoRig specimen is a 10\,mm thick aluminum plate ($k = 205$\,W/m$\cdot$K) with area $A = 50 \times 50$\,mm $= 0.0025$\,m$^2$. With $\Delta T = 57$\,\degC{} across the plate: $\dot{Q} = 205 \times 0.0025 \times 57 / 0.010 = 2921$\,W. This is very high because aluminum is an excellent conductor. If the specimen were stainless steel ($k = 15$\,W/m$\cdot$K): $\dot{Q} = 15 \times 0.0025 \times 57 / 0.010 = 214$\,W. If acrylic ($k = 0.2$): $\dot{Q} = 2.85$\,W. The material determines whether the 200\,W heater is adequate.
+\end{examplebox}
+
+\section{Convection}
+Convection is heat transfer between a surface and a moving fluid (gas or liquid). Newton's law of cooling:
+\begin{equation}
+\dot{Q} = hA(T_s - T_\infty)
+\end{equation}
+where $h$ is the convection heat transfer coefficient (W/m$^2\cdot$K), $A$ is the surface area, $T_s$ is the surface temperature, and $T_\infty$ is the bulk fluid temperature far from the surface.
+
+\subsection{Natural (Free) Convection}
+Fluid motion driven by buoyancy (density differences caused by temperature gradients). Typical $h$ values: still air: 5--25\,W/m$^2\cdot$K. Still water: 20--100\,W/m$^2\cdot$K. Natural convection is the dominant cooling mechanism for electronics enclosures, laboratory apparatus, and any surface exposed to ambient air without forced airflow.
+
+\subsection{Forced Convection}
+Fluid motion driven by an external source (fan, pump, wind). Typical $h$ values: forced air (low speed): 25--250\,W/m$^2\cdot$K. Forced air (high speed): 250--1000. Forced water: 100--20{,}000. The dramatic increase in $h$ with forced flow is why fans are essential for cooling power electronics and why stirring a liquid dramatically accelerates heating or cooling.
+
+\subsection{Convective Thermal Resistance}
+$R_{\text{conv}} = 1/(hA)$ (K/W). For the ThermoRig specimen surface ($A = 0.0025$\,m$^2$) in still air ($h = 10$\,W/m$^2\cdot$K): $R_{\text{conv}} = 1/(10 \times 0.0025) = 40$\,K/W. In forced air ($h = 100$): $R_{\text{conv}} = 4$\,K/W. The convective resistance can dominate or be negligible depending on the flow conditions.
+
+\begin{tipbox}[Estimating $h$ for Laboratory Conditions]
+For back-of-envelope calculations in MEGN~300: $h \approx 10$\,W/m$^2\cdot$K for still air (natural convection, small temperature difference). $h \approx 50$ for gentle airflow from a nearby fan. $h \approx 200$ for direct airflow from a bench fan at 2\,m/s. $h \approx 500$--1000 for water cooling. These estimates are accurate to $\pm$50\%, which is often sufficient for initial design.
+\end{tipbox}
+
+\section{Radiation}
+Radiation is heat transfer by electromagnetic waves. It requires no medium and is significant at high temperatures or in vacuum. The Stefan-Boltzmann law for a gray body:
+\begin{equation}
+\dot{Q}_{\text{rad}} = \epsilon \sigma A (T_s^4 - T_{\text{surr}}^4)
+\end{equation}
+where $\epsilon$ is the emissivity (0--1; $\epsilon = 1$ for a perfect blackbody, $\epsilon \approx 0.9$ for painted surfaces, $\epsilon \approx 0.05$ for polished metal), $\sigma = 5.67 \times 10^{-8}$\,W/m$^2\cdot$K$^4$ is the Stefan-Boltzmann constant, and temperatures are in Kelvin.
+
+\subsection{When Radiation Matters}
+At low temperatures ($<$100\,\degC{}), radiation is typically small compared to convection. At 80\,\degC{} ($= 353$\,K) with surroundings at 20\,\degC{} ($= 293$\,K), $\epsilon = 0.9$, $A = 0.0025$\,m$^2$: $\dot{Q}_{\text{rad}} = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (353^4 - 293^4) = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (1.55 \times 10^{10} - 7.37 \times 10^{9}) = 1.0$\,W. Compared to convective loss of $\dot{Q}_{\text{conv}} = 10 \times 0.0025 \times 60 = 1.5$\,W, radiation contributes about 40\% of the total heat loss. At higher temperatures or in vacuum, radiation dominates.
+
+\section{Energy Balance}
+The energy balance is the most powerful tool in heat transfer analysis. For any system:
+\begin{equation}
+\dot{E}_{\text{in}} - \dot{E}_{\text{out}} + \dot{E}_{\text{gen}} = \dot{E}_{\text{stored}}
+\end{equation}
+At steady state ($\dot{E}_{\text{stored}} = 0$): heat in $=$ heat out. In transient conditions: the imbalance changes the system's thermal energy, which changes its temperature.
+
+\subsection{Steady-State Energy Balance}
+For the ThermoRig at steady state at 80\,\degC{}: the heater power input must exactly balance the heat losses (conduction through insulation + convection from surfaces + radiation from surfaces). If total loss is 50\,W: the heater must supply 50\,W continuously. Changing the ambient temperature changes the losses, requiring the controller to adjust heater power.
+
+\subsection{Transient Energy Balance}
+During heating or cooling, the rate of temperature change is:
+\begin{equation}
+mC_p\frac{dT}{dt} = \dot{Q}_{\text{in}} - \dot{Q}_{\text{out}}
+\end{equation}
+where $m$ is the mass (kg) and $C_p$ is the specific heat capacity (J/kg$\cdot$K). For the ThermoRig aluminum specimen ($m = 0.034$\,kg, $C_p = 900$\,J/kg$\cdot$K) with 200\,W heater power and 50\,W losses:
+\begin{equation}
+0.034 \times 900 \times \frac{dT}{dt} = 200 - 50 = 150\,\text{W}
+\end{equation}
+$dT/dt = 150/30.6 = 4.9$\,\degC{}/s. This is the initial heating rate (when losses are small). As the specimen heats up, losses increase and $dT/dt$ decreases, following an exponential approach to steady state.
+
+\subsection{The Lumped Capacitance Model}
+When the thermal resistance within the object (conduction) is much smaller than the thermal resistance at the surface (convection), the object's temperature is approximately uniform. This is the \textbf{lumped capacitance} assumption, valid when the Biot number $\text{Bi} = hL_c/k < 0.1$, where $L_c = V/A_s$ is the characteristic length (volume/surface area).
+
+Under lumped capacitance, the transient temperature response to a step change in environment is:
+\begin{equation}
+T(t) = T_\infty + (T_i - T_\infty)e^{-t/\tau}, \qquad \tau = \frac{mC_p}{hA_s} = \frac{\rho V C_p}{hA_s}
+\end{equation}
+This is a first-order response with time constant $\tau$. This equation directly connects heat transfer to the dynamic measurement theory of Chapter~3: the sensor's thermal time constant is $\tau = mC_p/(hA_s)$.
+
+\begin{examplebox}[ThermoRig: Thermocouple Time Constant from Heat Transfer]
+A Type~K thermocouple bead (diameter $d = 1$\,mm, $\rho = 8600$\,kg/m$^3$, $C_p = 500$\,J/kg$\cdot$K) in stirred water ($h = 500$\,W/m$^2\cdot$K). Volume $V = \pi d^3/6 = 5.24 \times 10^{-10}$\,m$^3$. Surface area $A_s = \pi d^2 = 3.14 \times 10^{-6}$\,m$^2$. Mass $m = \rho V = 4.5 \times 10^{-6}$\,kg. Time constant: $\tau = 4.5 \times 10^{-6} \times 500 / (500 \times 3.14 \times 10^{-6}) = 1.43$\,s. In still air ($h = 10$): $\tau = 71.7$\,s. This explains why thermocouples respond much faster in liquids than in air: the convective resistance dominates and is 50$\times$ lower in stirred water.
+\end{examplebox}
+
+\section{Heat Transfer and Sensor Placement}
+Where you place the sensor determines what you measure. Temperature is not uniform in most systems; gradients exist due to conduction, convection, and radiation.
+
+\textbf{Surface temperature}: mount the sensor in intimate thermal contact with the surface (thermal paste or epoxy). The sensor measures the surface temperature, not the fluid temperature. Lead wires conduct heat away from the sensor, creating ``fin effects'' that bias the reading toward ambient. Minimize lead wire thermal conduction by using small-diameter wire and routing leads along isotherms (not across temperature gradients).
+
+\textbf{Fluid temperature}: immerse the sensor in the fluid with sufficient depth (at least 10 sensor diameters) to minimize conduction error along the stem. In high-velocity flow, the sensor may measure the stagnation temperature (slightly above the static temperature due to kinetic energy recovery).
+
+\textbf{Contact resistance}: the interface between a sensor and a surface has thermal resistance from air gaps and surface roughness. Contact resistance can be 10$\times$ larger than the sensor's own thermal resistance, dominating the time constant and introducing a temperature offset. Thermal paste (zinc oxide or silicone-based) reduces contact resistance by 5--10$\times$.
+
+\section{Thermal Design for Control Systems}
+When designing the ThermoRig PID control system, heat transfer analysis answers critical design questions:
+
+\textbf{Heater power sizing}: at the maximum setpoint ($T_{\text{max}} = 200$\,\degC{}) with worst-case ambient ($T_{\text{amb}} = 15$\,\degC{}), the total heat loss is $\dot{Q}_{\text{loss}} = (h_{\text{conv}} + h_{\text{rad}}) \times A \times (200 - 15)$. Size the heater for at least $1.5 \times \dot{Q}_{\text{loss, max}}$ to ensure the controller has authority to reach the setpoint with margin.
+
+\textbf{Insulation design}: adding insulation reduces $\dot{Q}_{\text{loss}}$, reducing the required heater power and making control easier (smaller disturbance sensitivity). However, insulation also increases the thermal time constant $\tau = mC_p/(h_{\text{eff}}A)$, making the system slower to respond.
+
+\textbf{Achievable bandwidth}: the thermal time constant sets the fundamental speed limit. No controller can make the temperature change faster than the thermal physics allow. For the ThermoRig with $\tau = 30$\,s: the closed-loop bandwidth is limited to approximately $1/(2\pi\tau) = 0.005$\,Hz with P-only control, increased to $\sim$0.05\,Hz with aggressive PID tuning.
+
+\section{Extended Surfaces: Fins}
+When natural convection from a surface is insufficient to dissipate the required heat (common in electronics cooling), \textbf{fins} (extended surfaces) increase the effective surface area. A typical heatsink is an array of aluminum fins attached to the component's case.
+
+The fin effectiveness depends on the fin parameter $m = \sqrt{hP/(kA_c)}$ where $h$ is the convection coefficient, $P$ is the fin perimeter, $k$ is the fin thermal conductivity, and $A_c$ is the fin cross-sectional area. The fin efficiency $\eta_f$ (ratio of actual heat transfer to the heat transfer if the entire fin were at the base temperature):
+\begin{equation}
+\eta_f = \frac{\tanh(mL)}{mL}
+\end{equation}
+where $L$ is the fin length. For $mL < 1$: $\eta_f > 0.76$ (efficient). For $mL > 3$: $\eta_f < 0.33$ (the fin tip is near ambient temperature; the outer portion contributes little). Making fins longer beyond $mL \approx 2.5$ has diminishing returns.
+
+Practical rule for MEGN~300: an aluminum heatsink ($k = 205$\,W/m$\cdot$K) with fins 20\,mm long, 1\,mm thick, in still air ($h = 10$\,W/m$^2\cdot$K): $m = \sqrt{10 \times 0.042/(205 \times 0.001 \times 0.020)} = 3.2$\,m$^{-1}$, $mL = 3.2 \times 0.02 = 0.064$. $\eta_f = 0.9987 \approx 1.0$. The aluminum fin is so conductive that it is essentially isothermal. Fin efficiency only becomes a concern for long fins in high-$h$ environments (forced water cooling) or for low-conductivity fin materials (steel, plastic).
+
+\section{Thermal Time Constants and Sensor Response}
+The lumped capacitance time constant $\tau = mC_p/(hA_s)$ directly connects heat transfer to sensor dynamics (Chapter~3). Reducing $\tau$ (faster sensor) requires:
+
+\textbf{Reducing mass} $m$: use smaller sensor elements. A 0.25\,mm diameter thermocouple bead has $8\times$ less mass than a 0.5\,mm bead, and $4\times$ less surface area, giving $2\times$ lower $\tau$.
+
+\textbf{Increasing $h$}: immerse in liquid instead of air, or increase flow velocity. Moving from still air ($h = 10$) to stirred water ($h = 500$) reduces $\tau$ by $50\times$.
+
+\textbf{Increasing $A_s/m$ ratio}: use thin, flat sensor elements rather than bulky probe assemblies. An exposed junction thermocouple ($A_s/m$ ratio limited only by the wire diameter) is faster than a grounded junction in a protective sheath (which adds thermal mass without proportional surface area).
+
+\section{Thermal Interface Materials}
+The contact between two solid surfaces is never perfect. Microscopic surface roughness creates air gaps that act as thermal insulators. Contact resistance $R_{\text{contact}} = 1/(h_c A)$ where $h_c$ is the contact conductance, ranging from 3{,}000\,W/m$^2\cdot$K (rough, dry metal surfaces) to 20{,}000\,W/m$^2\cdot$K (smooth, greased surfaces).
+
+Thermal interface materials (TIMs) fill the air gaps:
+
+\textbf{Thermal paste} (silicone + ZnO or Al$_2$O$_3$ particles): $k = 1$--$5$\,W/m$\cdot$K. Most common for electronics. Apply a thin, uniform layer (50--100\,$\mu$m). Too thick: paste itself becomes the resistance.
+
+\textbf{Thermal pads} (silicone sheet with filler): $k = 1$--$6$\,W/m$\cdot$K. Easier to apply than paste; maintains consistent thickness. Slightly higher resistance than paste due to greater thickness.
+
+\textbf{Phase-change materials}: solid at room temperature, soften at operating temperature to fill gaps. $k = 3$--$5$\,W/m$\cdot$K. Used in laptop CPU cooling.
+
+For the ThermoRig thermocouple: attaching the bead to the specimen surface with thermal paste reduces the contact resistance from $\sim$100\,K/W (dry contact) to $\sim$10\,K/W, significantly improving the temperature measurement accuracy and reducing the apparent time constant.
+
+\section{Radiation Shields and View Factors}
+In high-temperature applications or vacuum environments, radiation becomes the dominant heat transfer mode. \textbf{Radiation shields} (polished metal foils between hot and cold surfaces) reduce radiative heat transfer by introducing additional resistances in the radiation path. Each shield approximately halves the radiation heat transfer. Three shields reduce it by $\sim$$8\times$.
+
+The \textbf{view factor} $F_{12}$ describes the fraction of radiation leaving surface~1 that reaches surface~2. For two parallel plates: $F_{12} \approx 1$. For a small surface facing a large enclosure: $F_{12} = 1$. For a sensor mounted on a surface facing a room: $F_{12}$ depends on the geometry but is typically 0.5--0.8. The radiation exchange between surfaces 1 and 2:
+\begin{equation}
+\dot{Q}_{12} = \sigma A_1 F_{12} \frac{T_1^4 - T_2^4}{1/\epsilon_1 + A_1/A_2(1/\epsilon_2 - 1)}
+\end{equation}
+
+For MEGN~300 applications at moderate temperatures ($< 200$\,\degC{}), the simplified form $\dot{Q}_{\text{rad}} = \epsilon\sigma A(T_s^4 - T_{\text{surr}}^4)$ with $\epsilon$ as the surface emissivity is usually sufficient.
+
+\section{Dimensional Analysis and Nusselt Number}
+In advanced heat transfer, the convection coefficient $h$ is predicted using dimensionless correlations. The \textbf{Nusselt number} $\text{Nu} = hL/k_{\text{fluid}}$ is the dimensionless heat transfer coefficient. It depends on the \textbf{Reynolds number} $\text{Re} = \rho v L / \mu$ (forced convection) or the \textbf{Rayleigh number} $\text{Ra} = g\beta\Delta T L^3/(\nu\alpha)$ (natural convection).
+
+For natural convection from a vertical plate: $\text{Nu} = 0.59 \, \text{Ra}^{1/4}$ for $10^4 < \text{Ra} < 10^9$. This allows you to estimate $h$ from the geometry and temperature difference without experimental measurement.
+
+While you will not need to use these correlations for MEGN~300 labs (the empirical $h$ estimates are sufficient), understanding that $h$ can be predicted from fluid mechanics principles connects instrumentation to your heat transfer coursework.
+\section{Heat Transfer Coefficient Estimation}
+For back-of-envelope calculations without solving the full convection equations, use these empirical correlations:
+
+\textbf{Natural convection from a vertical plate} (laminar, $\text{Ra} < 10^9$):
+\begin{equation}
+h \approx 1.42 \left(\frac{\Delta T}{L}\right)^{0.25} \text{ W/m}^2\text{K (in air)}
+\end{equation}
+For a 100\,mm plate at $\Delta T = 50$\,\degC{}: $h \approx 1.42 \times (50/0.1)^{0.25} = 1.42 \times 4.73 = 6.7$\,W/m$^2\cdot$K.
+
+\textbf{Forced convection over a flat plate} (turbulent, $\text{Re} > 5 \times 10^5$):
+\begin{equation}
+h \approx 0.037 \frac{k_{\text{air}}}{L} \text{Re}^{0.8} \text{Pr}^{0.33}
+\end{equation}
+For air at 2\,m/s over a 100\,mm plate: $\text{Re} = 1.2 \times 2 \times 0.1 / (1.8 \times 10^{-5}) = 13{,}333$ (laminar). Use the laminar correlation instead: $h \approx 0.664 \times (0.026/0.1) \times 13333^{0.5} \times 0.71^{0.33} = 0.172 \times 115.5 \times 0.89 = 17.7$\,W/m$^2\cdot$K.
+
+\section{Transient Heating and Cooling Curves}
+The lumped capacitance model produces exponential heating/cooling curves that directly determine measurement system behavior:
+
+\textbf{Heating}: $T(t) = T_{ss} - (T_{ss} - T_i)e^{-t/\tau}$ where $T_{ss} = T_{\text{amb}} + \dot{Q}_{\text{heater}}/(hA)$ is the steady-state temperature and $\tau = mC_p/(hA)$.
+
+\textbf{Cooling} (heater off): $T(t) = T_{\text{amb}} + (T_i - T_{\text{amb}})e^{-t/\tau}$.
+
+The time to reach a target temperature (within $\delta$ of $T_{ss}$): $t_{\text{settle}} = \tau \ln((T_{ss} - T_i)/\delta)$. For $T_i = 22$\,\degC{}, $T_{ss} = 80$\,\degC{}, $\delta = 0.5$\,\degC{}: $t = \tau \ln(58/0.5) = 4.76\tau$. With $\tau = 30$\,s: $t = 143$\,s $\approx 2.4$\,minutes to settle within 0.5\,\degC{} of setpoint.
+
+\section{Multi-Node Thermal Models}
+When the lumped capacitance assumption is not valid ($\text{Bi} > 0.1$), the system must be modeled with multiple thermal nodes, each with its own temperature. The ThermoRig with a thick steel specimen might require three nodes: (1) heater surface, (2) specimen center, (3) specimen surface exposed to air.
+
+Each node has a thermal capacitance $C_i = m_i C_{p,i}$ and is connected to adjacent nodes by thermal resistances $R_{ij}$. The energy balance for each node:
+\begin{equation}
+C_i \frac{dT_i}{dt} = \sum_j \frac{T_j - T_i}{R_{ij}} + \dot{Q}_{i,\text{ext}}
+\end{equation}
+This system of ODEs can be solved in LabVIEW using the ``ODE Solver'' VI, MATLAB's \texttt{ode45}, or a simple Euler integration in a While Loop.
+
+The multi-node model reveals internal temperature gradients. The heater surface may be at 120\,\degC{} while the measurement surface is at 80\,\degC{}. If the thermocouple is on the measurement surface, the controller ``sees'' 80\,\degC{}, but the heater is already at its thermal limit. This mismatch between the controlled variable and the constraint variable is a common cause of heater failure in poorly designed thermal systems.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A steel plate ($k = 50$\,W/m$\cdot$K) is 5\,mm thick with area 100\,cm$^2$. If one face is at 120\,\degC{} and the other at 80\,\degC{}, what is the heat transfer rate?
+\item The ThermoRig specimen (aluminum, $m = 34$\,g, $C_p = 900$\,J/kg$\cdot$K) is heated by a 100\,W heater in still air ($h = 10$\,W/m$^2\cdot$K, $A = 50$\,cm$^2$). Write the energy balance and find the steady-state temperature (ambient: 22\,\degC{}).
+\item Calculate the Biot number for the thermocouple bead in the worked example. Is the lumped capacitance assumption valid?
+\item A copper block ($k = 385$\,W/m$\cdot$K, $\rho = 8960$\,kg/m$^3$, $C_p = 385$\,J/kg$\cdot$K) is a 20\,mm cube cooled by forced air ($h = 100$\,W/m$^2\cdot$K). Calculate the time constant and the time to cool from 100\,\degC{} to within 1\,\degC{} of ambient (25\,\degC{}).
+\item Explain why a thermocouple in still air has a time constant 50$\times$ longer than the same thermocouple in stirred water. Which physical parameter changes, and by how much?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $\dot{Q} = 50 \times 0.01 \times (120-80)/0.005 = 4000$\,W. The thin steel plate conducts very effectively.
+\item Energy balance: $100 = 10 \times 0.005 \times (T_{ss} - 22) + \epsilon\sigma \times 0.005 \times (T_{ss}^4 - 295^4)$. Neglecting radiation as first approximation: $100 = 0.05(T_{ss} - 22)$, $T_{ss} = 2022$\,\degC{}. This is clearly too high, the steady state would be limited by the heater surface area and the onset of higher convection at elevated temperatures. In practice, the specimen reaches the heater's surface temperature limit ($\sim$200\,\degC{} for ceramic heaters) and the energy balance includes radiation and increased natural convection ($h$ increases with $\Delta T$). A more realistic $h = 15$\,W/m$^2\cdot$K with radiation ($h_{\text{rad}} \approx 5$ at moderate temperatures): $100 = (15+5) \times 0.005 \times (T_{ss} - 22)$, $T_{ss} = 1022$\,\degC{}. The problem illustrates that 100\,W is far more power than needed for a small specimen in air.
+\item $L_c = V/A_s = (5.24 \times 10^{-10})/(3.14 \times 10^{-6}) = 1.67 \times 10^{-4}$\,m. In water ($h = 500$): $\text{Bi} = 500 \times 1.67 \times 10^{-4}/22 = 0.0038 \ll 0.1$. Lumped capacitance is valid ($k_{\text{chromel}} \approx 22$\,W/m$\cdot$K).
+\item $V = (0.02)^3 = 8 \times 10^{-6}$\,m$^3$. $A_s = 6 \times (0.02)^2 = 2.4 \times 10^{-3}$\,m$^2$. $m = 8960 \times 8 \times 10^{-6} = 0.0717$\,kg. $\tau = 0.0717 \times 385/(100 \times 2.4 \times 10^{-3}) = 115$\,s. Time to 1\,\degC{} of ambient: $T(t) = 25 + 75e^{-t/115} = 26$\,\degC{} when $75e^{-t/115} = 1$, $t = 115\ln(75) = 115 \times 4.32 = 497$\,s $\approx 8.3$\,min.
+\item The time constant $\tau = mC_p/(hA_s)$ is inversely proportional to $h$. Only $h$ changes: from $\sim$10\,W/m$^2\cdot$K in still air to $\sim$500\,W/m$^2\cdot$K in stirred water (50$\times$ increase). All other parameters ($m$, $C_p$, $A_s$) are properties of the thermocouple and do not change with the medium.
+\end{enumerate}
+
+

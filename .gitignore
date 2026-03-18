@@ -1,0 +1,29 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lot
+*.lof
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.run.xml
+*.bak
+
+# Keep PDFs (built by CI)
+!megn300_master_reference.pdf
+!MEGN300_Student_Guide.pdf
+
+# OS files
+.DS_Store
+Thumbs.db

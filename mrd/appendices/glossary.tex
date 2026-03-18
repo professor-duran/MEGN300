@@ -1,0 +1,64 @@
+% Glossary of Key Terms and Acronyms
+% Auto-generated from megn300_master_reference.tex
+
+\chapter*{Glossary of Key Terms and Acronyms}
+\addcontentsline{toc}{chapter}{Glossary of Key Terms and Acronyms}
+
+\begin{description}[style=nextline,leftmargin=3em,font=\sffamily\bfseries]
+\item[AC] Alternating Current. Current that periodically reverses direction; characterized by frequency and RMS amplitude.
+\item[ADC] Analog-to-Digital Converter. Converts a continuous analog voltage to a discrete digital number.
+\item[Aliasing] The misidentification of a high-frequency signal as a lower frequency due to insufficient sampling rate. Prevented by sampling at $> 2f_{\max}$ (Nyquist criterion) and using anti-alias filters.
+\item[Bandwidth] The range of frequencies a system can process or transmit. For amplifiers: the frequency range over which gain is within 3\,dB of the midband value.
+\item[Biot Number (Bi)] Dimensionless ratio $Bi = hL_c/k$ comparing internal conduction resistance to external convection resistance. If $Bi < 0.1$, the lumped capacitance assumption is valid.
+\item[BJT] Bipolar Junction Transistor. A current-controlled semiconductor switch (NPN or PNP).
+\item[Buck Converter] A switching DC-DC converter that steps voltage down. $V_{\text{out}} = D \times V_{\text{in}}$.
+\item[Boost Converter] A switching DC-DC converter that steps voltage up. $V_{\text{out}} = V_{\text{in}}/(1-D)$.
+\item[Calibration] The process of comparing a measurement device's output to a known standard and applying corrections to minimize systematic error.
+\item[CMRR] Common-Mode Rejection Ratio. Measures an amplifier's ability to reject signals common to both inputs. Higher is better; instrumentation amplifiers achieve 80--120\,dB.
+\item[DAC] Digital-to-Analog Converter. Converts a digital number to an analog voltage or current.
+\item[DAQ] Data Acquisition. The process of sampling signals from sensors and converting them to digital data for processing.
+\item[dB] Decibel. A logarithmic unit: $\text{dB} = 20\log_{10}(V_{\text{out}}/V_{\text{in}})$. Used for gain, attenuation, and signal levels.
+\item[DC] Direct Current. Current that flows in one direction at a constant (or slowly varying) magnitude.
+\item[DFT/FFT] Discrete Fourier Transform / Fast Fourier Transform. Decomposes a time-domain signal into its frequency components. The FFT is an efficient algorithm for computing the DFT.
+\item[Duty Cycle ($D$)] The fraction of a PWM period during which the signal is HIGH. $D = t_{\text{on}}/T$.
+\item[ENOB] Effective Number of Bits. The actual resolution of an ADC after accounting for noise: $\text{ENOB} = (\text{SINAD} - 1.76)/6.02$.
+\item[ESD] Electrostatic Discharge. A sudden flow of electricity between two objects at different potentials. Damages CMOS components.
+\item[FIR] Finite Impulse Response. A digital filter type with guaranteed stability and exactly linear phase. Requires more computation than IIR for the same rolloff.
+\item[Flyback Diode] A diode placed across an inductive load to clamp voltage spikes when the current is switched off. Essential for all motor, solenoid, and relay circuits.
+\item[GBW] Gain-Bandwidth Product. For an op-amp, $\text{GBW} = A_v \times f$. The maximum usable frequency at gain $G$ is $f_{\max} = \text{GBW}/G$.
+\item[GPIO] General-Purpose Input/Output. A digital pin on a microcontroller configurable as input or output.
+\item[Ground Loop] A closed loop formed by multiple ground connections that picks up magnetically induced noise. Eliminated by star grounding.
+\item[GUM] Guide to the Expression of Uncertainty in Measurement (JCGM 100:2008). The international standard for reporting measurement uncertainty.
+\item[H-Bridge] A circuit of four switches that drives a motor in both directions by reversing current flow.
+\item[IIR] Infinite Impulse Response. A digital filter type that uses feedback; efficient but can be unstable and has nonlinear phase.
+\item[INA] Instrumentation Amplifier. A precision differential amplifier with very high input impedance and high CMRR, designed for low-level sensor signals.
+\item[KCL] Kirchhoff's Current Law. The sum of currents entering a node equals the sum leaving.
+\item[KVL] Kirchhoff's Voltage Law. The sum of voltages around any closed loop is zero.
+\item[LDO] Low-Dropout Regulator. A linear voltage regulator that requires only a small voltage differential between input and output.
+\item[MOSFET] Metal-Oxide-Semiconductor Field-Effect Transistor. A voltage-controlled semiconductor switch. N-channel is most common for low-side switching.
+\item[MTBF] Mean Time Between Failures. Average operating time before a system failure.
+\item[MTTR] Mean Time To Repair. Average time to restore a failed system to operation.
+\item[Nyquist Frequency] Half the sampling rate ($f_s/2$). The maximum frequency that can be correctly represented in a sampled signal.
+\item[Op-Amp] Operational Amplifier. A high-gain differential amplifier used as a building block for signal conditioning circuits.
+\item[PID] Proportional-Integral-Derivative controller. The standard feedback controller combining proportional response, integral error elimination, and derivative damping.
+\item[PWM] Pulse Width Modulation. A technique for controlling average power by varying the duty cycle of a square wave.
+\item[Quantization] The process of mapping a continuous value to the nearest discrete level in an ADC. Introduces quantization noise with RMS value $q/\sqrt{12}$ where $q$ is the LSB size.
+\item[RMS] Root Mean Square. The effective value of an AC signal: $V_{\text{RMS}} = V_{\text{peak}}/\sqrt{2}$ for sinusoidal signals.
+\item[RTD] Resistance Temperature Detector. A temperature sensor based on the change of electrical resistance with temperature (typically platinum, Pt100).
+\item[Sensitivity] The ratio of output change to input change: $S = \Delta V_{\text{out}} / \Delta x_{\text{measurand}}$. Units depend on the sensor type.
+\item[SINAD] Signal-to-Noise and Distortion ratio. Measures total signal quality including harmonic distortion.
+\item[SNR] Signal-to-Noise Ratio. The ratio of signal power to noise power, usually expressed in dB.
+\item[SSR] Solid-State Relay. A relay using semiconductor switching instead of mechanical contacts. No moving parts, faster, longer life.
+\item[Thevenin Equivalent] Any linear circuit reduced to a voltage source ($V_{Th}$) in series with a resistance ($R_{Th}$).
+\item[Time Constant ($\tau$)] The time for a first-order system to reach 63.2\% of its final value. For RC circuits: $\tau = RC$. For RL: $\tau = L/R$. For thermal: $\tau = mC_p/(hA)$.
+\item[Type I/II/III Error] Type~I: false positive (rejecting a true null hypothesis). Type~II: false negative (failing to reject a false null). Type~III: correctly rejecting the null but for the wrong reason (asking the wrong question).
+\item[Uncertainty] A quantitative estimate of the range within which the true value of a measurand is expected to lie, expressed at a stated confidence level (typically 95\%).
+\item[Wheatstone Bridge] A circuit of four resistances used to detect small resistance changes in sensors (strain gauges, RTDs). Produces a voltage proportional to the fractional resistance change.
+\item[Z-Transform] The discrete-time equivalent of the Laplace transform. Maps discrete sequences to the complex $z$-plane for stability analysis and digital filter design.
+\item[Ziegler-Nichols (Z-N)] A heuristic PID tuning method based on the ultimate gain and oscillation period of a system at marginal stability. Provides starting-point tuning parameters.
+\end{description}
+
+
+% ================================================================
+% APPENDIX: QUICK REFERENCE TABLES
+% ================================================================

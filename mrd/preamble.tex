@@ -1,0 +1,83 @@
+% MEGN 300 Master Reference Document - Preamble
+% Package loading, color definitions, custom environments
+
+\documentclass[11pt,letterpaper,twoside,openany]{book}
+\usepackage[margin=1in,inner=1.2in,outer=0.9in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{amsmath,amssymb}
+% \usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage{graphicx}
+\graphicspath{{./figs/}}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{textcomp}
+\usepackage{multicol}
+\usepackage{titletoc}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,decorations.pathmorphing,patterns,fit,backgrounds}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{imakeidx}
+\makeindex[intoc,title=Index]
+
+\newcommand{\degC}{\ensuremath{{}^{\circ}\text{C}}}
+\newcommand{\degF}{\ensuremath{{}^{\circ}\text{F}}}
+\providecommand{\ang}[1]{#1\ensuremath{{}^{\circ}}}
+
+\definecolor{MinesBlue}{HTML}{21314D}
+\definecolor{MinesSilver}{HTML}{A2A4A3}
+\definecolor{AccentTeal}{HTML}{00796B}
+\definecolor{WarnOrange}{HTML}{E65100}
+\definecolor{LightBG}{HTML}{F5F7FA}
+
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{keyconceptbox}[1][]{enhanced,breakable,colback=LightBG,colframe=MinesBlue,fonttitle=\bfseries\sffamily,title={#1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{warningbox}[1][]{enhanced,breakable,colback=WarnOrange!8,colframe=WarnOrange,fonttitle=\bfseries\sffamily,title={#1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{tipbox}[1][]{enhanced,breakable,colback=AccentTeal!8,colframe=AccentTeal,fonttitle=\bfseries\sffamily,title={#1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{examplebox}[1][]{enhanced,breakable,colback=AccentTeal!5,colframe=AccentTeal!70!black,fonttitle=\bfseries\sffamily,title={\textsf{WE}~#1},boxrule=1pt,arc=3pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\definecolor{MasteryPurple}{HTML}{6A1B9A}
+\definecolor{IndustryGold}{HTML}{F57F17}
+\newtcolorbox{masterycheckbox}[1][]{enhanced,breakable,colback=MasteryPurple!5,colframe=MasteryPurple!80,fonttitle=\bfseries\sffamily,title={\textsf{\checkmark}~Mastery Diagnostic: #1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{advancedbox}[1][]{enhanced,breakable,colback=MinesSilver!8,colframe=MinesSilver!60,fonttitle=\bfseries\sffamily,title={\textsf{$\bigstar$ Advanced Topic:}~#1},boxrule=0.6pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{industrybox}[1][]{enhanced,breakable,colback=IndustryGold!8,colframe=IndustryGold!80!black,fonttitle=\bfseries\sffamily,title={\textsf{Industry Insight:}~#1},boxrule=0.8pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\titleformat{\chapter}[display]{\normalfont\huge\bfseries\sffamily\color{MinesBlue}}{\chaptertitlename\ \thechapter}{20pt}{\Huge}[\vspace{-0.5em}\textcolor{MinesBlue}{\rule{\textwidth}{1pt}}]
+\titleformat{\section}{\Large\bfseries\sffamily\color{MinesBlue}}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries\sffamily\color{MinesBlue}}{\thesubsection}{0.75em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\sffamily\color{AccentTeal}}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+\titleformat{\part}[display]{\centering\normalfont\Huge\bfseries\sffamily\color{MinesBlue}}{Part \thepart}{20pt}{\huge}
+
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[LE]{\small\sffamily\textcolor{MinesBlue}{\leftmark}}
+\fancyhead[RO]{\small\sffamily\textcolor{MinesBlue}{\rightmark}}
+\fancyfoot[C]{\small\sffamily\textcolor{MinesSilver}{\thepage}}
+\fancyfoot[R]{\scriptsize\sffamily\textcolor{MinesSilver}{March 2026}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter:\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=MinesBlue,
+    urlcolor=AccentTeal,
+    citecolor=MinesBlue,
+    pdftitle={MEGN 300 Instrumentation and Automation: Master Reference Document},
+    pdfauthor={Adam Duran},
+    pdfsubject={Instrumentation, Signal Processing, Control Systems},
+    pdfkeywords={measurement, instrumentation, signal processing, PID control, LabVIEW, NI DAQ}
+}
+\newcommand{\phantomsectionaliased}{\phantomsection}
+
+\frenchspacing

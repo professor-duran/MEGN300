@@ -1,0 +1,371 @@
+% Chapter 2: Static Measurements
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Static Measurements}
+\label{ch:static}\index{calibration!static}\index{Wheatstone bridge}\index{sensitivity}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    res/.style={draw=MinesBlue, thick, fill=LightBG, minimum width=0.8cm, minimum height=0.4cm, font=\small\sffamily},
+]
+\coordinate (top) at (0,2.5);
+\coordinate (left) at (-2.5,0);
+\coordinate (right) at (2.5,0);
+\coordinate (bot) at (0,-2.5);
+\node[res, rotate=45] (R1) at (-1.25,1.25) {$R_1$};
+\node[res, rotate=-45] (R2) at (1.25,1.25) {$R_2$};
+\node[res, rotate=-45] (R3) at (-1.25,-1.25) {$R_3$};
+\node[res, rotate=45] (R4) at (1.25,-1.25) {$R_4$};
+\draw[MinesBlue, thick] (top) -- (R1.north east);
+\draw[MinesBlue, thick] (R1.south west) -- (left);
+\draw[MinesBlue, thick] (top) -- (R2.north west);
+\draw[MinesBlue, thick] (R2.south east) -- (right);
+\draw[MinesBlue, thick] (left) -- (R3.north west);
+\draw[MinesBlue, thick] (R3.south east) -- (bot);
+\draw[MinesBlue, thick] (right) -- (R4.north east);
+\draw[MinesBlue, thick] (R4.south west) -- (bot);
+\draw[-{Stealth[length=2mm]}, MinesBlue, thick] (0,3.2) -- (top);
+\node[font=\small\sffamily, MinesBlue] at (0,3.5) {$V_{\text{ex}}$};
+\draw[MinesBlue, thick] (bot) -- (0,-3.0);
+\node[font=\small\sffamily, MinesSilver] at (0,-3.3) {GND};
+\draw[MinesBlue, thick, dashed] (left) -- (-3.5,0);
+\draw[MinesBlue, thick, dashed] (right) -- (3.5,0);
+\node[font=\small\sffamily\bfseries, AccentTeal] at (4.5,0) {$V_{\text{out}}$};
+\node[font=\scriptsize\sffamily, AccentTeal] at (0,-0.3) {To INA};
+\node[font=\scriptsize\sffamily\bfseries, WarnOrange] at (2.2,-2.2) {Sensor ($R_4$)};
+\end{tikzpicture}
+\caption{Wheatstone bridge circuit. $R_4$ is the sensor element (e.g., RTD or strain gauge). When balanced ($R_1 R_4 = R_2 R_3$), $V_{\text{out}} = 0$. A change in sensor resistance produces a differential output proportional to $\Delta R/R$, measured by an instrumentation amplifier.}
+\label{fig:wheatstone}
+\end{figure}
+
+\section{Static Calibration}
+Static calibration determines the relationship between the sensor input (measurand) and output (signal) under steady-state conditions, where the measurand is not changing with time. The calibration process produces a \textbf{calibration curve}: a plot or equation mapping input to output.
+
+\subsection{The Calibration Process}
+\begin{enumerate}[leftmargin=1.5em]
+\item Apply a series of known, stable input values spanning the sensor's range, using a \textbf{calibration standard} with accuracy $\geq 4\times$ better than the sensor under test (4:1 Test Accuracy Ratio, per ANSI/NCSL Z540.3).
+\item Record the sensor output at each input value. Allow sufficient settling time at each point.
+\item Apply inputs in both increasing and decreasing order to detect hysteresis.
+\item Repeat the entire sequence at least 3 times to assess repeatability.
+\item Fit a calibration equation (linear, polynomial, or piecewise) to the data.
+\item Calculate residuals (measured $-$ predicted) and report maximum error.
+\end{enumerate}
+
+\subsection{Linear Calibration}
+Most sensors are designed to be approximately linear over their operating range:
+\begin{equation}
+y = mx + b
+\end{equation}
+where $y$ = sensor output, $x$ = measurand, $m$ = sensitivity (slope), and $b$ = zero offset (intercept). The sensitivity $m$ and offset $b$ are determined by least-squares regression on the calibration data.
+
+\subsection{Nonlinear Calibration}
+Some sensors are inherently nonlinear (e.g., thermistors: $R = R_0 e^{\beta(1/T - 1/T_0)}$). For these, use a polynomial fit ($y = a_0 + a_1 x + a_2 x^2 + \cdots$) or a lookup table with interpolation. The Steinhart-Hart equation provides a three-coefficient model for thermistors that is accurate to $\pm$0.01\,\degC{} over wide ranges.
+
+\begin{examplebox}[ThermoRig: Static Calibration of a Type K Thermocouple]
+Calibration standard: NIST-traceable ice point (0.0\,\degC{}) and boiling point (100.0\,\degC{} at local altitude, corrected for barometric pressure in Golden, CO: $\approx$95.0\,\degC{} at 5,675\,ft elevation). Additional points at 25\,\degC{} and 50\,\degC{} using a calibrated water bath.
+
+Calibration equation (linear fit): $T = 24.98 \times V_{mV} + 0.15$\,\degC{}. Residuals: max $\pm$0.8\,\degC{} over 0--95\,\degC{} range. With a second-order polynomial: max residual drops to $\pm$0.3\,\degC{}.
+\end{examplebox}
+
+\section{Static Characteristics}
+
+\subsection{Sensitivity}
+Sensitivity $S$ is the slope of the calibration curve:
+\begin{equation}
+S = \frac{\partial y}{\partial x} \approx \frac{\Delta y}{\Delta x}
+\end{equation}
+Units: output units per input unit (e.g., mV/\degC{}, $\Omega$/kPa). A higher sensitivity produces a larger output change for a given input change, improving resolution and signal-to-noise ratio. For a linear sensor, sensitivity is constant. For a nonlinear sensor, sensitivity varies with the operating point.
+
+\subsection{Linearity}
+Linearity error is the maximum deviation of the calibration curve from a reference straight line, expressed as a percentage of full-scale output (FSO):
+\begin{equation}
+\text{Linearity} = \frac{\max |y_{\text{actual}} - y_{\text{line}}|}{\text{FSO}} \times 100\%
+\end{equation}
+Three definitions of the reference line exist: \textbf{end-point} (connects the zero and full-scale points), \textbf{best-fit} (least-squares line through all data), and \textbf{independent} (best-fit line not constrained to pass through zero). The independent best-fit method gives the smallest linearity error and is most common in datasheets.
+
+\subsection{Hysteresis}
+Hysteresis is the difference in output between the up-sweep (increasing input) and the down-sweep (decreasing input) at the same input value. Causes include mechanical friction, magnetic remanence, and thermal lag. Expressed as \% FSO:
+\begin{equation}
+\text{Hysteresis} = \frac{\max |y_{\text{up}} - y_{\text{down}}|}{\text{FSO}} \times 100\%
+\end{equation}
+
+\subsection{Resolution and Threshold}
+\textbf{Resolution} is the smallest input change that produces a detectable output change. For analog sensors, resolution is limited by noise. For digital sensors, resolution is set by the least significant bit (LSB). \textbf{Threshold} is the minimum input required to produce any output at all (relevant for sensors with a dead zone near zero).
+
+\subsection{Drift}
+\textbf{Zero drift} (offset drift) is a change in the output at zero input over time or with temperature changes. \textbf{Sensitivity drift} (span drift) is a change in the slope of the calibration curve. Temperature is the most common cause of both. Drift is specified in units per \degC{} or units per year.
+
+\begin{tipbox}[Recalibrate Regularly]
+Drift means your calibration degrades over time. Establish a recalibration interval based on the manufacturer's stability specification and the accuracy requirements of your application. For student lab instruments, recalibrate at the start of each semester. For critical measurements, recalibrate before every test series.
+\end{tipbox}
+
+
+\section{Bridge Circuits}
+The Wheatstone bridge is the most important circuit in resistive sensor instrumentation. It converts small resistance changes into measurable voltage changes with excellent sensitivity and inherent temperature compensation.
+
+\subsection{The Wheatstone Bridge}
+Four resistors arranged in a diamond pattern with excitation voltage $V_{ex}$ applied across one diagonal and the output voltage $V_o$ measured across the other:
+\begin{equation}
+V_o = V_{ex} \left(\frac{R_1}{R_1 + R_2} - \frac{R_3}{R_3 + R_4}\right)
+\end{equation}
+When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\Delta R$ in one arm produces:
+\begin{equation}
+\Delta V_o \approx \frac{V_{ex}}{4} \cdot \frac{\Delta R}{R} \quad \text{(quarter-bridge)}
+\end{equation}
+
+\subsection{Bridge Configurations}
+\textbf{Quarter-bridge}: one active gauge, three fixed resistors. Simplest; output proportional to strain. Sensitive to temperature unless a dummy gauge is used in an adjacent arm.
+
+\textbf{Half-bridge}: two active gauges in adjacent arms. Doubles sensitivity and provides automatic temperature compensation if both gauges experience the same temperature.
+
+\textbf{Full-bridge}: four active gauges. Quadruples sensitivity, provides full temperature compensation, and rejects bending strains (if configured for axial measurement). Used in commercial load cells.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    rbox/.style={draw=MinesBlue, thick, fill=LightBG, minimum width=0.6cm, minimum height=0.3cm, font=\tiny\sffamily},
+    act/.style={draw=WarnOrange, thick, fill=WarnOrange!15, minimum width=0.6cm, minimum height=0.3cm, font=\tiny\sffamily\bfseries},
+    lbl/.style={font=\small\sffamily\bfseries, MinesBlue}
+]
+\foreach \xoff/\title/\sens/\actlist in {
+    0/{Quarter Bridge}/{$\Delta V \approx V_{ex}\frac{\Delta R}{R}/4$}/{4},
+    5/{Half Bridge}/{$\Delta V \approx V_{ex}\frac{\Delta R}{R}/2$}/{3,4},
+    10/{Full Bridge}/{$\Delta V \approx V_{ex}\frac{\Delta R}{R}$}/{1,2,3,4}} {
+    \begin{scope}[shift={(\xoff,0)}]
+        \draw[MinesBlue, thick] (0,1.5) -- (-1.5,0) -- (0,-1.5) -- (1.5,0) -- cycle;
+        \node[rbox] (r1) at (-0.75,0.75) {$R_1$};
+        \node[rbox] (r2) at (0.75,0.75) {$R_2$};
+        \node[rbox] (r3) at (-0.75,-0.75) {$R_3$};
+        \node[rbox] (r4) at (0.75,-0.75) {$R_4$};
+        \node[lbl] at (0,2.0) {\title};
+        \node[font=\scriptsize\sffamily, AccentTeal] at (0,-2.0) {\sens};
+    \end{scope}
+}
+% Highlight active elements: quarter=R4, half=R3+R4, full=all
+\begin{scope}[shift={(0,0)}]
+    \node[act] at (0.75,-0.75) {$R_4$};
+\end{scope}
+\begin{scope}[shift={(5,0)}]
+    \node[act] at (-0.75,-0.75) {$R_3$};
+    \node[act] at (0.75,-0.75) {$R_4$};
+\end{scope}
+\begin{scope}[shift={(10,0)}]
+    \node[act] at (-0.75,0.75) {$R_1$};
+    \node[act] at (0.75,0.75) {$R_2$};
+    \node[act] at (-0.75,-0.75) {$R_3$};
+    \node[act] at (0.75,-0.75) {$R_4$};
+\end{scope}
+\node[font=\scriptsize\sffamily\itshape, WarnOrange] at (7.5,-2.6) {Orange = active sensor elements; white = fixed reference resistors};
+\end{tikzpicture}
+\caption{Wheatstone bridge configurations. Sensitivity doubles with each step: quarter-bridge ($1$ active element), half-bridge ($2$), full-bridge ($4$). Full bridge also provides complete temperature compensation.}
+\label{fig:bridge}
+\end{figure}
+
+\begin{examplebox}[ThermoRig: RTD in a Wheatstone Bridge]
+A Pt100 RTD ($R_0 = 100.0\,\Omega$ at 0\,\degC{}, $\alpha = 0.00385$\,\degC{}$^{-1}$) is placed in a quarter-bridge with $V_{ex} = 5.0$\,V and three 100.0\,$\Omega$ precision resistors. At 25\,\degC{}: $R_{RTD} = 100(1 + 0.00385 \times 25) = 109.6\,\Omega$. Bridge output: $V_o = 5.0 \times (109.6/(109.6+100) - 100/(100+100)) = 5.0 \times (0.5229 - 0.5000) = 114.5$\,mV. Sensitivity: 114.5\,mV / 25\,\degC{} = 4.58\,mV/\degC{}.
+
+Self-heating check: bridge current through RTD $= V_{ex}/(2R) \approx 25$\,mA. Power dissipated in RTD $= I^2 R = 0.025^2 \times 110 = 0.069$\,W. Self-heating coefficient for a Pt100 in still air $\approx$ 0.5\,\degC{}/mW $\to$ self-heating error $= 0.069 \times 0.5 = 0.035$\,\degC{}. Acceptable for $\pm$0.5\,\degC{} accuracy, but reduce $V_{ex}$ to 1\,V for higher precision.
+\end{examplebox}
+
+\section{Calibration Standards and Traceability}
+A calibration is only as good as the reference standard. \textbf{Traceability} means the calibration chain can be traced back to a national or international standard through an unbroken series of comparisons, each with documented uncertainty.
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Primary standards}: defined by fundamental physics (triple point of water = 273.16\,K exactly; NIST maintains primary standards for all SI units).
+\item \textbf{Secondary/transfer standards}: calibrated against primary standards. Used by calibration laboratories.
+\item \textbf{Working standards}: calibrated against secondary standards. Used in the lab to calibrate sensors.
+\item \textbf{Test Accuracy Ratio (TAR)}: the standard should be $\geq$4$\times$ more accurate than the device under test (4:1 TAR per ANSI/NCSL Z540.3).
+\end{itemize}
+
+
+\section{Fundamentals of Calibration}
+Calibration establishes the relationship between sensor output and true measurand value by applying known reference stimuli. Without calibration, a sensor's output is a raw electrical signal with no physical meaning.
+
+\subsection{Calibration Standards and Traceability}
+The reference standard must be at least 4$\times$ more accurate than the sensor under calibration (4:1 test accuracy ratio). Common standards: ice-point baths (0.000\,\degC{} $\pm$0.002\,\degC{}), dead-weight testers (pressure), precision decade resistors, certified mass sets. All standards must be traceable to NIST through an unbroken chain of documented calibrations.
+
+\subsection{Static Calibration Procedure}
+(1) Thermal equilibrium (15+ minutes after power-on). (2) Apply 5--7 known inputs spanning the full range. (3) Record sensor output at each. (4) Repeat sweep in reverse (detect hysteresis). (5) Repeat 3--5 times (quantify repeatability). (6) Fit calibration curve. (7) Calculate residuals and report uncertainty.
+
+\subsection{Linear vs.\ Polynomial Calibration}
+For linear sensors (RTDs, LVDTs): $y = mx + b$ via least-squares regression. Sensitivity $m$ and offset $b$. For nonlinear sensors (thermistors, wide-range thermocouples): polynomial $y = a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n$ using LabVIEW's General Polynomial Fit VI. Report the goodness-of-fit $R^2$.
+
+\begin{warningbox}[Do Not Extrapolate Beyond Calibration Range]
+A calibration curve is valid only within the range of inputs used to generate it. Beyond this range, the sensor may saturate, exhibit unexpected nonlinearity, or produce physically meaningless outputs. Always recalibrate over a wider range if measurements approach the boundaries.
+\end{warningbox}
+
+\begin{examplebox}[ThermoRig: Type K Thermocouple Calibration]
+Five calibration points: ice bath (0\,\degC{}), room temperature (23\,\degC{} from NIST-traceable reference), warm water at 50\,\degC{}, 75\,\degC{}, and boiling water (100\,\degC{} adjusted for altitude: $T_{bp} = 100 - 0.037(760 - P_{mmHg})$). At each point, 100 samples (10\,s at 10\,S/s), mean computed. Linear fit: $T = 24.12 \times V_{mV} + 0.31$, $R^2 = 0.9998$, max residual 0.28\,\degC{}. Calibration uncertainty: $\pm$0.3\,\degC{} (95\% confidence).
+\end{examplebox}
+
+\section{The Wheatstone Bridge in Detail}
+\subsection{Bridge Theory}
+Four resistors in a diamond, excitation voltage $V_{ex}$ across one diagonal, output $V_o$ across the other. For balanced bridge (all $R$ equal): $V_o = 0$. With one arm changed by $\Delta R$ (quarter bridge):
+\begin{equation}
+V_o \approx \frac{V_{ex}}{4} \cdot \frac{\Delta R}{R} \quad (\Delta R \ll R)
+\end{equation}
+
+\subsection{Bridge Nonlinearity}
+The exact output: $V_o = (V_{ex}/4) \cdot (\Delta R/R)/(1 + \Delta R/(2R))$. For $\Delta R/R = 1\%$: 0.5\% nonlinearity. For 10\%: 5\%. Half and full bridges cancel this.
+
+\subsection{Lead Wire Compensation}
+Remote sensors add series lead resistance that offsets and desensitizes the bridge. Three-wire connection: adds equal lead resistance to adjacent arm, canceling the effect. Four-wire (Kelvin): eliminates lead resistance entirely using separate current and voltage pairs.
+
+\section{Signal Conditioning for Static Measurements}
+\textbf{Amplification}: INA maps bridge output ($\pm$10\,mV typical) to DAQ range. For $\pm$10\,mV to $\pm$5\,V: $G = 500$.
+
+\textbf{Anti-alias filtering}: LP filter at 10--100\,Hz for static measurements removes wideband noise.
+
+\textbf{Excitation regulation}: bridge sensitivity is proportional to $V_{ex}$. Use precision voltage reference (e.g., REF5050 for 5.000\,V $\pm$0.05\%), not a bench supply.
+
+\begin{tipbox}[Self-Heating in Resistance Sensors]
+Excitation current through RTDs/thermistors generates Joule heating ($P = I^2 R$) raising sensor temperature above the measurand. For Pt100 at 1\,mA: 0.1--1\,\degC{} self-heating depending on thermal coupling. Use the minimum excitation current that produces a measurable voltage.
+\end{tipbox}
+
+\section{Traceability and Measurement Audit Trail}
+Every calibration must be documented: date/time, reference standard (certificate number, expiration), environmental conditions (ambient T, humidity), raw data, calibration equation with coefficients, residuals and uncertainty, operator name. Include calibration records in your engineering logbook and reference them in reports.
+
+
+\section{Advanced Calibration Techniques}
+\subsection{Multi-Point Calibration with Uncertainty Bands}
+For high-accuracy applications, calibrate at 10--20 points across the range. At each point, acquire enough samples ($N \geq 30$) to compute the mean and standard deviation. Plot the calibration curve with $\pm 2\sigma$ uncertainty bands. Any point where the measurement falls outside the band indicates a problem (sensor nonlinearity, environmental interference, or reference standard error).
+
+\subsection{In-Situ Calibration}
+When possible, calibrate the sensor in its actual operating environment (mounted in the test fixture, wired to the DAQ, with the same cable lengths and routing). This captures installation effects (strain from mounting, thermal coupling, EMI environment) that a bench calibration misses. For the ThermoRig, this means calibrating the thermocouple while it is installed in the thermal specimen holder, not on the bench.
+
+\subsection{Two-Point vs.\ Multi-Point Calibration}
+A two-point calibration (zero and span) assumes the sensor is linear and only corrects for offset and gain errors. This is adequate for sensors with specified linearity better than the required accuracy. For sensors with significant nonlinearity (thermistors, some pressure sensors), multi-point calibration with polynomial fitting is necessary. The polynomial order should be the minimum that reduces residuals below the target accuracy; overfitting (too high an order) creates oscillations between calibration points.
+
+\section{Resistance Measurement Techniques}
+Many sensors are resistive (strain gauges, RTDs, thermistors, potentiometers). Measuring resistance accurately requires careful technique.
+
+\subsection{Two-Wire Measurement}
+The simplest method: pass a known current through the sensor and measure the voltage across it. Problem: the voltage includes the drop across the lead wires ($V = I(R_{\text{sensor}} + 2R_{\text{lead}})$). For a Pt100 RTD ($R = 100\,\Omega$) with 10\,m of 24\,AWG copper wire ($R_{\text{lead}} = 0.85\,\Omega$ per wire), the lead resistance is $1.7\,\Omega$, a 1.7\% error that changes with temperature (copper has $\alpha = 0.00393$/\degC{}).
+
+\subsection{Three-Wire Measurement}
+Adds a third wire to sense the voltage at the far end of one lead. The bridge circuit uses the third wire to compensate for lead resistance in one arm. This cancels the lead resistance to first order (assumes both leads have equal resistance). Accuracy improves from 1.7\% to approximately 0.05\% (limited by lead resistance mismatch).
+
+\subsection{Four-Wire (Kelvin) Measurement}
+The gold standard: separate pairs of wires carry the excitation current and sense the voltage. The voltage sense wires carry negligible current, so their resistance does not affect the measurement. The measured voltage is exactly $V = I \times R_{\text{sensor}}$, independent of lead resistance. Required for precision RTD measurements ($<$0.01\% accuracy) and any sensor more than a few meters from the DAQ.
+
+\section{Signal Conditioning Chain Design}
+The complete signal conditioning chain from sensor to ADC must be designed as an integrated system. Key design decisions and their interactions:
+
+\textbf{Gain allocation}: if total gain of 1000 is needed, splitting it as $100 \times 10$ (first stage $\times$ second stage) is better than $1000 \times 1$ because: (1) the first stage amplifies the signal above the noise floor of the second stage, (2) each stage operates at lower gain, reducing the impact of gain error and bandwidth limitations, and (3) the anti-alias filter can be placed between stages at an intermediate voltage level.
+
+\textbf{Filter placement}: the anti-alias filter should be placed after the last amplification stage and immediately before the ADC. This ensures the filter operates on a signal with good SNR (already amplified) and that no noise is added after filtering.
+
+\textbf{Power supply sequencing}: if the signal conditioning circuit is powered from the same supply as the actuators (heaters, motors), power supply transients from actuator switching can inject noise into the signal chain. Use separate, filtered power supplies for analog and digital/power circuits.
+
+\begin{examplebox}[ThermoRig: Complete Measurement Uncertainty Budget]
+The final ThermoRig measurement system, after calibration, has the following uncertainty contributors at the 80\,\degC{} operating point:
+
+Thermocouple calibration residual: $\pm$0.28\,\degC{} (from 5-point linear fit).
+
+Cold junction compensation: $\pm$0.10\,\degC{} (from the AD595 CJC IC accuracy).
+
+INA128 gain error: $\pm$0.05\% $\times$ 80\,\degC{} $= \pm$0.04\,\degC{}.
+
+INA128 offset: 50\,$\mu$V $\times$ 611 gain $= 30.5$\,mV, equivalent to $\pm$0.01\,\degC{} after calibration.
+
+ADC quantization: $\pm$0.5 LSB $= \pm$0.15\,mV $\to \pm$0.004\,\degC{} (negligible).
+
+Total (RSS): $\sqrt{0.28^2 + 0.10^2 + 0.04^2 + 0.01^2 + 0.004^2} = 0.30$\,\degC{}.
+
+This meets the $\pm$0.5\,\degC{} system requirement with 40\% margin. The thermocouple calibration dominates the budget; improving the ADC would have no measurable effect.
+\end{examplebox}
+
+\section{Strain Measurement in Detail}
+Strain gauges are the most common resistive sensor in mechanical engineering. A metal foil gauge bonded to a structure changes resistance proportionally to strain:
+\begin{equation}
+\frac{\Delta R}{R} = GF \times \epsilon
+\end{equation}
+where $GF$ (gauge factor) is approximately 2.0 for metal foil gauges and $\epsilon$ is the mechanical strain (dimensionless, typically expressed in microstrain, $\mu\epsilon = 10^{-6}$).
+
+For a typical strain of 1000\,$\mu\epsilon$ ($= 0.1\%$): $\Delta R/R = 2.0 \times 0.001 = 0.2\%$. For a 120\,$\Omega$ gauge: $\Delta R = 0.24\,\Omega$. In a quarter-bridge with 10\,V excitation: $\Delta V = 10 \times 0.002/4 = 5$\,mV. This tiny signal requires careful amplification and noise rejection.
+
+\subsection{Gauge Installation}
+The quality of the gauge bond determines measurement accuracy. Clean the surface with solvent (acetone, then isopropanol). Abrade lightly with 320-grit sandpaper. Apply a thin, uniform layer of cyanoacrylate (strain gauge cement). Position the gauge and clamp for 60 seconds. Verify electrical continuity ($R = 120 \pm 0.5\,\Omega$ for a 120\,$\Omega$ gauge). Any air bubble, misalignment, or excess adhesive degrades the measurement.
+
+\subsection{Temperature Compensation}
+Thermal expansion of the structure and the gauge causes apparent strain that is not due to mechanical loading. A quarter-bridge on a steel beam sees approximately $23\,\mu\epsilon$/\degC{} from thermal effects alone. The half-bridge compensates: mount two gauges on the same material; one active (in the strain field), one passive (nearby but unstrained). Temperature affects both equally, canceling in the bridge output.
+\section{Sensor Fusion and Redundancy}
+When a single sensor cannot meet the accuracy or reliability requirement, combining multiple sensors improves performance. \textbf{Homogeneous redundancy}: multiple identical sensors measuring the same quantity, with outputs averaged to reduce random noise by $\sqrt{N}$. Also provides fault detection: if one sensor deviates significantly from the others, it is likely faulty. \textbf{Heterogeneous fusion}: combining different sensor types (e.g., thermocouple for fast response + RTD for accuracy). A Kalman filter or complementary filter can combine them optimally, using each sensor's strengths.
+
+In MEGN~300 projects, the simplest form of sensor fusion is comparing your primary measurement to an independent check instrument (reference thermometer, multimeter, calibrated pressure gauge). This does not improve your primary measurement but validates it.
+
+\section{Environmental Effects on Static Measurements}
+Temperature affects virtually every component in the measurement chain. Strain gauge resistance changes with temperature (apparent thermal strain). Op-amp offset voltage drifts (typically 1--10\,$\mu$V/\degC{}). Resistor values drift (25--100\,ppm/\degC{} for metal film). ADC reference voltage drifts (1--50\,ppm/\degC{}).
+
+For outdoor or industrial measurements, design for the full expected temperature range. Compute the worst-case drift for each component and include it in the error budget. For laboratory measurements, controlling the ambient temperature to $\pm$2\,\degC{} (typical HVAC) usually keeps thermal effects negligible.
+
+Humidity affects: capacitive sensors directly; high-impedance circuits (leakage currents across PCB surfaces); and hygroscopic materials (some strain gauge adhesives absorb moisture, causing drift). Conformal coating protects PCBs in humid environments.
+
+\section{Data Logging Best Practices}
+Static measurements often run for hours, days, or weeks. Data integrity requires: (1)~timestamp every sample with a real-time clock (not just sample count), (2)~log raw data (before calibration equations) so you can recalibrate offline, (3)~flush data to disk periodically (every 1--10\,s) to prevent data loss on power failure, (4)~include metadata in the file header (sensor type, calibration date, DAQ settings, operator name), (5)~use binary file formats (TDMS, HDF5) for large datasets rather than CSV (which is 3--10$\times$ larger).
+\section{Advanced Bridge Techniques}
+\subsection{AC Bridge Excitation}
+For high-impedance sensors (semiconductor strain gauges, capacitive sensors), AC excitation offers advantages over DC: (1) eliminates thermoelectric offset voltages (thermocouples at connections produce DC errors that are rejected by AC demodulation), (2) enables capacitive and inductive measurements (which require AC), and (3) allows the use of transformer coupling for galvanic isolation.
+
+The bridge is excited with a sine wave (typically 1--10\,kHz), and the output is demodulated (multiplied by the excitation waveform and low-pass filtered) to extract the DC component proportional to the measurand. This is essentially lock-in detection applied to the bridge, providing excellent noise rejection.
+
+\subsection{Auto-Balancing Bridge}
+In a conventional bridge, the output voltage is proportional to $\Delta R/R$, but also depends on the excitation voltage $V_{ex}$. An \textbf{auto-balancing} (or servo-balanced) bridge uses a feedback loop to drive the bridge output to zero by adjusting a reference element. The value of the reference element at balance equals the unknown sensor resistance. This technique eliminates the nonlinearity of the unbalanced bridge and removes sensitivity to excitation voltage variations. Commercial LCR meters and precision resistance bridges use this technique.
+
+\section{Sensor Selection: Decision Matrix}
+For temperature measurement, the choice among thermocouple, RTD, thermistor, and IC sensor involves multiple tradeoffs:
+
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\textwidth}{l c c c c}
+\toprule
+\textbf{Property} & \textbf{Thermocouple} & \textbf{RTD (Pt100)} & \textbf{Thermistor} & \textbf{IC (LM35)} \\
+\midrule
+Range & $-200$ to $+1260$\,\degC{} & $-200$ to $+850$ & $-40$ to $+300$ & $-55$ to $+150$ \\
+Accuracy (uncal.) & $\pm$2.2\,\degC{} & $\pm$0.3\,\degC{} & $\pm$0.2\,\degC{} & $\pm$0.5\,\degC{} \\
+Sensitivity & 41\,$\mu$V/\degC{} & 0.385\,$\Omega$/\degC{} & $-$4\%/\degC{} & 10\,mV/\degC{} \\
+Linearity & Fair & Excellent & Poor & Excellent \\
+Response time & 0.1--10\,s & 1--50\,s & 0.1--10\,s & 1--5\,s \\
+Self-heating & None & Yes (excitation) & Yes (excitation) & Yes (bias current) \\
+Cost & \$1--\$10 & \$10--\$50 & \$1--\$5 & \$1--\$3 \\
+\bottomrule
+\end{tabularx}
+\caption{Temperature sensor comparison. Thermocouples excel in range and speed; RTDs in accuracy; thermistors in sensitivity; IC sensors in ease of use.}
+\end{table}
+
+The selection depends on the application priority: if you need to measure above 300\,\degC{}, only thermocouples and RTDs are options. If you need 0.01\,\degC{} resolution, the thermistor's 4\%/\degC{} sensitivity is best. If you need simple, no-conditioning interface: the IC sensor outputs mV directly, readable by any ADC.
+
+\section{Calibration Transfer Standards}
+When your reference standard cannot be brought to the measurement location (e.g., an ice-point bath cannot be used in a vibration test cell), a \textbf{transfer standard} bridges the gap. The transfer standard is calibrated against the primary reference in the lab, then transported to the field and used to calibrate the working sensor.
+
+The transfer standard must be more stable than accurate: it does not need to hold an exact value, but the value must not change between calibration and use. For temperature: a precision platinum RTD in a protective housing, calibrated to $\pm$0.05\,\degC{}, stable to $\pm$0.01\,\degC{}/year. For voltage: a precision voltage reference (Fluke 732A), stable to $\pm$1\,ppm/year.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A pressure sensor is calibrated with the following data: (0\,psi, 0.02\,V), (100\,psi, 1.01\,V), (200\,psi, 2.03\,V), (300\,psi, 2.98\,V), (400\,psi, 4.02\,V), (500\,psi, 4.99\,V). Calculate the sensitivity and linearity error (\% FSO) using the end-point line.
+\item A thermistor has the Steinhart-Hart coefficients $A = 1.125 \times 10^{-3}$, $B = 2.347 \times 10^{-4}$, $C = 0.856 \times 10^{-7}$ (all in $\text{K}^{-1}$). The measured resistance is 10.0\,k$\Omega$. Calculate the temperature in \degC{}.
+\item During calibration of a load cell, the readings during the up-sweep and down-sweep at 250\,N are 2.48\,mV/V and 2.53\,mV/V respectively. Full-scale output is 3.00\,mV/V. Calculate the hysteresis as \% FSO.
+\item Your measurement system has a 12-bit ADC with a $\pm$5\,V input range. What is the voltage resolution (LSB)? If the sensor sensitivity is 10\,mV/\degC{}, what is the temperature resolution?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item End-point line: slope $= (4.99 - 0.02)/(500 - 0) = 9.94\,\text{mV/psi}$, intercept $= 0.02\,\text{V}$. Predicted at each point: 0.02, 1.014, 2.008, 3.002, 3.996, 4.99. Residuals: 0, $-$0.004, 0.022, $-$0.022, 0.024, 0. Max $|$residual$|$ = 0.024\,V. FSO = 4.97\,V. Linearity = $0.024/4.97 \times 100 = 0.48\%$ FSO. Sensitivity = 9.94\,mV/psi.
+\item $1/T = A + B \ln R + C (\ln R)^3 = 1.125 \times 10^{-3} + 2.347 \times 10^{-4} \times \ln(10000) + 0.856 \times 10^{-7} \times (\ln 10000)^3$. $\ln(10000) = 9.2103$. $1/T = 1.125 \times 10^{-3} + 2.161 \times 10^{-3} + 6.69 \times 10^{-5} = 3.353 \times 10^{-3}$. $T = 298.2\,\text{K} = 25.1$\,\degC{}.
+\item Hysteresis $= |2.53 - 2.48| / 3.00 \times 100 = 1.67\%$ FSO.
+\item LSB $= 10\,\text{V} / 2^{12} = 10/4096 = 2.44\,\text{mV}$. Temperature resolution $= 2.44\,\text{mV} / 10\,\text{mV/\degC{}} = 0.244\,$\degC{}.
+\end{enumerate}
+
+
+% ================================================================
+
+\begin{masterycheckbox}{Static Measurements}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Perform a multi-point static calibration: collect $\geq$5 points, fit a curve, compute maximum residual.
+\item Calculate sensitivity ($S = \partial y/\partial x$) from calibration data.
+\item Configure and balance a Wheatstone bridge for a quarter-bridge RTD measurement.
+\item Report a calibrated measurement with uncertainty, reference traceability, and valid range.
+\item Identify systematic errors in a calibration procedure and explain mitigation.
+\end{enumerate}
+\end{masterycheckbox}
+

@@ -1,0 +1,343 @@
+% Chapter 10: FFT and Signal Decomposition
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{FFT and Complex Signal Decomposition}
+\label{ch:fft}\index{FFT}\index{spectral leakage}\index{windowing}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    win/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                minimum width=3.0cm, minimum height=2.6cm, align=left, font=\scriptsize\sffamily,
+                inner sep=5pt, text width=2.6cm},
+]
+\node[win] (rect) at (0,0) {
+\textbf{\color{MinesBlue}Rectangular}\\[2pt]
+Best freq.\ resolution\\
+Worst leakage\\
+Use: periodic signals\\that fill the window
+};
+\node[win] (hann) at (3.8,0) {
+\textbf{\color{AccentTeal}Hanning}\\[2pt]
+Good resolution\\
+Good leakage\\
+\textbf{Default for MEGN~300}\\
+Use: general analysis
+};
+\node[win, draw=AccentTeal, fill=AccentTeal!5] (flat) at (7.6,0) {
+\textbf{\color{AccentTeal}Flat-Top}\\[2pt]
+Worst resolution\\
+Best amplitude accuracy\\
+Use: calibration,\\amplitude measurement
+};
+\node[win] (blk) at (11.4,0) {
+\textbf{\color{MinesBlue}Blackman-Harris}\\[2pt]
+Wide main lobe\\
+Very low sidelobes\\
+Use: signals with large\\dynamic range
+};
+% Window shapes above
+\begin{scope}[shift={(0,2.2)}, scale=0.35]
+\draw[MinesBlue, thick] (0,0) -- (0,1.5) -- (4,1.5) -- (4,0);
+\end{scope}
+\begin{scope}[shift={(3.8,2.2)}, scale=0.35]
+\draw[AccentTeal, thick] plot[domain=0:4, samples=50] (\x, {1.5*0.5*(1-cos(deg(2*pi*\x/4)))});
+\end{scope}
+\begin{scope}[shift={(7.6,2.2)}, scale=0.35]
+\draw[AccentTeal, thick] plot[domain=0:4, samples=50] (\x, {1.5*(0.22-0.5*cos(deg(2*pi*\x/4))+0.28*cos(deg(4*pi*\x/4)))});
+\end{scope}
+\begin{scope}[shift={(11.4,2.2)}, scale=0.35]
+\draw[MinesBlue, thick] plot[domain=0:4, samples=50] (\x, {1.5*(0.36-0.49*cos(deg(2*pi*\x/4))+0.14*cos(deg(4*pi*\x/4))-0.01*cos(deg(6*pi*\x/4)))});
+\end{scope}
+\end{tikzpicture}
+\caption{Common FFT window functions. Hanning is the default for MEGN~300 general analysis. Flat-top sacrifices frequency resolution for amplitude accuracy (use when measuring exact amplitudes). Rectangular is used only when the signal is exactly periodic within the window.}
+\label{fig:windows}
+\end{figure}
+
+\section{From Fourier Series to Fourier Transform}
+The Fourier series applies to periodic signals. For non-periodic or finite-duration signals, the \textbf{Fourier Transform} generalizes the concept to a continuous frequency spectrum:
+\begin{equation}
+X(f) = \int_{-\infty}^{\infty} x(t) \, e^{-j2\pi f t} \, dt
+\end{equation}
+$X(f)$ is complex-valued: its magnitude $|X(f)|$ gives the amplitude spectrum, and its angle $\angle X(f)$ gives the phase spectrum.
+
+\section{The Discrete Fourier Transform (DFT) and FFT}
+For sampled data ($N$ points, sampling rate $f_s$), the DFT computes:
+\begin{equation}
+X[k] = \sum_{n=0}^{N-1} x[n] \, e^{-j2\pi kn/N}, \quad k = 0, 1, \ldots, N-1
+\end{equation}
+The \textbf{Fast Fourier Transform (FFT)} is an algorithm that computes the DFT in $O(N \log N)$ operations instead of $O(N^2)$. For $N = 1024$: DFT requires $\sim$1 million multiplications; FFT requires $\sim$10,000. This is what makes real-time spectral analysis practical.
+
+\subsection{Interpreting the FFT Output}
+The FFT produces $N$ complex numbers. The useful frequency range is $0$ to $f_s/2$ (first $N/2 + 1$ bins). The frequency resolution (bin width) is:
+\begin{equation}
+\Delta f = \frac{f_s}{N}
+\end{equation}
+To resolve two closely spaced frequencies, you need $\Delta f$ smaller than their separation. Increasing $N$ (longer acquisition time) improves frequency resolution.
+
+\subsection{Windowing}
+The FFT assumes the signal is periodic within the acquisition window. If the signal frequency does not exactly match an FFT bin, the result ``leaks'' energy into adjacent bins (\textbf{spectral leakage}). Windowing functions (Hanning, Hamming, Blackman, flat-top) taper the signal edges to reduce leakage at the cost of slightly reduced frequency resolution.
+
+\begin{tipbox}[Which Window to Use]
+Hanning (Hann): best general-purpose choice; good frequency resolution with moderate leakage. Flat-top: best for accurate amplitude measurement of known tones. Rectangular (no window): best frequency resolution but worst leakage; use only when the signal is exactly periodic in the window.
+\end{tipbox}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    name=nowin, width=6.5cm, height=5cm,
+    xlabel={Frequency (Hz)}, ylabel={Magnitude (dB)},
+    xmin=40, xmax=80, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{WarnOrange} No Window (Rectangular)},
+]
+% Simulate leakage: sinc-like pattern around 60.5 Hz
+\addplot[domain=40:80, samples=400, thick, WarnOrange]
+    {-abs(60.5-x) < 0.3 ? 0 : 20*log10(abs(sin(deg(pi*(x-60.5)*10))/(pi*(x-60.5)*10))+0.001)};
+\node[font=\tiny\sffamily\itshape, WarnOrange] at (axis cs:70,-15) {Energy smeared\\across bins};
+\end{axis}
+\begin{axis}[
+    at={(nowin.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={Frequency (Hz)}, ylabel={Magnitude (dB)},
+    xmin=40, xmax=80, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{AccentTeal} Hanning Window},
+]
+% Windowed: sharper peak with faster sidelobe decay
+\addplot[domain=40:80, samples=400, thick, AccentTeal]
+    {-abs(60.5-x) < 0.3 ? 0 : 20*log10(abs(sin(deg(pi*(x-60.5)*10))/(pi*(x-60.5)*10))^2+0.0001)};
+\node[font=\tiny\sffamily\itshape, AccentTeal] at (axis cs:70,-15) {Energy concentrated\\in narrow peak};
+\end{axis}
+\end{tikzpicture}
+\caption{Spectral leakage: without windowing (left), a 60.5\,Hz signal smears across many FFT bins. With a Hanning window (right), sidelobe energy is suppressed and the peak sharpens. Always window unless the signal is exactly periodic in the acquisition window.}
+\label{fig:leakage}
+\end{figure}
+
+\section{Practical FFT in LabVIEW}
+In LabVIEW, use the \texttt{FFT Power Spectrum and PSD} VI. Set: $N$ (power of 2 for efficiency), window type, and averaging mode. The output is a 1D array of power spectral density (PSD) values in $\text{V}^2/\text{Hz}$ or amplitude spectrum in V\textsubscript{RMS}.
+
+
+\section{Power Spectral Density (PSD)}
+The PSD describes how the signal's power is distributed across frequencies, normalized by the frequency resolution:
+\begin{equation}
+\text{PSD}(f) = \frac{|X(f)|^2}{N \cdot f_s} \quad [\text{V}^2/\text{Hz}]
+\end{equation}
+PSD is independent of the FFT length $N$ and sampling rate $f_s$, making it suitable for comparing measurements taken with different acquisition parameters. Use PSD for broadband (continuous) signals like vibration and noise. Use amplitude spectrum for discrete tones (known frequencies).
+
+\section{Averaging for Spectral Estimates}
+A single FFT of noisy data has high variance. Averaging reduces this variance:
+
+\textbf{Linear averaging}: divide the signal into $M$ overlapping segments, compute the FFT of each, and average the magnitude spectra. Reduces spectral variance by $1/M$. Use 50\% overlap with Hanning window for optimal noise reduction with minimal data loss.
+
+\textbf{Exponential averaging}: weights recent FFTs more heavily; tracks slowly changing spectra. Set the averaging constant based on how quickly the spectrum changes.
+
+\section{Practical FFT Analysis Workflow}
+\begin{enumerate}[leftmargin=1.5em]
+\item Choose $f_s \geq 2.56 \times f_{\max}$ (signal bandwidth + anti-alias margin).
+\item Choose $N$ based on required frequency resolution: $N = f_s / \Delta f$. Use a power of 2.
+\item Apply a window function (Hanning for general use).
+\item Compute the FFT; convert to single-sided amplitude or PSD.
+\item Average multiple blocks (10--100 averages for noisy data).
+\item Identify peaks; read frequency and amplitude. Compare to noise floor.
+\end{enumerate}
+
+
+\section{From DFT to FFT}
+The Discrete Fourier Transform (DFT) computes the frequency content of a sampled signal by decomposing it into $N$ complex sinusoids:
+\begin{equation}
+X[k] = \sum_{n=0}^{N-1} x[n] \, e^{-j2\pi kn/N}, \quad k = 0, 1, \ldots, N-1
+\end{equation}
+where $x[n]$ is the $n$th time-domain sample and $X[k]$ is the complex amplitude at frequency $f_k = k \cdot f_s / N$. Computing the DFT directly requires $N^2$ complex multiplications. The \textbf{Fast Fourier Transform (FFT)} is an algorithm (Cooley-Tukey, 1965) that reduces this to $N \log_2 N$ operations by exploiting symmetry and periodicity. For $N = 1024$, this is a 100$\times$ speedup; for $N = 1{,}048{,}576$ (one million points), it is a 50{,}000$\times$ speedup.
+
+\section{FFT Output Interpretation}
+The FFT output $X[k]$ is a complex number with magnitude and phase. The \textbf{magnitude spectrum} $|X[k]|$ shows how much of each frequency is present. The \textbf{phase spectrum} $\angle X[k]$ shows the phase angle of each frequency component. In LabVIEW, the ``FFT'' function returns both; the ``Power Spectrum'' function returns $|X[k]|^2/N$ or its variants.
+
+\subsection{Frequency Resolution}
+The spacing between adjacent frequency bins is:
+\begin{equation}
+\Delta f = \frac{f_s}{N}
+\end{equation}
+To resolve two closely spaced frequencies (e.g., 99\,Hz and 101\,Hz, $\Delta f = 2$\,Hz), you need $N \geq f_s / \Delta f$. At $f_s = 1000$\,S/s, this requires $N \geq 500$ samples (0.5\,s of data). Want 0.1\,Hz resolution? You need $N = 10{,}000$ samples (10\,s of data at 1\,kS/s). This is the fundamental tradeoff: \textbf{better frequency resolution requires longer acquisition time}.
+
+\subsection{Frequency Range}
+The FFT produces output from $f = 0$ (DC) to $f = f_s/2$ (Nyquist). Only the first $N/2$ bins are unique; the second half is a mirror image (for real-valued input signals). In practice, you use bins $k = 0$ to $k = N/2$.
+
+\section{Power Spectral Density (PSD)}
+For random or broadband signals, the magnitude spectrum depends on the FFT length $N$ (longer records produce taller peaks because more energy is captured). The \textbf{Power Spectral Density (PSD)} normalizes by the frequency resolution:
+\begin{equation}
+\text{PSD}[k] = \frac{|X[k]|^2}{N \cdot \Delta f} \quad \text{(units: V$^2$/Hz)}
+\end{equation}
+The PSD is independent of record length, making it the correct representation for comparing noise floors, characterizing random vibration, and specifying sensor noise performance.
+
+\section{Windowing: Theory and Practice}
+The FFT assumes the signal is exactly periodic within the acquisition window of $N$ samples. If this assumption is violated (which it almost always is for real signals), the resulting discontinuity at the window boundaries produces \textbf{spectral leakage}: the energy of a single frequency smears across adjacent bins, reducing amplitude accuracy and frequency resolution.
+
+\subsection{The Root Cause}
+Consider acquiring 1000 samples of a 100.5\,Hz sine wave at 1000\,S/s. The FFT frequency bins are at 0, 1, 2, $\ldots$, 999\,Hz (with 1\,Hz spacing). The signal frequency (100.5\,Hz) falls between bins 100 and 101. The FFT cannot represent 100.5\,Hz exactly, so the energy ``leaks'' into neighboring bins, producing a smeared peak with sidelobes.
+
+\subsection{Window Functions}
+A window function $w[n]$ is multiplied with the signal before the FFT: $x_w[n] = x[n] \cdot w[n]$. The window tapers the signal to zero at both ends, forcing it to appear periodic and reducing the discontinuity. Common windows and their tradeoffs:
+
+\textbf{Rectangular (no window)}: highest frequency resolution (narrowest main lobe) but worst sidelobe rejection ($-13$\,dB). Use only when the signal is exactly periodic in the window.
+
+\textbf{Hanning}: moderate resolution, good sidelobe rejection ($-31$\,dB). The default choice for general-purpose spectral analysis.
+
+\textbf{Flat-top}: wide main lobe (poor frequency resolution) but extremely accurate amplitude measurement ($<$0.01\,dB error). Use when you need to measure the exact amplitude of a known frequency (e.g., calibration).
+
+\textbf{Blackman-Harris}: excellent sidelobe rejection ($-92$\,dB) but widest main lobe. Use when small signals near large ones must be detected.
+
+\begin{examplebox}[ThermoRig: Identifying Switching Noise with FFT]
+The ThermoRig thermocouple signal, sampled at 10\,kS/s ($N = 8192$ for FFT), reveals a sharp peak at 60\,Hz (expected: mains coupling) and a broader peak near 500\,kHz that has been aliased to 0.5\,kHz. This aliased component comes from the switching regulator's 500\,kHz oscillator, which couples capacitively into the thermocouple wiring. The Hanning window produces clean, narrow peaks at both frequencies, confirming they are discrete tones rather than broadband noise. The solution: add a 100\,Hz anti-alias filter before the ADC, eliminating the aliased component entirely.
+\end{examplebox}
+
+\section{Spectral Averaging}
+A single FFT of a random (noisy) signal produces a noisy spectrum. To obtain a smooth estimate of the PSD, compute multiple FFTs of successive blocks of data and average the magnitude spectra. With $M$ averages, the variance of the PSD estimate decreases by a factor of $M$. Typical practice: 10--100 averages for laboratory measurements, 100--1000 for production testing.
+
+\subsection{Overlap Processing}
+To improve the effective averaging rate without acquiring more data, successive FFT blocks can overlap (typically 50--75\%). With 50\% overlap, a Hanning-windowed signal uses approximately 90\% of the acquired data (vs.\ 50\% without overlap). LabVIEW's ``Power Spectrum'' function supports overlap processing natively.
+
+\section{Common FFT Pitfalls}
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Forgetting the anti-alias filter}: aliased components appear real and cannot be distinguished from true signals in the FFT.
+\item \textbf{Not windowing}: spectral leakage smears energy across bins, reducing dynamic range.
+\item \textbf{Using too few points}: poor frequency resolution causes adjacent peaks to merge.
+\item \textbf{Confusing linear and dB scales}: a peak at $-40$\,dB is not ``almost zero''; it is 1\% of full scale.
+\item \textbf{Ignoring DC offset}: a large DC component (bin 0) can mask nearby low-frequency content. Remove the mean before computing the FFT.
+\end{enumerate}
+
+
+\section{From DFT to FFT}
+The DFT: $X[k] = \sum_{n=0}^{N-1} x[n]\,e^{-j2\pi kn/N}$, $k = 0,\ldots,N-1$. Direct computation: $O(N^2)$. The FFT (Cooley-Tukey, 1965) reduces this to $O(N\log_2 N)$. For $N = 1024$: 100$\times$ speedup. For $N = 10^6$: 50,000$\times$.
+
+\section{FFT Output Interpretation}
+$X[k]$ is complex: magnitude $|X[k]|$ gives amplitude at frequency $f_k = k \cdot f_s/N$; phase $\angle X[k]$ gives the phase angle. Only bins $k = 0$ to $N/2$ are unique for real input.
+
+\textbf{Frequency resolution}: $\Delta f = f_s/N$. To resolve 99\,Hz from 101\,Hz ($\Delta f = 2$\,Hz) at 1\,kS/s requires $N \geq 500$ (0.5\,s of data). Better resolution requires longer acquisition.
+
+\section{Power Spectral Density}
+For random signals, the magnitude spectrum depends on $N$. The PSD normalizes: $\text{PSD}[k] = |X[k]|^2/(N\cdot\Delta f)$ (units: V$^2$/Hz). PSD is independent of record length, making it the correct representation for noise characterization.
+
+\section{Windowing}
+The FFT assumes the signal is periodic within the window. Non-periodic signals create discontinuities at the window edges, causing spectral leakage. A window function tapers the signal to zero at both ends.
+
+\textbf{Rectangular}: best resolution, worst sidelobes ($-13$\,dB). Use only for exactly periodic signals.
+
+\textbf{Hanning}: good general-purpose choice. $-31$\,dB sidelobes.
+
+\textbf{Flat-top}: wide main lobe but $<$0.01\,dB amplitude error. Use for calibration.
+
+\textbf{Blackman-Harris}: $-92$\,dB sidelobes. Use when small signals near large ones must be detected.
+
+\section{Spectral Averaging and Overlap}
+A single FFT of noisy data produces a noisy spectrum. Average $M$ FFTs to reduce variance by $M$. With 50\% overlap between successive blocks, approximately 90\% of data is used. LabVIEW's Power Spectrum supports overlap processing natively.
+
+\begin{examplebox}[ThermoRig: Identifying Switching Noise]
+FFT of TC signal at 10\,kS/s ($N = 8192$) reveals: 60\,Hz peak (mains coupling) and 500\,Hz peak (aliased 500\,kHz switching regulator). Hanning window confirms both are discrete tones. Fix: 100\,Hz anti-alias filter eliminates the aliased component.
+\end{examplebox}
+
+\section{Common FFT Pitfalls}
+(1) Forgetting anti-alias filter: aliases look real. (2) Not windowing: leakage smears peaks. (3) Too few points: poor resolution. (4) Confusing linear and dB scales: $-40$\,dB is 1\%, not ``almost zero.'' (5) Large DC offset masks low-frequency content; remove mean before FFT.
+
+
+\section{Choosing FFT Parameters for MEGN 300 Labs}
+When setting up an FFT measurement in LabVIEW, four parameters must be chosen correctly:
+
+\textbf{Sample rate $f_s$}: must be at least $2.56\times$ the highest frequency of interest (standard vibration analysis convention). For a 1\,kHz bandwidth measurement: $f_s \geq 2560$\,S/s. Round up to a convenient value (4096\,S/s or 5000\,S/s).
+
+\textbf{Number of points $N$}: determines frequency resolution ($\Delta f = f_s/N$). For 1\,Hz resolution at 4096\,S/s: $N \geq 4096$. For 0.1\,Hz resolution: $N \geq 40{,}960$. $N$ should be a power of 2 for maximum FFT algorithm efficiency (1024, 2048, 4096, 8192, etc.).
+
+\textbf{Window function}: Hanning is the default for general use. Use Flat-top when amplitude accuracy is critical (calibration, amplitude comparison). Use Rectangular only when the signal is exactly periodic in the window (e.g., a frequency generator locked to the DAQ clock).
+
+\textbf{Number of averages}: for random/noisy signals, average 10--100 spectra to reduce variance. For deterministic signals (sine waves, harmonics), a single FFT is sufficient.
+
+\subsection{Acquisition Time Tradeoff}
+The total acquisition time is $T = N \times M / f_s$ where $M$ is the number of averages. For $f_s = 4096$\,S/s, $N = 4096$, $M = 50$ averages with 50\% overlap: $T \approx 25.6$\,s. Finer frequency resolution or more averaging requires longer acquisition. Plan accordingly for time-limited measurements.
+
+\section{Interpreting FFT Results}
+\subsection{Identifying Signal Components}
+\textbf{Discrete tones}: sharp, narrow peaks at specific frequencies. Sources: rotating machinery (shaft speed and harmonics), electrical interference (60\,Hz, switching frequencies), resonances (structural natural frequencies). The peak height gives the amplitude; the peak frequency identifies the source.
+
+\textbf{Broadband noise}: a raised floor across many or all frequencies. Sources: thermal noise, turbulent flow, friction. The PSD level (V$^2$/Hz) characterizes the noise intensity.
+
+\textbf{Sidebands}: peaks flanking a main peak, spaced equally on both sides. Sources: amplitude modulation (bearing defects modulating shaft rotation), frequency modulation (speed fluctuations). The sideband spacing identifies the modulation frequency.
+
+\subsection{Frequency Identification Guide}
+For a machine rotating at $f_r$: shaft imbalance appears at $f_r$. Misalignment at $2f_r$. Gear mesh at $N_{\text{teeth}} \times f_r$. Ball bearing outer race defect at $\sim 0.4 N_{\text{balls}} \times f_r$. Blade pass frequency at $N_{\text{blades}} \times f_r$. Electrical motor slip frequency at $(f_{\text{line}} - N_p f_r)$ where $N_p$ is the number of poles.
+
+\section{Cross-Spectral Analysis}
+When measuring two channels simultaneously (e.g., force input and acceleration output), the \textbf{cross-spectrum} $G_{xy}(f) = X^*(f) \cdot Y(f)$ relates the two signals in the frequency domain. The \textbf{frequency response function} (transfer function magnitude) is:
+\begin{equation}
+|H(f)| = \frac{|G_{xy}(f)|}{G_{xx}(f)}
+\end{equation}
+where $G_{xx}$ is the auto-spectrum of the input. The \textbf{coherence function} $\gamma^2(f) = |G_{xy}|^2/(G_{xx} G_{yy})$ indicates how much of the output is linearly related to the input at each frequency. $\gamma^2 = 1$: output is completely explained by the input. $\gamma^2 < 0.9$: other sources (noise, nonlinearity, unmeasured inputs) contribute significantly.
+
+\section{Practical LabVIEW FFT Implementation}
+The recommended LabVIEW approach for FFT measurement:
+
+(1) Use the ``Spectral Measurements'' Express VI for simple measurements (magnitude, phase, PSD). It handles windowing, averaging, and scaling automatically.
+
+(2) For more control, use the ``FFT'' primitive: wire in the time-domain waveform, apply a window (``Scaled Time Domain Window'' VI), compute the FFT, take the magnitude, and scale appropriately.
+
+(3) For real-time display, place the FFT inside a While Loop with a ``Waveform Chart'' or ``Intensity Graph'' for waterfall (spectrogram) display. The spectrogram shows how the frequency content evolves over time, which is invaluable for diagnosing transient events and speed-varying machinery.
+\section{FFT Resolution Enhancement Techniques}
+\subsection{Zero-Padding}
+Appending zeros to the time-domain data before computing the FFT increases the number of frequency bins without acquiring more data. Zero-padding does \emph{not} improve the true frequency resolution (which is fixed at $\Delta f = 1/T_{\text{acq}}$ where $T_{\text{acq}}$ is the acquisition duration), but it interpolates between the existing bins, producing a smoother spectrum that makes it easier to identify peak frequencies.
+
+For example: 1024 samples at 1\,kS/s gives $\Delta f = 1$\,Hz with 512 frequency bins. Zero-padding to 4096 points gives the same $\Delta f = 1$\,Hz resolution but now with 2048 bins (interpolated), making peaks easier to locate visually.
+
+\subsection{Zoom FFT}
+To achieve very fine frequency resolution in a narrow band without acquiring an impractically long record: (1) frequency-shift the band of interest to baseband by multiplying the signal by $e^{-j2\pi f_c t}$ where $f_c$ is the center frequency, (2) low-pass filter and decimate to reduce the sample rate, (3) compute the FFT of the decimated data. The frequency resolution improves by the decimation factor. LabVIEW: use the ``Zoom FFT'' VI or implement manually with frequency shifting and decimation.
+
+\section{Order Analysis for Rotating Machinery}
+When a machine's speed varies (run-up, coast-down, load changes), the vibration frequencies change proportionally. A standard FFT at fixed sample rate produces smeared peaks because the signal frequency sweeps across bins during the acquisition. \textbf{Order analysis} solves this by resampling the signal at constant angular increments (using a tachometer pulse as the sampling clock) rather than constant time increments. The resulting ``order spectrum'' shows vibration amplitude vs.\ multiples of shaft speed (orders), with sharp peaks regardless of speed variation.
+
+In LabVIEW: the Sound and Vibration Toolkit includes order analysis VIs. Without the toolkit: use the tachometer signal to compute instantaneous speed, resample the vibration signal at constant angle increments using interpolation, then compute the FFT normally.
+
+\begin{advancedbox}{Cepstral Analysis}
+Cepstral analysis is an advanced vibration diagnostics technique not covered in MEGN~300 exams. It is included for students whose projects involve rotating machinery fault detection.
+\end{advancedbox}
+\section{Cepstral Analysis (Overview)}
+The \textbf{cepstrum} is the inverse FFT of the log magnitude spectrum: $c[n] = \text{IFFT}(\log|X[k]|)$. It separates multiplicative effects in the frequency domain (which become additive in the log domain) into individual components. The cepstrum is particularly useful for detecting periodic patterns in the spectrum, such as harmonics of a fundamental frequency or sidebands around a carrier. In vibration analysis, cepstral analysis detects bearing defects (which produce a family of harmonics and sidebands) more reliably than spectral analysis alone.
+
+The ``quefrency'' axis of the cepstrum has units of time: a peak at quefrency $\tau_q$ indicates a periodic pattern in the spectrum with spacing $1/\tau_q$\,Hz. For a bearing defect at frequency $f_d$ with harmonics at $2f_d$, $3f_d$, etc.: the cepstrum shows a peak at $\tau_q = 1/f_d$.
+
+\section{Waterfall and Spectrogram Displays}
+For signals whose frequency content evolves over time, a single FFT captures only the average. Time-frequency displays show the evolution:
+
+\textbf{Waterfall plot}: a 3D display with time on one axis, frequency on another, and amplitude on the third (or represented by color). Each ``slice'' is an FFT computed from a short segment of the data. Used in vibration analysis for run-up/coast-down tests.
+
+\textbf{Spectrogram}: a 2D color map with time on the horizontal axis, frequency on the vertical axis, and amplitude represented by color intensity. More compact than a waterfall; the standard display for speech analysis, bioacoustics, and transient event analysis.
+
+The time-frequency resolution tradeoff: shorter FFT segments give better time resolution but worse frequency resolution (and vice versa). The product of time resolution $\Delta t$ and frequency resolution $\Delta f$ is bounded: $\Delta t \cdot \Delta f \geq 1$. This is a fundamental physical constraint (the uncertainty principle for signals).
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item You sample a signal at 10\,kS/s for 0.1\,s. How many FFT points do you have? What is the frequency resolution? What is the maximum frequency you can resolve?
+\item A vibration signal contains components at 120\,Hz, 240\,Hz, and 360\,Hz. You sample at 1\,kS/s with $N = 1024$ points. Can you resolve all three components? What is the frequency resolution?
+\item Explain why you should use a Hanning window when analyzing a signal whose frequency is unknown, and why you should use a flat-top window when calibrating an accelerometer with a known reference frequency.
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $N = f_s \times T = 10000 \times 0.1 = 1000$ points. $\Delta f = f_s/N = 10000/1000 = 10$\,Hz. Max frequency $= f_s/2 = 5000$\,Hz.
+\item $\Delta f = 1000/1024 = 0.977$\,Hz. The three components are separated by 120\,Hz $\gg \Delta f$; yes, all three are easily resolved. They appear at bins $k = 120/0.977 \approx 123$, $k \approx 246$, $k \approx 369$.
+\item Hanning reduces spectral leakage when the signal frequency does not exactly align with an FFT bin (which is the common case for unknown signals). Flat-top preserves the true amplitude of a known tone (the flat passband of the window means the amplitude reading is accurate regardless of where the tone falls within a bin), which is critical for calibration where you need the exact voltage at a known frequency.
+\end{enumerate}
+
+
+% ================================================================
+
+\begin{masterycheckbox}{FFT and Frequency Analysis}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Select FFT parameters ($f_s$, $N$, window type) and justify each choice.
+\item Interpret an FFT magnitude spectrum: identify signal peaks, noise floor, harmonics, and aliases.
+\item Explain spectral leakage and demonstrate how windowing mitigates it.
+\item Calculate frequency resolution ($\Delta f = f_s/N$) and evaluate sufficiency.
+\item Use RMS averaging to reduce FFT variance and calculate expected noise floor improvement.
+\end{enumerate}
+\end{masterycheckbox}
+

@@ -1,77 +1,83 @@
-# Capstone — EDNS 491/492 Capstone Design I & II
+# MEGN 300: Instrumentation & Automation — Course Materials
 
-**Colorado School of Mines · Interdisciplinary Engineering Design**
+[![Build MEGN 300 PDFs](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml/badge.svg)](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml)
 
-[![Build LaTeX PDFs](https://github.com/professor-duran/Capstone/actions/workflows/build.yml/badge.svg)](https://github.com/professor-duran/Capstone/actions/workflows/build.yml)
+**Author:** Adam Duran, PE, PMP  
+**Institution:** Colorado School of Mines, Department of Mechanical Engineering  
+**Term:** Spring 2026  
 
-Course materials for the two-semester, multi-disciplinary capstone design sequence.
+---
 
-## 📄 Latest Documents
+## Download PDFs
 
-| Document | Download |
-|----------|----------|
-| **Student Course Text** | [📥 main.pdf](main.pdf) |
-| **Student Guide** | [📥 student_guide.pdf](student_guide.pdf) |
+| Document | Description | Link |
+|---|---|---|
+| **Master Reference Document** | 350+ page comprehensive reference covering measurement theory, signal processing, electronics, and PID control | [**Download PDF**](megn300_master_reference.pdf) |
+| **Student Guide** | 25-page companion with FAQ, tips, common pitfalls, and "Before You Start" checklists for each module | [**Download PDF**](MEGN300_Student_Guide.pdf) |
 
-> PDFs are automatically rebuilt on every push to `main` via GitHub Actions.
+PDFs are auto-compiled by GitHub Actions on every push and committed to this branch.
 
-## Document Structure
+---
 
-### Front Matter
-- How to Use This Document (three-document ecosystem, reading by role)
-- What Should I Be Reading Right Now? (triage table, sprint-to-chapter mapping)
-- Laboratory and Workshop Safety
+## Repository Structure
 
-### Part I: The Design Process
-1. Engineering Design as a Professional Practice
-2. Understanding Your Client and Defining the Problem
-3. Requirements Engineering
-4. Concept Generation, Selection, and Early Design
-5. Sustainability, Equity, and Societal Impact Assessment
-6. Verification, Validation, and Test Planning
+```
+MEGN300/
+├── mrd/                             Master Reference Document (modular)
+│   ├── main.tex                     Build entry point
+│   ├── preamble.tex                 Packages, colors, custom environments
+│   ├── .latexmkrc                   latexmk config (handles makeindex)
+│   ├── frontmatter/
+│   │   ├── titlepage.tex
+│   │   ├── preface.tex
+│   │   ├── triage.tex
+│   │   ├── survival_guide.tex
+│   │   ├── ai_policy.tex
+│   │   └── safety.tex
+│   ├── chapters/
+│   │   ├── ch01_measurement_theory.tex
+│   │   ├── ch02_static_measurements.tex
+│   │   ├── ...
+│   │   └── ch22_fluid_power.tex
+│   └── appendices/
+│       ├── projects_fail.tex
+│       ├── labview.tex
+│       ├── glossary.tex
+│       ├── quick_reference.tex
+│       ├── abet.tex
+│       └── references.tex
+├── student_guide/
+│   └── MEGN300_Student_Guide.tex
+├── .github/workflows/               GitHub Actions auto-build
+├── megn300_master_reference.pdf      ← auto-built by CI
+└── MEGN300_Student_Guide.pdf         ← auto-built by CI
+```
 
-### Part II: Major Project Milestones
-7. The Statement of Work and Project Plan
-8. Preliminary Design Review (PDR)
-9. Critical Design Review (CDR)
-10. Final Design Review (FDR) and Design Showcase
+## Editing Workflow
 
-### Part III: Project Management and Operations
-11. Hybrid Project Management for Capstone
-12. Fabrication Spaces, Resources, and Manufacturing
-13. Team Dynamics, Leadership, and Professional Conduct
-14. Budgeting and Financial Management
-15. Purchasing Procedures
-16. Travel Planning and Policies
+Each chapter is a self-contained `.tex` file. Edit any file under `mrd/` or `student_guide/`, commit, push. GitHub Actions recompiles **both** PDFs automatically.
 
-### Part IV: Professional Skills
-17. Client Engagement and Management
-18. Professional Communication — Written
-19. Professional Communication — Oral
-20. Resumes, Interviews, and Career Preparation
+**Fast local build of a single chapter:**
+```bash
+# Uncomment this line in mrd/main.tex:
+#   \includeonly{chapters/ch15_amplifiers}
+cd mrd && latexmk -pdf main.tex    # ~5 seconds instead of ~60
+```
 
-### Part V: Safety, Compliance, and Professional Practice
-21. Environmental Health and Safety (EHS)
-22. Professional Ethics, Licensure, and Course Policies
-
-### Appendices
-- A: Glossary of Key Terms (40 entries)
-- B: Why Capstone Projects Fail (12 patterns + Project Health Check)
-- C: Quick Reference Checklists (Sprint 0, SOW, PDR, CDR, FDR, Final Checkout)
+Re-comment `\includeonly` before pushing.
 
 ## Building Locally
 
-Requires `pdflatex` with `tcolorbox`, `tikz`, `enumitem`, `booktabs`, `tabularx`, `longtable`, `fancyhdr`, and `hyperref` packages.
+**Prerequisites:** TeX Live (full) or MacTeX, with `latexmk`
 
 ```bash
-# Course Text (3 passes for TOC/references)
-pdflatex main.tex && pdflatex main.tex && pdflatex main.tex
+# Build MRD
+cd mrd && latexmk -pdf main.tex
 
-# Student Guide
-pdflatex student_guide.tex && pdflatex student_guide.tex && pdflatex student_guide.tex
+# Build Student Guide
+cd student_guide && latexmk -pdf MEGN300_Student_Guide.tex
 ```
 
-## Author
+## Zero Textbook Cost (ZTC)
 
-**Adam Duran** · Assistant Teaching Professor · PE, PMP  
-Department of Mechanical Engineering · Colorado School of Mines
+All 42 figures are generated inline using TikZ/pgfplots. No external image files are required. The document compiles from source on any system with a standard TeX Live installation.

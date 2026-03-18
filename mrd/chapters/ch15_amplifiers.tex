@@ -1,0 +1,366 @@
+% Chapter 15: Amplifiers
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Amplifiers}
+\label{ch:amplifiers}\index{amplifier!operational}\index{amplifier!instrumentation}\index{gain-bandwidth product}\index{CMRR}
+
+\begin{warningbox}[Op-Amp Non-Idealities: Required Reading]
+Section~\ref{sec:opamp_nonideal} in this chapter (``The Brutal Realities'') is one of the most important in the entire document. Read it before designing any amplifier circuit.
+\end{warningbox}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=1.2cm, align=center, font=\scriptsize\sffamily\bfseries},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+    vlabel/.style={font=\tiny\sffamily, AccentTeal, align=center}
+]
+\node[block] (bridge) at (0,0) {Bridge\\Circuit};
+\node[block] (ina) at (3,0) {INA\\($G=100$)};
+\node[block] (filt) at (6,0) {Anti-Alias\\Filter};
+\node[block] (adc) at (9,0) {ADC\\(NI DAQ)};
+\node[block] (sw) at (12,0) {LabVIEW\\Processing};
+\draw[arr] (-1.8,0) -- (bridge) node[midway, above, font=\tiny\sffamily] {$\Delta R$};
+\draw[arr] (bridge) -- (ina); \draw[arr] (ina) -- (filt);
+\draw[arr] (filt) -- (adc); \draw[arr] (adc) -- (sw);
+\node[vlabel] at (1.5,-1.0) {$\sim$2\,mV\\differential};
+\node[vlabel] at (4.5,-1.0) {$\sim$200\,mV\\single-ended};
+\node[vlabel] at (7.5,-1.0) {200\,mV\\filtered};
+\node[vlabel] at (10.5,-1.0) {12-bit\\digital};
+\end{tikzpicture}
+\caption{Complete signal conditioning chain for a bridge-based sensor. Verify signal levels at each stage using the Signal Walk debugging protocol (Chapter~\ref{ch:debugging}).}
+\label{fig:signal_chain}
+\end{figure}
+
+\section{Why Amplification?}
+Many sensors produce millivolt or microvolt signals (thermocouples: $\sim$40\,$\mu$V/\degC{}; strain gauges: $\sim$2\,mV/V at full scale). ADCs work best when the signal spans most of their input range. Amplification bridges this gap, improving resolution and SNR.
+
+\section{Operational Amplifier (Op-Amp) Fundamentals}
+An ideal op-amp has infinite gain, infinite input impedance, zero output impedance, and infinite bandwidth. Real op-amps approximate this well enough for most instrumentation.
+
+\subsection{Inverting Amplifier}
+\begin{equation}
+V_{\text{out}} = -\frac{R_f}{R_{\text{in}}} V_{\text{in}}, \qquad G = -\frac{R_f}{R_{\text{in}}}
+\end{equation}
+The $-$ sign means the output is inverted. Input impedance equals $R_{\text{in}}$; this can load a high-impedance sensor.
+
+\subsection{Non-Inverting Amplifier}
+\begin{equation}
+V_{\text{out}} = \left(1 + \frac{R_f}{R_g}\right) V_{\text{in}}, \qquad G = 1 + \frac{R_f}{R_g}
+\end{equation}
+No inversion. Very high input impedance (the op-amp's input impedance, typically $>$1\,G$\Omega$). Preferred for sensor interfacing.
+
+\subsection{Voltage Follower (Buffer)}
+Non-inverting amplifier with $G = 1$ ($R_f = 0$, $R_g = \infty$). Provides impedance transformation: high input impedance, low output impedance. Use between a high-impedance sensor and a low-impedance load (ADC input, cable driver).
+
+\subsection{Differential Amplifier}
+\begin{equation}
+V_{\text{out}} = G (V_+ - V_-)
+\end{equation}
+Amplifies the difference between two inputs while rejecting the common-mode voltage (noise, ground offsets). Critical for bridge circuits (strain gauges, RTDs) and any measurement in electrically noisy environments.
+
+\section{Instrumentation Amplifiers}
+A specialized differential amplifier with three op-amps that provides: very high input impedance on both inputs, precisely settable gain with a single resistor ($R_G$), and very high Common-Mode Rejection Ratio (CMRR). The gain equation (for a standard 3-op-amp INA):
+\begin{equation}
+G = 1 + \frac{2R}{R_G}
+\end{equation}
+Common ICs: INA128, AD620, INA333. CMRR typically $>$100\,dB.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    amp/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                minimum width=3.0cm, minimum height=2.0cm, align=center, font=\scriptsize\sffamily},
+]
+\node[amp] (inv) at (0,0) {\textbf{Inverting}\\$G = -R_f/R_i$\\Phase: $180^\circ$\\Input $Z$: $R_i$};
+\node[amp] (noninv) at (4,0) {\textbf{Non-Inverting}\\$G = 1 + R_f/R_g$\\Phase: $0^\circ$\\Input $Z$: very high};
+\node[amp] (diff) at (8,0) {\textbf{Differential}\\$G = R_f/R_i$\\Rejects CM noise\\Input $Z$: $R_i$};
+\node[amp, draw=AccentTeal, fill=AccentTeal!8] (ina) at (12,0) {\textbf{INA}\\$G = 1 + 50\text{k}/R_G$\\Highest CMRR\\Input $Z$: $>$G$\Omega$};
+% Best for labels
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (0,-1.5) {Summing circuits};
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (4,-1.5) {General-purpose};
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (8,-1.5) {Differential signals};
+\node[font=\tiny\sffamily\itshape\bfseries, text=AccentTeal] at (12,-1.5) {Bridge circuits};
+\end{tikzpicture}
+\caption{Four amplifier configurations for instrumentation. The instrumentation amplifier (INA, teal) is the gold standard for bridge-based sensor interfacing due to its balanced high-impedance inputs and superior CMRR.}
+\label{fig:amps}
+\end{figure}
+
+\begin{keyconceptbox}[Requirements Mapping: Amplifier to Shall-Statements]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item ``Measure strain gauge bridge output (0--10\,mV) with a 0--5\,V ADC'' $\to$ AMP-REQ: Amplifier gain shall be 500 $\pm$ 0.1\%. Amplifier CMRR shall be $\geq$ 100\,dB to reject 60\,Hz common-mode noise.
+\item ``Sensor output impedance is 10\,k$\Omega$'' $\to$ AMP-REQ: Amplifier input impedance shall be $\geq$ 100\,M$\Omega$ (10,000:1 ratio to avoid loading error $>$ 0.01\%).
+\end{itemize}
+\end{keyconceptbox}
+
+
+\section{Amplifier Noise}
+Real amplifiers add noise to the signal. Two key specifications:
+
+\textbf{Input-referred voltage noise} ($e_n$): specified in nV/$\sqrt{\text{Hz}}$. Total noise voltage $= e_n \times \sqrt{\text{bandwidth}}$. For an INA128: $e_n \approx 8$\,nV/$\sqrt{\text{Hz}}$.
+
+\textbf{Input-referred current noise} ($i_n$): specified in pA/$\sqrt{\text{Hz}}$. Generates noise across the source impedance: $V_n = i_n \times R_s$. High source impedance (thermocouples, piezo sensors) makes current noise dominant.
+
+\textbf{Total input-referred noise}:
+\begin{equation}
+V_{n,\text{total}} = \sqrt{e_n^2 + (i_n R_s)^2 + 4k_B T R_s} \times \sqrt{\text{BW}}
+\end{equation}
+where the third term is thermal (Johnson) noise from the source resistance.
+
+\begin{tipbox}[Choosing an Amplifier for Low-Noise Applications]
+For low source impedance ($<$1\,k$\Omega$, e.g., strain gauge bridges): choose a low $e_n$ amplifier (INA128, AD8221). For high source impedance ($>$100\,k$\Omega$, e.g., piezo sensors): choose a low $i_n$ amplifier (INA116, OPA129; FET-input types). Always calculate total noise and compare to your signal level to verify adequate SNR.
+\end{tipbox}
+
+
+\begin{warningbox}[Mandate: Use Differential Mode for All Millivolt-Level Signals]
+When a sensor is physically separated from the DAQ (even by 1 meter of cable), the sensor's ``ground'' and the DAQ's ``ground'' are at different potentials. This ground offset (often 10--100\,mV from building wiring) adds directly to your measurement. For a thermocouple producing 1\,mV, a 50\,mV ground offset is a 50$\times$ error. \textbf{Solution}: always configure the NI~DAQ in Differential mode for millivolt-level signals (thermocouples, strain gauge bridges, low-output sensors). Differential mode measures the voltage \emph{between} the two signal wires, rejecting the common-mode ground offset. In NI~MAX, select ``Differential'' (not ``RSE'') when configuring analog input channels.
+\end{warningbox}
+
+\section{Signal Conditioning Chains}
+A complete signal conditioning chain for a resistive sensor:
+
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Bridge excitation}: precision voltage or current source drives the Wheatstone bridge.
+\item \textbf{Instrumentation amplifier}: amplifies the differential bridge output (typically 100--1000$\times$) while rejecting common-mode voltage.
+\item \textbf{Low-pass filter}: removes high-frequency noise and provides anti-aliasing. Cutoff frequency set to $\leq 0.4 f_s$.
+\item \textbf{Voltage offset/scaling}: shifts and scales the signal to match the ADC input range (0--5\,V or $\pm$10\,V).
+\item \textbf{ADC}: digitizes the conditioned signal.
+\end{enumerate}
+
+\begin{examplebox}[ThermoRig: Complete Signal Chain for Strain Measurement]
+A 350\,$\Omega$ strain gauge in a quarter-bridge (\textbf{ThermoRig Variant: Strain Measurement} --- this example demonstrates the signal chain design process for a resistive sensor, complementing the thermocouple-based ThermoRig) with $V_{ex} = 5$\,V. At 1000\,$\mu\epsilon$: $\Delta V = V_{ex} \times GF \times \epsilon / 4 = 5 \times 2.1 \times 0.001 / 4 = 2.625$\,mV. Signal chain: INA128 at $G = 500$ ($V_{out} = 1.31$\,V), followed by a 2nd-order Butterworth LP at 500\,Hz, feeding a 16-bit ADC ($\pm$5\,V range). ADC resolution at sensor: $10/(65536 \times 500) = 0.305\,\mu$V $= 0.116\,\mu\epsilon$. Noise: INA128 noise ($8\,\text{nV}/\sqrt{\text{Hz}} \times \sqrt{500} = 179$\,nV input-referred) $\to$ referred to strain: $179\,\text{nV} / (5 \times 2.1 / 4) = 0.068\,\mu\epsilon$. Total: well within a $\pm$5\,$\mu\epsilon$ requirement.
+\end{examplebox}
+
+
+\section{Why Amplification Is Necessary}
+Sensor outputs are often too small for the ADC. A Type K thermocouple at 100\,\degC{} produces only 4.1\,mV. An NI USB-6001 on $\pm$10\,V has 1.22\,mV LSB, meaning the TC signal spans only 3--4 bits. Amplification by 500--1000$\times$ utilizes the full 14-bit range.
+
+\section{Op-Amp Fundamentals}
+Key real-world limitations: \textbf{Input offset voltage ($V_{os}$)}: 0.1--5\,mV. At gain 1000, a 1\,mV offset becomes 1\,V. Use precision or auto-zero op-amps. \textbf{Input bias current ($I_b$)}: nA to pA. Creates voltage offsets across high-impedance sources. Match impedances or use FET-input. \textbf{GBW}: gain $\times$ bandwidth is constant. 1\,MHz GBW gives 1000$\times$ gain only to 1\,kHz. \textbf{Slew rate}: max output change rate (V/$\mu$s). For 5\,V at 10\,kHz: need $\geq$0.31\,V/$\mu$s.
+
+\section{Amplifier Configurations}
+\textbf{Non-inverting}: $G = 1 + R_f/R_g$. High input impedance. Default for sensors.
+
+\textbf{Inverting}: $G = -R_f/R_i$. Input impedance $= R_i$. Use when inversion is acceptable.
+
+\textbf{Buffer}: $G = 1$. Converts high-impedance source to low-impedance output.
+
+\textbf{Differential}: $V_o = (R_f/R_i)(V_2 - V_1)$. CMRR limited by resistor matching ($\sim$60\,dB for 0.1\% resistors).
+
+\section{Instrumentation Amplifier (INA)}
+Three-op-amp topology: two input buffers + difference amplifier. $G = 1 + 2R/R_G$. CMRR $> 100$\,dB. Very high input impedance ($>10^{10}\,\Omega$). Gain set by single resistor. The gold standard for sensor interfacing.
+
+\begin{examplebox}[ThermoRig: Complete Signal Chain]
+TC produces 0--8.2\,mV (0--200\,\degC{}). DAQ accepts 0--5\,V. Required gain: $G \approx 600$. INA128 ($R = 49.4$\,k$\Omega$): $R_G = 98.8\text{k}/(600-1) = 165\,\Omega$. Use 162\,$\Omega$ standard, $G = 611$. CMRR of 120\,dB rejects 50\,mV ground offset. Signal chain: TC $\to$ INA128 ($G = 611$) $\to$ Sallen-Key LP (40\,Hz) $\to$ NI USB-6001 (diff, 0--5\,V, 100\,S/s).
+\end{examplebox}
+
+\section{Common Mistakes}
+(1) No decoupling capacitors (100\,nF at each power pin). (2) Input exceeds common-mode range. (3) Driving capacitive loads without series resistor (causes oscillation). (4) Gain maps signal beyond ADC range (clipping).
+
+
+\section{Reading Op-Amp Datasheets}
+The datasheet is the most important document for amplifier design. Key sections to examine:
+
+\textbf{Absolute maximum ratings}: voltages and currents that must never be exceeded. Exceeding these destroys the device permanently. Always design with margin.
+
+\textbf{Electrical characteristics table}: input offset voltage ($V_{os}$), input bias current ($I_b$), open-loop gain ($A_{ol}$), CMRR, GBW product, slew rate. These are specified at particular conditions (supply voltage, temperature).
+
+\textbf{Typical performance curves}: plots of key parameters vs.\ frequency, temperature, and supply voltage. The ``Open-Loop Gain vs.\ Frequency'' plot determines the usable gain-bandwidth. The ``CMRR vs.\ Frequency'' plot shows that CMRR degrades at high frequencies, which is critical for rejecting EMI.
+
+\textbf{Application circuits}: the manufacturer's recommended configurations, including component values and PCB layout tips.
+
+\section{PCB Layout for Low-Noise Amplifiers}
+Poor layout can undo careful circuit design. Key rules: (1) Keep traces short between sensor input and amplifier. (2) Route analog traces away from digital and power traces. (3) Use a continuous ground plane under the amplifier. (4) Place decoupling capacitors within 5\,mm of power pins. (5) Use Kelvin connections for precision resistors (separate current and voltage traces). (6) Enclose the sensitive input area with a guard ring (a trace connected to the non-inverting input potential) to intercept leakage currents.
+
+\section{Signal Conditioning Chain Design Example}
+For a full Wheatstone bridge strain gauge system: (1) Bridge excitation: REF5050 (5.000\,V precision reference). (2) First stage: INA128 with $G = 100$ (maps $\pm$20\,mV bridge output to $\pm$2\,V). (3) Second stage: 4th-order Sallen-Key Butterworth LP at 100\,Hz (anti-alias for 1\,kS/s DAQ). (4) Buffer: unity-gain buffer (OPA2277) to drive the DAQ input. (5) DAQ: NI USB-6001, differential input, $\pm$5\,V range, 1\,kS/s. Total system noise: dominated by the INA128's $e_n = 8$\,nV/$\sqrt{\text{Hz}}$ over 100\,Hz bandwidth: $V_n = 8 \times \sqrt{100} = 80$\,nV input-referred, or $80 \times 100 = 8$\,$\mu$V at the ADC, well below the 1.22\,mV LSB.
+\section{Op-Amp Selection Guide}
+With thousands of op-amps available, selection can be overwhelming. Use this decision tree for MEGN~300 applications:
+
+\textbf{General purpose (non-critical)}: TL072 (JFET input, low cost, GBW = 3\,MHz). Good for buffering, non-inverting amplification of volt-level signals, and filter stages where noise is not the limiting factor.
+
+\textbf{Precision DC measurement}: OPA2277 ($V_{os} = 10\,\mu$V, low drift, low noise). For strain gauge amplification, thermocouple signal conditioning, and any application where DC accuracy matters.
+
+\textbf{Low noise}: OPA1612 ($e_n = 1.1$\,nV/$\sqrt{\text{Hz}}$). For hydrophone preamplifiers, high-impedance sensor buffering, and applications where the noise floor limits measurement resolution.
+
+\textbf{High speed}: OPA657 (GBW = 1.6\,GHz, slew rate = 700\,V/$\mu$s). For photodiode transimpedance amplifiers, high-frequency signal conditioning, and wideband measurements. Requires careful PCB layout.
+
+\textbf{Rail-to-rail, single supply}: MCP6022 (operates on 2.5--5.5\,V, rail-to-rail I/O). For battery-powered portable instruments and 3.3\,V MCU-compatible signal conditioning.
+
+\section{INA Design Details}
+\subsection{Gain Resistor Selection}
+The INA128's gain equation $G = 1 + 49.4\text{k}\Omega / R_G$ means that very high gains require very small $R_G$. At $G = 1000$: $R_G = 49.4\,\Omega$. At this value, the resistor's lead resistance and contact resistance (especially on a breadboard) can contribute significant gain error. Solution: use a precision ($\leq$0.1\%), low-TCR metal film resistor soldered directly to the INA's $R_G$ pins. Never use a potentiometer for $R_G$ (the wiper resistance fluctuates).
+
+\subsection{Input Bias Current Path}
+The INA128's input bias current ($\pm$2\,nA typical) must have a DC return path to ground. If the sensor is AC-coupled (capacitor in series) or the source is floating (isolated thermocouple), the bias current has no path, and the output saturates to the rail. Solution: add high-value resistors (1--10\,M$\Omega$) from each input to ground, providing the bias current path while maintaining high common-mode impedance.
+
+\subsection{Reference Pin}
+The INA128's output is referenced to the voltage on its REF pin (pin 5). For single-supply operation, connect REF to mid-supply (2.5\,V from a precision reference) to center the output swing. For bipolar operation, connect REF to ground. If REF is driven by a noisy source, the noise appears directly at the output.
+
+\section{Signal Chain Design Methodology}
+A systematic approach to designing the complete signal conditioning chain:
+
+\textbf{Step 1: Define the input and output.} Input: sensor output range (e.g., $-10$ to $+40$\,mV for a thermocouple at 0--200\,\degC{}). Output: ADC input range (e.g., 0--5\,V).
+
+\textbf{Step 2: Calculate required gain.} $G = V_{\text{ADC,range}} / V_{\text{sensor,range}} = 5000\,\text{mV}/50\,\text{mV} = 100$.
+
+\textbf{Step 3: Add offset to shift the signal.} The sensor output includes negative values ($-10$\,mV at 0\,\degC{}). After $100\times$ gain: $-1$\,V (cannot be measured by a 0--5\,V ADC). Add an offset of $+1$\,V after amplification, or bias the INA's REF pin to $+1$\,V.
+
+\textbf{Step 4: Design the anti-alias filter.} For 100\,S/s sample rate and 10\,Hz signal bandwidth: 2nd-order Sallen-Key Butterworth at $f_c = 40$\,Hz. This provides $-24$\,dB attenuation at $f_s/2 = 50$\,Hz, adequate for 14-bit.
+
+\textbf{Step 5: Verify the noise budget.} Compute the total output noise and compare to the ADC's LSB. If the noise exceeds 0.5\,LSB, reduce the bandwidth, increase the gain (to use more of the ADC range), or select a lower-noise amplifier.
+
+\textbf{Step 6: Simulate, build, test.} Use SPICE simulation (LTspice is free) to verify the design before building. After building, measure the actual gain, offset, frequency response, and noise, and compare to the design.
+
+\section{Differential vs.\ Single-Ended Signal Routing}
+\textbf{Single-ended}: one signal wire and a ground return. Simple but susceptible to ground noise. Use for volt-level signals from low-impedance sources over short distances ($<$30\,cm).
+
+\textbf{Differential}: two signal wires (no ground reference). Rejects common-mode noise. Use for millivolt signals, long cable runs, and noisy environments. The INA at the receiving end converts differential to single-ended.
+
+\textbf{Rule of thumb}: if the sensor output is less than 100\,mV, or the cable is longer than 1\,m, or the environment contains motors/power electronics, use differential signal routing with an INA.
+\section{Practical Amplifier Troubleshooting}
+\textbf{Output saturated at positive rail}: (1) check power supply connections (is $V+$ actually connected?), (2) check for open feedback path ($R_f$ disconnected = infinite gain = rail), (3) check input common-mode range (input voltage too high for the op-amp).
+
+\textbf{Output saturated at negative rail}: (1) check that $V-$ supply is connected, (2) check for reversed input polarity (signal on $V-$ instead of $V+$ for non-inverting), (3) check for DC offset amplified to the rail.
+
+\textbf{Output oscillates at high frequency (MHz range)}: (1) add decoupling capacitors (100\,nF ceramic at power pins), (2) check for capacitive load on output (add 100\,$\Omega$ series resistor), (3) verify the op-amp is unity-gain stable (some high-speed op-amps require minimum gain for stability).
+
+\textbf{Output has excessive noise}: (1) check grounding (star ground, no ground loops), (2) check power supply decoupling, (3) verify the input is properly terminated (floating inputs pick up noise), (4) check for resistor values too high ($R > 100$\,k$\Omega$ increases thermal noise).
+
+\textbf{Gain is wrong}: (1) measure actual resistor values with a multimeter (tolerance effects), (2) check for loading at the output (the next stage drawing current through $R_f$), (3) verify the op-amp has sufficient GBW for the gain and frequency.
+
+\section{Precision Measurement Techniques}
+\textbf{Chopper stabilization}: an auto-zero technique that periodically measures and corrects the offset voltage. The LTC2057 (chopper-stabilized) achieves $V_{os} = 0.5\,\mu$V and drift of 0.015\,$\mu$V/\degC{}. For thermocouple measurement where the sensor output is 41\,$\mu$V/\degC{}, a 0.5\,$\mu$V offset corresponds to only 0.012\,\degC{} of error, negligible.
+
+\textbf{Guard rings}: for high-impedance circuits ($R > 1$\,G$\Omega$), PCB surface leakage can exceed the signal current. A guard ring (a PCB trace driven to the same potential as the high-impedance node, surrounding it on the PCB surface) intercepts leakage currents before they reach the sensitive input. Standard practice for pH meters, picoammeters, and charge amplifiers.
+
+\textbf{Kelvin connections}: for precision resistance measurement, separate the current-carrying wires from the voltage-sensing wires. The current wires have IR drops across their resistance; the voltage-sensing wires carry no current (connected to high-impedance amplifier inputs) and therefore have no voltage error.
+
+\section{INA Applications Beyond Temperature}
+The instrumentation amplifier is used wherever a small differential signal must be extracted from a common-mode environment:
+
+\textbf{Strain gauge bridges}: output is $\sim$2\,mV/V at full scale. INA gain of 200--1000 maps this to the ADC range.
+
+\textbf{Current sensing} (high-side): a shunt resistor in the supply line produces a differential voltage proportional to current, riding on the full supply voltage as common-mode. The INA rejects the supply voltage and amplifies only the shunt voltage.
+
+\textbf{Biomedical signals} (ECG, EMG): body-surface potentials are $\sim$1\,mV differential with $\sim$1\,V common-mode (from mains coupling to the body). INA with CMRR $> 100$\,dB rejects the mains interference.
+
+\textbf{Thermocouple cold junction compensation}: the reference junction voltage ($\sim$1\,mV) must be measured differentially to reject the ground offset between the thermocouple and the compensation IC.
+\section{Noise Analysis for Amplifier Circuits}
+\subsection{Op-Amp Noise Model}
+Every op-amp has two internal noise sources: a voltage noise source $e_n$ (in series with the non-inverting input) and a current noise source $i_n$ (flowing into each input). The total input-referred noise voltage depends on the source impedance $R_s$:
+\begin{equation}
+V_{n,\text{total}} = \sqrt{e_n^2 + (i_n R_s)^2 + 4k_B T R_s}
+\end{equation}
+The three terms represent: amplifier voltage noise, amplifier current noise flowing through the source impedance, and the source's own thermal noise. For low source impedance ($R_s < 1$\,k$\Omega$): $e_n$ dominates; choose a BJT-input op-amp (low $e_n$, e.g., OPA2277: 8\,nV/$\sqrt{\text{Hz}}$). For high source impedance ($R_s > 100$\,k$\Omega$): $i_n R_s$ dominates; choose a JFET-input op-amp (low $i_n$, e.g., OPA2132: 4\,fA/$\sqrt{\text{Hz}}$).
+
+\subsection{Noise Gain}
+The noise gain of an amplifier circuit is the gain experienced by the input-referred noise sources, which is \emph{not} always the same as the signal gain. For a non-inverting amplifier: noise gain $= 1 + R_f/R_g = $ signal gain. For an inverting amplifier: noise gain $= 1 + R_f/R_i$ but signal gain $= -R_f/R_i$. The noise gain is always $\geq 1$ and determines the amplifier's bandwidth (GBW/noise gain) and output noise.
+
+\subsection{Noise Bandwidth}
+The noise bandwidth of a filter is the bandwidth of an ideal rectangular filter that would pass the same total noise power. For a single-pole (first-order) system with $-3$\,dB frequency $f_{-3\text{dB}}$: noise bandwidth $= (\pi/2) f_{-3\text{dB}} = 1.57 f_{-3\text{dB}}$. For a second-order Butterworth: noise bandwidth $= 1.11 f_{-3\text{dB}}$. Use the noise bandwidth (not the $-3$\,dB bandwidth) when computing total noise from noise spectral density.
+
+\section{Practical Circuit Construction}
+\subsection{Breadboard vs.\ Protoboard vs.\ PCB}
+\textbf{Breadboard}: acceptable for initial testing of digital circuits and proof-of-concept. Unacceptable for final analog signal conditioning: contact resistance varies (0.01--1\,$\Omega$), parasitic capacitance is high ($\sim$2\,pF between adjacent rows), and connections are unreliable under vibration. Maximum recommended use: circuits with signal levels $> 100$\,mV and frequencies $< 1$\,kHz.
+
+\textbf{Protoboard} (solderable perfboard): adequate for most MEGN~300 final projects. Solder connections are permanent, low resistance ($< 1$\,m$\Omega$), and mechanically robust. Use point-to-point wiring with minimum wire length. Keep analog and digital sections physically separated with a ground plane (copper tape on the bottom side).
+
+\textbf{Custom PCB}: best performance. Ground planes, controlled impedance traces, and optimized component placement minimize noise and parasitic effects. PCB fabrication services (JLCPCB, OSH~Park) produce 2-layer boards for \$2--\$5 with 5-day turnaround. For MEGN~301 projects requiring reliable, compact electronics: a custom PCB is strongly recommended.
+
+\subsection{Decoupling Best Practices}
+Every IC power pin needs a 100\,nF ceramic capacitor (C0G or X7R) placed within 5\,mm of the pin, connected to the nearest ground with the shortest possible trace. Additionally, place one 10\,$\mu$F electrolytic capacitor at each power rail entry point to the board. For op-amps operating above 1\,MHz: add a 1\,nF capacitor in parallel with the 100\,nF for high-frequency decoupling.
+
+The decoupling capacitor provides local charge storage so that fast current transients (from the op-amp switching its output stage) are supplied locally rather than propagating through long power traces (which act as antennas, radiating EMI and injecting noise into adjacent circuits).
+
+\section{Signal Chain Verification Checklist}
+Before connecting the signal conditioning to the DAQ, verify each stage independently:
+
+\begin{enumerate}[leftmargin=1.5em]
+\item Power supply: correct voltage, low noise ($< 1$\,mV ripple on oscilloscope).
+\item Zero input: short the amplifier input. Measure the output DC offset (should be $< V_{os} \times G$).
+\item Known DC input: apply a precision voltage (from a calibrated source or voltage divider) and verify the output matches the expected gain.
+\item Frequency response: sweep a sine wave from $0.1 f_c$ to $10 f_c$ and verify the gain and phase match the design.
+\item Noise floor: short the input, measure the output RMS noise. Compare to the calculated noise budget.
+\item Full-scale output: apply the maximum expected input and verify the output does not clip (stays within the ADC's input range).
+\item Common-mode rejection (for INA): apply the same voltage to both inputs. The output should remain near zero (within the specified CMRR).
+\end{enumerate}
+\section{Op-Amp Non-Idealities: The Brutal Realities}
+\label{sec:opamp_nonideal}
+The preceding sections treat the op-amp as ideal (infinite gain, infinite bandwidth, zero offset). In practice, non-idealities are what destroy measurement accuracy. Understanding three key limitations prevents the most common student design failures.
+
+\subsection{Gain-Bandwidth Product (GBW)}
+An op-amp has finite open-loop gain that decreases with frequency at $-20$\,dB/decade above the dominant pole. The \textbf{Gain-Bandwidth Product} (GBW) is the frequency at which the open-loop gain equals 1 (0\,dB). For a TL072: GBW $= 3$\,MHz. For an OPA2277: GBW $= 1$\,MHz.
+
+The maximum usable closed-loop bandwidth at gain $G$ is:
+\begin{equation}
+f_{\text{max}} = \frac{\text{GBW}}{G}
+\end{equation}
+
+For a non-inverting amplifier with $G = 1000$ using a TL072 (GBW $= 3$\,MHz): $f_{\text{max}} = 3000$\,Hz. Any signal above 3\,kHz is \emph{attenuated}, not amplified. A student expecting flat gain from DC to 10\,kHz will measure a signal that rolls off above 3\,kHz and be confused.
+
+\begin{warningbox}[The Gain-Bandwidth Trap]
+If you need $G = 1000$ with bandwidth to 10\,kHz, you need GBW $\geq 10{,}000 \times 1000 = 10$\,MHz (with $10\times$ margin: $\geq 100$\,MHz). No general-purpose op-amp achieves this at reasonable cost. The solution: split the gain into two stages ($G_1 = 100$, $G_2 = 10$). Each stage needs GBW $\geq 100 \times 10000 = 1$\,MHz and GBW $\geq 10 \times 10000 = 100$\,kHz respectively. Both are easily achievable with a TL072.
+\end{warningbox}
+
+\subsection{Input Offset Voltage ($V_{os}$)}
+The input offset voltage is a small DC voltage that appears between the inverting and non-inverting inputs due to manufacturing mismatches in the input transistor pair. It is amplified by the closed-loop gain just like a real signal:
+\begin{equation}
+V_{\text{output, offset}} = V_{os} \times G
+\end{equation}
+
+For a TL072 ($V_{os} = 3$\,mV typical) at gain 611 (ThermoRig INA configuration): $V_{\text{output, offset}} = 3 \times 10^{-3} \times 611 = 1.83$\,V. The thermocouple signal at 50\,\degC{} is $50 \times 0.041 = 2.05$\,mV, which amplified to $2.05 \times 611 = 1.25$\,V. The offset (1.83\,V) is \emph{larger than the signal} (1.25\,V). The measurement is useless.
+
+\begin{warningbox}[Offset Voltage Kills Millivolt Measurements]
+For thermocouple and strain gauge signal conditioning, the op-amp's $V_{os}$ must be much smaller than the signal: $V_{os} \ll V_{\text{signal}}$. For a 2\,mV thermocouple signal: $V_{os} < 0.02$\,mV ($20\,\mu$V). This requires a precision op-amp: OPA2277 ($V_{os} = 10\,\mu$V), AD8421 ($V_{os} = 35\,\mu$V), or a chopper-stabilized type like the LTC2057 ($V_{os} = 0.5\,\mu$V). General-purpose op-amps (TL072, LM741, LM358) are completely unsuitable for millivolt instrumentation due to their millivolt-level offsets.
+\end{warningbox}
+
+The INA128 used in the ThermoRig has $V_{os} = 50\,\mu$V maximum (referred to input), which produces only $50 \times 10^{-6} \times 611 = 30.5$\,mV at the output, small enough to be calibrated out. This is why INAs are specified for instrumentation: their offset, drift, and CMRR are optimized for the task.
+
+\subsection{Input Offset Voltage Drift ($dV_{os}/dT$)}
+The offset voltage changes with temperature. For a TL072: $10\,\mu$V/\degC{} typical. Over a 20\,\degC{} temperature excursion (lab temperature varying from 18 to 38\,\degC{}): $\Delta V_{os} = 10 \times 20 = 200\,\mu$V. At gain 611: $\Delta V_{\text{output}} = 122$\,mV, equivalent to a 5\,\degC{} measurement error that slowly wanders as the room temperature changes. This appears as a mysterious drift in the data that cannot be traced to the sensor.
+
+For precision applications: use op-amps with $dV_{os}/dT < 1\,\mu$V/\degC{} (OPA2277: $0.1\,\mu$V/\degC{}; LTC2057: $0.015\,\mu$V/\degC{}). Alternatively, calibrate frequently (every 30 minutes in a temperature-variable environment).
+
+\subsection{Slew Rate}
+The maximum rate at which the output voltage can change. For a TL072: 13\,V/$\mu$s. For an LM741: 0.5\,V/$\mu$s. If the signal demands a faster rate (e.g., a 5\,V peak sine wave at 100\,kHz: required slew rate $= 2\pi \times 5 \times 100000 = 3.14$\,V/$\mu$s), the output cannot follow. The result: a sine wave with flattened peaks (slew-rate limiting), introducing harmonic distortion. Verify: required slew rate $= 2\pi f A_{\text{peak}} < $ op-amp slew rate.
+
+\subsection{Op-Amp Selection Decision Tree}
+(1) Is the signal millivolt-level or below? $\to$ Use a precision op-amp ($V_{os} < 100\,\mu$V) or an INA. Never use TL072 or LM741.
+
+(2) Does the signal bandwidth exceed 100\,kHz? $\to$ Select an op-amp with GBW $\geq 10 \times G \times f_{\text{max}}$. Consider splitting into multiple stages.
+
+(3) Is the source impedance high ($> 100$\,k$\Omega$)? $\to$ Use a JFET-input op-amp (TL072, OPA2132) for low input bias current.
+
+(4) Is the circuit battery-powered or single-supply? $\to$ Use a rail-to-rail op-amp (MCP6022, OPA2337) to maximize output swing.
+
+(5) None of the above constraints are critical? $\to$ TL072 (JFET, general purpose) or LM358 (BJT, single supply).
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Design a non-inverting amplifier with a gain of 50 using standard 1\% resistor values. Specify $R_f$ and $R_g$.
+\item A strain gauge bridge produces 5\,mV of signal with 2\,V of common-mode voltage. Your ADC cannot tolerate more than 10\,mV of common-mode breakthrough. What minimum CMRR does your amplifier need?
+\item Why should you use an instrumentation amplifier (INA128) rather than a single op-amp differential amplifier for measuring a thermocouple signal? Give at least two reasons.
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $G = 1 + R_f/R_g = 50$, so $R_f/R_g = 49$. Choose $R_g = 1.00$\,k$\Omega$, $R_f = 49.9$\,k$\Omega$ (both standard 1\% values). Actual gain $= 1 + 49.9/1.00 = 50.9$. For tighter accuracy, use $R_g = 2.00$\,k$\Omega$ and $R_f = 97.6$\,k$\Omega$ ($G = 49.8$), or use a precision resistor network.
+\item Required CMRR $= 20\log_{10}(V_{CM} / V_{\text{max breakthrough}}) = 20\log_{10}(2/0.010) = 20\log_{10}(200) = 46$\,dB minimum. In practice, use $\geq$ 80\,dB to provide comfortable margin.
+\item (1) An INA has very high and balanced input impedance on both inputs ($>$10\,G$\Omega$), while a single-op-amp differential amplifier's input impedance depends on the resistor values and is often unequal. This matters for thermocouples, which are high-impedance sources sensitive to loading. (2) An INA's gain is set by a single resistor ($R_G$), providing precise and easily adjustable gain, while a differential amplifier requires four matched resistors where any mismatch degrades CMRR.
+\end{enumerate}
+
+
+% ================================================================
+
+\begin{masterycheckbox}{Amplifiers and Signal Conditioning}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Design a non-inverting amplifier with specified gain ($G = 1 + R_f/R_g$) and verify GBP sufficiency.
+\item Select and configure an INA128 for a bridge circuit ($G = 1 + 50\text{k}\Omega/R_G$).
+\item Identify and mitigate op-amp non-idealities: offset, bias current, finite CMRR, slew rate.
+\item Apply the 100:1 impedance rule and insert buffers where needed.
+\item Design a complete signal conditioning chain from sensor to ADC.
+\end{enumerate}
+\end{masterycheckbox}
+

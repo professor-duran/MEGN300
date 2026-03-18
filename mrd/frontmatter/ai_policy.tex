@@ -1,0 +1,41 @@
+% Modern Tools and AI Use Policy
+% Auto-generated from megn300_master_reference.tex
+
+\chapter*{Modern Tools and AI Use Policy}
+\addcontentsline{toc}{chapter}{Modern Tools and AI Use Policy}
+\label{ch:aipolicy}
+
+Generative AI tools (ChatGPT, GitHub Copilot, Claude, Gemini) are part of the modern engineering toolkit. MEGN~300 uses a tiered policy distinguishing AI as a learning accelerator from AI as an integrity violation.
+
+\subsection*{The Traffic Light Framework}
+
+\begin{center}
+\begin{tikzpicture}[
+    zone/.style={rounded corners=4pt, minimum width=14cm, minimum height=2.0cm, text width=13.2cm, align=left, font=\small\sffamily},
+]
+\node[zone, fill=AccentTeal!15, draw=AccentTeal, thick] (green) at (0,0) {
+\textbf{\textsf{\color{AccentTeal}GREEN --- Always permitted:}}\\[2pt]
+Asking AI to explain a concept. Asking for help interpreting an error message. Using AI to review your writing for grammar after you have written it. Asking AI to explain a datasheet parameter. Using AI-generated study questions to test your own knowledge.
+};
+\node[zone, fill=WarnOrange!15, draw=WarnOrange, thick] (yellow) at (0,-2.8) {
+\textbf{\textsf{\color{WarnOrange}YELLOW --- Permitted with disclosure:}}\\[2pt]
+Using AI to generate a code skeleton that you then modify, understand, and can explain line by line. Asking AI for a starting approach to a design problem. Using AI to debug code you wrote, provided you understand the fix. Note ``AI-assisted'' on any deliverable where AI contributed substantive content.
+};
+\node[zone, fill=red!10, draw=red!70!black, thick] (red) at (0,-5.6) {
+\textbf{\textsf{\color{red!70!black}RED --- Never permitted (academic integrity violation):}}\\[2pt]
+Submitting AI-generated code, analysis, or writing as your own. Having AI write your lab report, uncertainty analysis, or design justification. Copying AI-generated LabVIEW block diagrams without understanding them. Using AI to generate data or plots you did not collect. Using AI during exams or practicals unless explicitly authorized.
+};
+\end{tikzpicture}
+\end{center}
+
+\subsection*{The Mastery Test}
+
+The boundary between Green/Yellow and Red: \textbf{Can you do it without the AI?} If AI helped you write a PID controller, you should be able to rebuild it from a blank VI, explaining every wire. If you cannot, the AI did the learning, not you. The lab practical exams test exactly this.
+
+\begin{warningbox}[AI-Generated Code Is Not Verified Code]
+AI tools produce plausible code that may contain subtle errors: wrong DAQmx configurations, incorrect filter coefficients, PID gain signs causing positive feedback, or timing assumptions mismatched to your hardware. \textbf{Never trust AI-generated code without testing against known inputs.} Treat AI output like a colleague's suggestion: verify independently before using it in a system controlling real hardware.
+\end{warningbox}
+
+\subsection*{Why This Policy Exists}
+In professional practice, you will use AI tools. But you will be the engineer of record who signs the drawing and certifies the test result. If you cannot verify what the AI produced, you cannot take responsibility for it. MEGN~300 builds the foundational skills that let you use AI as a \emph{force multiplier} rather than a \emph{crutch}. The difference matters when the system you designed controls a 400\,V battery thermal management system and a faulty sensor reading could trigger a thermal runaway event.
+

@@ -1,0 +1,96 @@
+% Laboratory Safety and Equipment Care
+% Auto-generated from megn300_master_reference.tex
+
+\chapter*{Laboratory Safety and Equipment Care}
+\addcontentsline{toc}{chapter}{Laboratory Safety and Equipment Care}
+\label{ch:safety}
+
+\section*{Your Safety Is Non-Negotiable}
+The MEGN~300 laboratory contains electrical equipment capable of causing injury, fire, and equipment damage. Every student must understand and follow the safety practices in this chapter before working with any equipment. No measurement, no deadline, and no grade justifies taking a safety shortcut.
+
+\section*{Electrical Safety Fundamentals}
+\subsection*{Voltage and Current Hazards}
+The human body has a resistance of approximately 1\,k$\Omega$--100\,k$\Omega$ depending on skin moisture and contact pressure. At these resistances:
+
+\textbf{Below 30\,V DC / 25\,V AC}: generally considered safe for dry skin contact. Most MEGN~300 circuits operate in this range. However, wet hands or broken skin can reduce body resistance to $\sim$500\,$\Omega$, making even low voltages dangerous.
+
+\textbf{30--48\,V DC}: can produce a painful shock and involuntary muscle contraction. Muscle contraction can prevent you from releasing the conductor (``let-go threshold'' is approximately 10--20\,mA depending on the individual).
+
+\textbf{Above 48\,V DC / 30\,V AC}: potentially lethal. Cardiac fibrillation can occur at currents as low as 75\,mA through the heart. AC is more dangerous than DC at equivalent voltages because it causes sustained muscle contraction and interferes with the heart's electrical rhythm.
+
+\textbf{Above 240\,V}: arc flash hazard. An electrical arc can form across air gaps, producing temperatures exceeding 10{,}000\,\degC{} and intense UV radiation. Arc flash causes severe burns and blindness.
+
+\begin{warningbox}[The One-Hand Rule]
+When working on energized circuits above 30\,V, keep one hand in your pocket or behind your back. If you touch a live conductor with one hand while the other hand (or any other part of your body) is grounded, current flows through your chest and across your heart. If only one hand contacts the conductor, current flows through that hand only, which is painful but far less likely to be fatal.
+\end{warningbox}
+
+\subsection*{Working with Benchtop Power Supplies}
+The benchtop DC power supply is the most commonly used piece of equipment in the lab. It provides adjustable voltage (0--30\,V typical) and current-limited output. Safe practices:
+
+\textbf{Before connecting}: set the voltage to zero and the current limit to the minimum. Turn the output OFF. Connect your circuit. Verify the connections visually (polarity, no shorts). Only then turn the output ON and slowly increase the voltage to the desired level while monitoring the current.
+
+\textbf{Current limiting}: always set the current limit before applying voltage. The current limit protects both your circuit and the power supply. For initial testing of a new circuit: set the current limit to 50\% of the expected operating current. If the supply immediately hits the current limit, something is wrong (short circuit, reversed polarity, component failure). Turn off, investigate, and fix before increasing the limit.
+
+\textbf{Never exceed rated voltage}: each component in your circuit has a maximum voltage rating. A 16\,V electrolytic capacitor exposed to 20\,V will bulge, leak, and potentially explode. Know the voltage ratings of every component and set the supply accordingly.
+
+\textbf{Capacitor discharge}: when you turn off the power supply, capacitors in your circuit retain charge. A 1000\,$\mu$F capacitor charged to 12\,V stores $E = \frac{1}{2}CV^2 = 0.072$\,J, sufficient to produce a painful spark and damage sensitive components. After power-off, verify that the supply voltage reads zero before touching the circuit. For high-capacitance circuits: add a discharge resistor or use a shorting wire (with appropriate current-limiting resistor) to safely discharge.
+
+\textbf{Multiple supplies}: when using two supplies to create a bipolar supply ($+15$\,V and $-15$\,V), connect the negative terminal of the positive supply to the positive terminal of the negative supply at a single point (the system ground). Never connect the outputs in parallel unless the supplies are specifically designed for parallel operation; imbalanced outputs will fight each other, potentially damaging both.
+
+\subsection*{Working with Digital Multimeters (DMMs)}
+The DMM is the most fundamental measurement tool. Safe and accurate use requires:
+
+\textbf{Select the correct function}: voltage (V), current (A), or resistance ($\Omega$). Measuring current in voltage mode (probes in the voltage jacks but the selector on current) is harmless. Measuring voltage in current mode (probes in the current jacks while measuring voltage) creates a dead short through the DMM's low-impedance current shunt, blowing the internal fuse and potentially damaging the circuit. \textbf{Always verify the probe jacks match the selected function before connecting.}
+
+\textbf{Current measurement}: current is measured in series (the DMM must be in the current path). To measure current: turn off the circuit, break the circuit at the point of interest, insert the DMM in series, turn on the circuit. Never connect the DMM's current jacks across a voltage source; this creates a short circuit through the DMM's $<$1\,$\Omega$ current shunt. The fuse may blow (best case) or the DMM may be damaged (worst case).
+
+\textbf{Resistance measurement}: measure resistance only on de-energized circuits. Resistance measurement injects a small current from the DMM's battery; if the circuit is powered, the external voltage overwhelms the DMM's measurement signal and produces meaningless readings (or damages the DMM).
+
+\textbf{Probe safety}: inspect probe insulation before each use. Cracked or worn insulation can expose the conductor, creating a shock hazard. Replace damaged probes immediately. When measuring high voltages ($>$30\,V): hold the probes by their insulated handles, not near the tips.
+
+\textbf{Auto-range vs.\ manual range}: auto-ranging is convenient but slow (the DMM cycles through ranges to find the right one). For steady-state measurements: auto-range is fine. For observing rapidly changing values: select the range manually to avoid the display flickering between ranges.
+
+\subsection*{Working with Oscilloscopes}
+The oscilloscope's ground clip is connected directly to earth ground through the power cord. This creates a safety hazard when measuring circuits that are not ground-referenced:
+
+\textbf{The ground clip IS ground}: never connect the oscilloscope's ground clip to anything other than the circuit's ground. Connecting it to a non-ground point creates a short circuit from that point to earth ground through the oscilloscope's ground wire. This can damage the circuit, the oscilloscope, or both, and can create a shock hazard.
+
+\textbf{Differential measurement}: to measure the voltage between two non-ground points, use the oscilloscope's math function (Ch1 $-$ Ch2) with each channel referenced to ground. Alternatively, use a differential probe.
+
+\textbf{Probe compensation}: oscilloscope probes have a compensation adjustment (a small trimmer capacitor). Before making critical measurements, connect the probe to the oscilloscope's calibration output (1\,kHz square wave) and adjust the trimmer until the square wave has flat tops and sharp corners (no overshoot, no rounding). An uncompensated probe can introduce 5--20\% amplitude error and distort the waveform shape.
+
+\subsection*{Working with NI DAQ Equipment}
+\textbf{Input voltage limits}: the NI~USB-6001 analog inputs are rated for $\pm$10\,V with respect to the AI ground. Exceeding this range (applying 15\,V to an AI pin) can damage the ADC permanently. Before connecting any signal, measure it with a DMM and verify it is within the DAQ's input range.
+
+\textbf{Output current limits}: the digital outputs can provide approximately 3--5\,mA per pin. Do not drive LEDs, relays, or motors directly from the digital outputs; use a transistor or MOSFET driver (Chapter~13).
+
+\textbf{USB ground}: the DAQ's ground is connected to the computer's USB ground, which is connected to earth ground through the computer's power supply. Be aware of this ground path when connecting to external circuits, especially those with their own ground reference.
+
+\textbf{Software crashes during acquisition}: if LabVIEW crashes or the VI is stopped abruptly during a continuous acquisition, the DAQ may retain its last output state (digital outputs stay high, analog outputs stay at last voltage). Include a ``cleanup'' routine that sets all outputs to safe states when the VI stops (use the ``Error'' wire to trigger cleanup even on abnormal termination).
+
+\textbf{ESD protection}: the DAQ's analog inputs are sensitive to electrostatic discharge (ESD). Before handling the DAQ or connecting wires: touch a grounded metal surface to discharge static. In dry winter conditions (Colorado humidity $< 20\%$), ESD voltages can exceed 10\,kV, easily damaging semiconductor inputs.
+
+\section*{Fire Safety}
+\textbf{Lithium battery fires}: LiPo batteries can enter thermal runaway (self-sustaining exothermic reaction) if overcharged, short-circuited, or physically damaged. The resulting fire produces toxic fluorine gas and cannot be extinguished with water. Containment: a LiPo fire bag or a metal container with sand. Prevention: never charge unattended, always use a BMS, inspect for swelling before each use, and never puncture or crush.
+
+\textbf{Soldering iron safety}: the soldering iron tip reaches 350--400\,\degC{}. It can ignite paper, plastic, and clothing on contact. Always return the iron to its holder when not in use. Never leave a powered iron unattended. Keep the work area clear of flammable materials. The fumes from rosin flux are an irritant; use a fume extractor or work in a ventilated area.
+
+\textbf{Overheated components}: a component dissipating more power than it can shed (wrong resistor value, short circuit, insufficient heatsinking) becomes a burn hazard. If a component is too hot to touch ($> 60$\,\degC{}), turn off the circuit and investigate. A burning smell indicates a component is being destroyed; turn off immediately.
+
+\section*{Personal Protective Equipment (PPE)}
+\textbf{Safety glasses}: required whenever soldering, cutting, drilling, or working with pressurized fluids. Flying solder, metal chips, and fluid spray can cause permanent eye damage.
+
+\textbf{ESD wrist strap}: required when handling bare PCBs, ICs, and the DAQ. Connect the strap to a grounded point. This maintains your body at ground potential, preventing ESD damage to components.
+
+\textbf{Closed-toe shoes}: required in the lab at all times. Dropped tools, hot solder, and sharp components can injure exposed feet.
+
+\section*{Equipment Care and Lab Etiquette}
+\textbf{Power down before leaving}: turn off all power supplies, soldering irons, and instruments when you leave the lab. Verify that no equipment is left energized.
+
+\textbf{Clean your workspace}: return all tools, probes, and cables to their designated locations. Dispose of wire clippings, solder debris, and failed components in the appropriate bins (electronics waste, not regular trash).
+
+\textbf{Report damage immediately}: if you damage equipment (blown fuse, broken probe, cracked display), report it to the TA or instructor immediately. Do not hide the damage or leave it for the next group to discover.
+
+\textbf{Respect shared equipment}: do not modify shared instruments (change probe tips, alter settings). If you need a specific configuration, set it for your session and restore the default before leaving.
+
+\textbf{No food or drink at the lab bench}: liquids can short-circuit exposed electronics, and crumbs attract pests. Keep food and drink at the designated area away from equipment.

@@ -1,0 +1,335 @@
+% Chapter 13: Digital Filter Design
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Digital Filter Design}
+\label{ch:digital_filters}\index{filter!digital}\index{FIR filter}\index{IIR filter}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    step/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                 minimum width=2.5cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
+    dec/.style={diamond, draw=AccentTeal, thick, fill=AccentTeal!8, align=center,
+                font=\scriptsize\sffamily, inner sep=2pt, aspect=2.5},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+    yn/.style={font=\tiny\sffamily\bfseries, MinesBlue}
+]
+\node[step] (spec) at (0,0) {Define\\Specifications};
+\node[dec] (phase) at (3.5,0) {Linear phase\\required?};
+\node[step] (fir) at (7,1.2) {FIR Design\\(window method)};
+\node[step] (iir) at (7,-1.2) {IIR Design\\(Butterworth/Cheby)};
+\node[step] (impl) at (10.5,0) {Implement in\\LabVIEW};
+\node[step] (verify) at (13.5,0) {Verify with\\known signal};
+\draw[arr] (spec) -- (phase);
+\draw[arr] (phase) -- (fir) node[midway, yn, above] {Yes};
+\draw[arr] (phase) -- (iir) node[midway, yn, below] {No};
+\draw[arr] (fir) -| (impl);
+\draw[arr] (iir) -| (impl);
+\draw[arr] (impl) -- (verify);
+% Specs below
+\node[font=\tiny\sffamily, MinesSilver, align=center, text width=2.5cm] at (0,-1.4) {$f_{\text{pass}}$, $f_{\text{stop}}$,\\ripple, attenuation};
+\end{tikzpicture}
+\caption{Digital filter design workflow. Start by specifying the passband, stopband, and required performance. Choose FIR if linear phase (pulse shape preservation) is needed; choose IIR if sharper cutoff with fewer coefficients is the priority. Always verify the implemented filter against a known signal before using it on measurement data.}
+\label{fig:filter_workflow}
+\end{figure}
+
+\section{Why Digital Filters?}
+Digital filters operate on sampled data in software or firmware. Advantages over analog: perfectly repeatable, easily modified by changing coefficients, no component drift, can implement filter shapes that are impractical in analog (e.g., linear phase, very high order).
+
+\section{FIR Filters (Finite Impulse Response)}
+A FIR filter computes the output as a weighted sum of the current and past $M$ input samples:
+\begin{equation}
+y[n] = \sum_{k=0}^{M} b_k \cdot x[n-k]
+\end{equation}
+\textbf{Moving average} is the simplest FIR filter: all $b_k = 1/(M+1)$. It smooths noise but smears transients. A moving average of $N$ points reduces random noise by $\sqrt{N}$.
+
+FIR filters can be designed with \textbf{exactly linear phase} (symmetric coefficients), which preserves signal shape. They are always stable.
+
+\section{IIR Filters (Infinite Impulse Response)}
+An IIR filter uses feedback (past output values):
+\begin{equation}
+y[n] = \sum_{k=0}^{M} b_k \cdot x[n-k] - \sum_{k=1}^{N} a_k \cdot y[n-k]
+\end{equation}
+IIR filters achieve sharper roll-off with fewer coefficients than FIR, but they have nonlinear phase and can be unstable if poorly designed. Digital implementations of Butterworth, Chebyshev, and Bessel filters are IIR.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    col/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                minimum width=5.5cm, minimum height=4.5cm, align=left, font=\scriptsize\sffamily,
+                inner sep=8pt, text width=5cm},
+]
+\node[col] (fir) at (0,0) {
+\textbf{\color{MinesBlue}FIR (Finite Impulse Response)}\\[4pt]
+$y[n] = \sum_{k=0}^{M} b_k x[n-k]$\\[4pt]
+\textcolor{AccentTeal}{\checkmark} Always stable\\
+\textcolor{AccentTeal}{\checkmark} Linear phase (symmetric)\\
+\textcolor{AccentTeal}{\checkmark} Easy to design\\
+\textcolor{WarnOrange}{$\times$} Many coefficients needed\\
+\textcolor{WarnOrange}{$\times$} Higher computational cost\\[2pt]
+\textit{Use for:} pulse shape preservation
+};
+\node[col] (iir) at (7,0) {
+\textbf{\color{MinesBlue}IIR (Infinite Impulse Response)}\\[4pt]
+$y[n] = \sum b_k x[n\!-\!k] - \sum a_k y[n\!-\!k]$\\[4pt]
+\textcolor{AccentTeal}{\checkmark} Sharp cutoff, few coefficients\\
+\textcolor{AccentTeal}{\checkmark} Lower computational cost\\
+\textcolor{AccentTeal}{\checkmark} Matches analog prototypes\\
+\textcolor{WarnOrange}{$\times$} Can be unstable\\
+\textcolor{WarnOrange}{$\times$} Nonlinear phase\\[2pt]
+\textit{Use for:} anti-aliasing, noise rejection
+};
+\node[font=\large\sffamily\bfseries, MinesSilver] at (3.5,0) {vs.};
+\end{tikzpicture}
+\caption{FIR vs.\ IIR digital filters. Choose FIR when signal shape must be preserved (linear phase). Choose IIR when sharp frequency selectivity is needed with low computational overhead.}
+\label{fig:fir_iir}
+\end{figure}
+
+\begin{tipbox}[FIR vs.\ IIR Decision]
+Use FIR when: linear phase is required (preserving pulse shape), stability is critical, or the filter order is manageable ($<$100 taps). Use IIR when: sharp cutoff is needed with minimal computation, phase distortion is acceptable, or you are implementing a digital equivalent of a known analog filter.
+\end{tipbox}
+
+\section{Practical Digital Filtering in LabVIEW}
+LabVIEW provides the \texttt{Filter Express VI} (interactive design) and the \texttt{IIR/FIR Filter Design} toolkit (programmatic). Specify: filter type (LP/HP/BP/BS), response (Butterworth/Chebyshev/Bessel), order, and cutoff frequency. The VI outputs filtered data; apply it to your DAQ signal chain.
+
+
+\section{Advantages of Digital Filters}
+Exact coefficients (no component tolerances), easy parameter changes in software, can implement impractical analog types (perfect linear phase, adaptive), no drift, can process stored data offline. Limitation: cannot undo aliasing.
+
+\section{Moving Average Filter}
+$y[n] = (1/M)\sum_{k=0}^{M-1}x[n-k]$. FIR with all coefficients $= 1/M$. Bandwidth $\approx 0.44 f_s/M$. Nulls at $f_s/M$ and multiples. Excellent for smoothing slowly varying signals. Poor frequency selectivity. In LabVIEW: shift register + Mean function, or Filter Express VI with Smoothing.
+
+\section{FIR Filter Design}
+Design by windowing: specify ideal response, compute inverse DFT (sinc for LP), truncate to $M$ points, multiply by window (Hamming, Blackman, Kaiser). Window choice determines transition width vs.\ stopband attenuation tradeoff.
+
+Order $M$ determines sharpness. Estimate: $M \approx 3.3/(\Delta f/f_s)$ for Hamming window. Group delay: $M/2$ samples. A symmetric FIR has exactly linear phase, preserving transient shapes.
+
+\section{IIR Filter Design}
+$y[n] = \sum b_k x[n-k] - \sum a_k y[n-k]$. Feedback gives efficiency: a 4th-order Butterworth needs only 9 coefficients (vs.\ 100+ FIR taps). Design: analog prototype $\to$ bilinear transform $\to$ digital coefficients. Implement as cascaded biquad sections for numerical stability.
+
+\begin{warningbox}[Fixed-Point Stability]
+On MCUs without FPU, IIR coefficients quantized to 16-bit integers can cause instability for $Q > 10$ or cutoff $< f_s/100$. Always simulate with actual precision before deploying.
+\end{warningbox}
+
+\section{Selection Guide}
+Smooth noisy DC data $\to$ moving average. Sharp cutoff $\to$ IIR Butterworth/Chebyshev. Preserve pulse shape $\to$ FIR linear phase or IIR Bessel. Remove single frequency $\to$ IIR notch. Adaptive $\to$ FIR LMS (advanced).
+
+
+\section{Implementation in LabVIEW}
+LabVIEW provides several digital filter options. The \textbf{Filter Express VI} offers one-click configuration: select filter type (LP, HP, BP, BS), response (Butterworth, Chebyshev, Bessel, Elliptic), order, and cutoff frequency. It processes the entire waveform in one call.
+
+For real-time filtering (one sample at a time in a control loop), use the \textbf{IIR Filter with Initialize} or implement the filter manually using shift registers. The manual approach provides explicit control over filter state initialization, anti-windup interaction, and coefficient precision.
+
+\subsection{Filter Testing Methodology}
+Test your digital filter with known inputs: (1) Apply a step function (constant array) to verify DC gain and settling behavior. (2) Apply a sine wave at the cutoff frequency to verify the $-3$\,dB attenuation. (3) Apply a sine wave at $10\times$ cutoff to verify stopband rejection. (4) Apply white noise and verify the output spectrum shows the expected rolloff.
+
+\section{Decimation and Interpolation Filters}
+When reducing sample rate (decimation), a digital LP filter at the new Nyquist frequency must precede the sample-rate reduction to prevent aliasing. This ``decimation filter'' is typically implemented as an FIR filter. For efficient multistage decimation (e.g., 100:1), cascade several smaller decimation stages (e.g., 10:1 $\to$ 10:1), each with its own anti-alias filter. This requires fewer total filter taps than a single-stage approach.
+
+\section{Adaptive Filters (Overview)}
+Adaptive filters automatically adjust their coefficients to minimize an error signal. The Least Mean Squares (LMS) algorithm is the simplest: $w[n+1] = w[n] + \mu \cdot e[n] \cdot x[n]$, where $\mu$ is the step size. Applications: noise cancellation (use a reference noise signal to adaptively subtract noise from the measurement), echo cancellation, and system identification. While beyond the scope of MEGN 300 labs, understanding that such filters exist prepares you for graduate-level signal processing.
+\section{Detailed FIR Design Example}
+Design a 50-tap FIR low-pass filter with cutoff at 100\,Hz for data sampled at 1\,kS/s.
+
+\textbf{Step 1}: normalized cutoff $f_c/f_N = 100/500 = 0.2$ (where $f_N = f_s/2$).
+
+\textbf{Step 2}: the ideal LP impulse response is a sinc function: $h[n] = \sin(2\pi \times 0.2 \times (n - 25))/((\pi(n-25))$ for $n = 0, \ldots, 49$ (centered at $n = 25$ for a 50-tap filter).
+
+\textbf{Step 3}: apply a Hamming window: $w[n] = 0.54 - 0.46\cos(2\pi n/49)$. The windowed coefficients are $b[n] = h[n] \times w[n]$.
+
+\textbf{Step 4}: normalize so the DC gain is unity: divide all $b[n]$ by their sum.
+
+The resulting filter has a $-3$\,dB cutoff at approximately 100\,Hz, transition bandwidth of $\sim$40\,Hz (80--120\,Hz), and stopband rejection of $\sim$$-53$\,dB (Hamming window property). The group delay is exactly 25 samples (2.5\,ms at 1\,kS/s).
+
+In LabVIEW, this entire design is accomplished by the ``FIR Windowed Coefficients'' VI: specify the sampling rate, cutoff frequency, number of taps, and window type. The VI outputs the coefficient array, which you wire to the ``FIR Filter'' VI.
+
+\section{IIR Biquad Implementation}
+The biquad (second-order section) is the building block of IIR filter implementation:
+\begin{equation}
+H(z) = \frac{b_0 + b_1 z^{-1} + b_2 z^{-2}}{1 + a_1 z^{-1} + a_2 z^{-2}}
+\end{equation}
+The difference equation:
+\begin{equation}
+y[n] = b_0 x[n] + b_1 x[n-1] + b_2 x[n-2] - a_1 y[n-1] - a_2 y[n-2]
+\end{equation}
+
+Implementation in LabVIEW or C requires two memory locations (shift registers or variables) for past inputs ($x[n-1]$, $x[n-2]$) and two for past outputs ($y[n-1]$, $y[n-2]$). A 4th-order filter uses two cascaded biquads, each with its own set of 5 coefficients ($b_0, b_1, b_2, a_1, a_2$). The biquad cascade is numerically more stable than a single high-order section because each biquad's coefficients are close to 1.0, minimizing quantization sensitivity.
+
+\subsection{Direct Form II Transposed}
+For floating-point implementation, the Direct Form II Transposed structure provides the best numerical properties. Instead of separate input and output delay lines, it uses a single state vector:
+\begin{verbatim}
+  y[n] = b0*x[n] + s1
+  s1 = b1*x[n] - a1*y[n] + s2
+  s2 = b2*x[n] - a2*y[n]
+\end{verbatim}
+This requires only two state variables per biquad section, minimizing memory and maximizing numerical precision.
+
+\section{Real-Time Filtering in Control Loops}
+When a digital filter is used inside a control loop (e.g., filtering the sensor signal before feeding it to the PID controller), the filter introduces delay that affects control stability.
+
+\textbf{FIR delay}: an $M$-tap FIR introduces exactly $M/2$ samples of group delay. For $M = 50$ at 1\,kS/s: 25\,ms delay. At the controller's crossover frequency, this delay contributes phase lag: $\phi = 360 \times f \times 0.025$ degrees. At $f = 10$\,Hz: $\phi = 90^\circ$, which is likely to destabilize the loop.
+
+\textbf{IIR delay}: varies with frequency. A 2nd-order Butterworth at $f_c = 100$\,Hz introduces approximately 3\,ms of group delay at 10\,Hz (much less than the equivalent FIR). This is why IIR filters are preferred in control applications where phase delay matters.
+
+\textbf{Design rule}: the filter's group delay at the controller's crossover frequency should contribute less than $20^\circ$ of phase lag. For a 10\,Hz crossover: max delay $= 20/(360 \times 10) = 5.6$\,ms. A 2nd-order IIR at $f_c = 50$\,Hz easily meets this; a 50-tap FIR at 1\,kS/s does not.
+
+\section{Notch Filter Design}
+A notch (band-reject) filter removes a single frequency. The second-order IIR notch:
+\begin{equation}
+H(z) = \frac{1 - 2\cos(\omega_0 T_s)z^{-1} + z^{-2}}{1 - 2r\cos(\omega_0 T_s)z^{-1} + r^2 z^{-2}}
+\end{equation}
+where $\omega_0 = 2\pi f_{\text{notch}}$ and $r$ controls the notch width (typical: $r = 0.95$--$0.99$; closer to 1 = narrower notch). For 60\,Hz rejection at $f_s = 1000$\,S/s: $\omega_0 T_s = 2\pi \times 60/1000 = 0.3770$\,rad.
+
+Cascading two notch filters (at 60\,Hz and 120\,Hz) removes the fundamental and first harmonic of mains interference. Three notches (60, 120, 180\,Hz) handle most situations.
+
+\section{Comb Filters}
+A comb filter rejects a fundamental frequency and all its harmonics simultaneously:
+\begin{equation}
+H(z) = \frac{1 - z^{-D}}{1 - \alpha z^{-D}}
+\end{equation}
+where $D = f_s/f_{\text{fundamental}}$ (must be an integer) and $\alpha$ controls the notch width. For rejecting 60\,Hz and all harmonics at $f_s = 600$\,S/s: $D = 10$. The filter has nulls at 60, 120, 180, \ldots, 300\,Hz. This is more efficient than cascading individual notch filters. The tradeoff: it also removes any real signal content at these frequencies.
+\section{Comparison: LabVIEW Filter VIs}
+LabVIEW offers several filtering VIs, each suited to different applications:
+
+\textbf{Filter Express VI}: one-click configuration (type, response, order, cutoff). Processes the entire waveform in one call. Best for: offline analysis of acquired data, quick prototyping.
+
+\textbf{IIR Filter VI}: takes a waveform and returns a filtered waveform. Supports Butterworth, Chebyshev, Bessel, and Elliptic responses. Offers ``reverse filtering'' option that applies the filter forward and backward, canceling phase distortion (zero-phase filtering, only for offline data).
+
+\textbf{FIR Windowed Filter VI}: generates and applies an FIR filter. Specify taps, cutoff, window type. Best for: linear-phase requirements, real-time filtering with known group delay.
+
+\textbf{Median Filter VI}: replaces each sample with the median of the surrounding $N$ samples. Excellent for removing spike noise (salt-and-pepper noise) while preserving edges. Not a frequency-domain filter; useful for preprocessing before FFT or control.
+
+\textbf{Savitzky-Golay Filter}: fits a local polynomial to each data neighborhood. Smooths noise while preserving peak shapes and widths. Widely used in chromatography and spectroscopy. Available in LabVIEW's Signal Processing palette.
+
+\section{Filter Transient Behavior}
+Every digital filter has a startup transient: the output is invalid for the first $M$ samples (where $M$ is the filter order for IIR or the number of taps for FIR). During this time, the filter's internal state is filling with data. Discard (or ignore) the first $M$ output samples. In a control loop, initialize the filter states with the first measured value (not zero) to minimize the startup transient.
+
+For IIR filters, the transient decays exponentially with a time constant related to the pole locations. A narrow-band IIR filter (low cutoff relative to $f_s$, or high $Q$) has a long transient that can persist for hundreds of samples. Plan your acquisition duration to include the transient plus the required steady-state data.
+\section{Zero-Phase Filtering}
+Conventional (causal) digital filters introduce phase distortion: different frequencies experience different delays. For time-domain analysis (peak detection, rise time measurement, waveform comparison), this phase distortion can be problematic. \textbf{Zero-phase filtering} eliminates phase distortion by applying the filter twice: once forward and once backward (time-reversed). The magnitude response is squared (doubled in dB), but the phase distortion cancels exactly.
+
+In LabVIEW, enable ``Reverse Filtering'' in the IIR Filter VI options. In MATLAB: \texttt{filtfilt(b,a,x)}. Important: zero-phase filtering is only possible for offline data (you need the entire signal before filtering). It cannot be used in real-time control because the backward pass requires future samples.
+
+\section{Implementing Filters on Microcontrollers}
+For embedded systems (ESP32, Arduino, STM32) without floating-point units, digital filters must be implemented in fixed-point arithmetic. Key considerations:
+
+\textbf{Coefficient quantization}: round filter coefficients to the available precision (typically 16 or 32 bits). Simulate the quantized filter and verify that the frequency response still meets specifications and that no instability occurs.
+
+\textbf{Overflow protection}: intermediate calculations can exceed the word size. Use 32-bit accumulators for 16-bit data, or saturating arithmetic that clips at the maximum value instead of wrapping around.
+
+\textbf{Execution time}: each filter tap requires one multiply-accumulate (MAC) operation. A 50-tap FIR at 10\,kS/s requires 500,000 MACs/s. An ARM Cortex-M4 at 168\,MHz executes $\sim$168 million MACs/s (with DSP instructions), leaving ample headroom. An 8-bit AVR at 16\,MHz can manage $\sim$4 million MACs/s, limiting filter complexity.
+
+\textbf{Circular buffer}: the shift register for past samples is efficiently implemented as a circular buffer (ring buffer): a fixed-size array with a pointer that wraps around, avoiding the need to physically shift data.
+
+\section{Practical Filter Selection Flowchart}
+(1) Is the signal DC or slowly varying ($f < 1$\,Hz)? $\to$ Moving average ($M = 10$--100).
+
+(2) Do you need sharp frequency cutoff? $\to$ IIR Butterworth (default) or Chebyshev (maximum sharpness).
+
+(3) Is pulse shape or rise time critical? $\to$ FIR with linear phase.
+
+(4) Do you need to remove 60\,Hz without affecting other frequencies? $\to$ IIR notch at 60\,Hz ($r = 0.97$).
+
+(5) Do you need to remove 60\,Hz and all harmonics? $\to$ Comb filter ($D = f_s/60$).
+
+(6) Is the noise source unknown or changing? $\to$ Adaptive FIR (LMS) with a reference noise signal.
+
+(7) Is the filter inside a feedback control loop? $\to$ Low-order IIR (2nd order max) to minimize phase lag.
+\section{Windowed FIR Design: Detailed Procedure}
+The windowed FIR design method is the most intuitive and widely used approach:
+
+\textbf{Step 1: Specify the ideal frequency response.} For a low-pass filter with cutoff $f_c$ (normalized to $f_N = f_s/2$): $H_d(f) = 1$ for $|f| \leq f_c$, $H_d(f) = 0$ for $|f| > f_c$.
+
+\textbf{Step 2: Compute the ideal impulse response.} The inverse Fourier transform of the ideal rectangular frequency response is a sinc function: $h_d[n] = \sin(2\pi f_c (n - M/2)) / (\pi(n - M/2))$ for $n = 0, 1, \ldots, M$, where $M$ is the filter order (number of taps minus 1). At $n = M/2$: $h_d[M/2] = 2f_c$ (by L'H\^opital's rule).
+
+\textbf{Step 3: Apply the window.} Multiply the truncated impulse response by a window function: $h[n] = h_d[n] \cdot w[n]$. The window tapers the coefficients to zero at the ends, which suppresses the sidelobes in the frequency response (at the cost of widening the transition band).
+
+\textbf{Step 4: Normalize.} Divide all coefficients by their sum to ensure unity DC gain: $h_{\text{norm}}[n] = h[n] / \sum_k h[k]$.
+
+\subsection{Window Function Selection}
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\textwidth}{l X c c}
+\toprule
+\textbf{Window} & \textbf{Characteristics} & \textbf{Min.\ stopband (dB)} & \textbf{Trans.\ BW ($\times f_s/M$)} \\
+\midrule
+Rectangular & Narrowest main lobe, worst sidelobes & $-21$ & 0.9 \\
+Hamming & Good all-around choice & $-53$ & 3.3 \\
+Hanning & Slightly wider, better sidelobes & $-44$ & 3.1 \\
+Blackman & Excellent sidelobes, wide transition & $-74$ & 5.5 \\
+Kaiser ($\beta = 8$) & Adjustable tradeoff via $\beta$ & $-80$ & 5.0 \\
+\bottomrule
+\end{tabularx}
+\caption{FIR window function comparison. Transition bandwidth determines the minimum filter order needed for a given sharpness.}
+\end{table}
+
+The Kaiser window is the most versatile: the parameter $\beta$ adjusts the sidelobe-to-mainlobe tradeoff continuously. For a target stopband attenuation $A_s$ (dB): $\beta = 0.1102(A_s - 8.7)$ for $A_s > 50$\,dB. The required order: $M = (A_s - 8)/(2.285 \times \Delta\omega)$ where $\Delta\omega = 2\pi\Delta f/f_s$ is the normalized transition width.
+
+\section{Equiripple (Parks-McClellan) FIR Design}
+For demanding applications, the Parks-McClellan algorithm designs an FIR filter that minimizes the maximum error between the desired and actual frequency response (minimax criterion). This produces an equiripple response: the error oscillates with equal amplitude across both the passband and stopband.
+
+Advantages over windowed design: for a given filter order, the equiripple design achieves either narrower transition band or greater stopband rejection. The improvement is significant for high-order filters ($M > 50$).
+
+In MATLAB: \texttt{b = firpm(M, [0 fp fs 1], [1 1 0 0])} where \texttt{fp} is the passband edge and \texttt{fs} is the stopband edge (both normalized to Nyquist). In LabVIEW: the ``Equiripple FIR'' VI in the Signal Processing palette.
+
+\begin{advancedbox}{Multirate Filter Structures and Adaptive Filtering}
+The following sections on multirate filters, adaptive LMS filtering, and Hilbert transform filters are advanced topics included for completeness. They are not required for MEGN~300 exams or lab reports.
+\end{advancedbox}
+\section{Multirate Filter Structures}
+\subsection{Polyphase Decomposition}
+For efficient decimation, the FIR filter can be decomposed into $M$ polyphase subfilters, each operating at the lower output rate. This reduces computation by exactly $M\times$ compared to filtering at the input rate and then discarding samples. The polyphase structure is the standard implementation in commercial DAQ systems and audio equipment.
+
+\subsection{Cascaded Integrator-Comb (CIC) Filter}
+A computationally efficient decimation filter that requires no multiplications (only additions and subtractions). The CIC consists of $N$ integrator stages followed by $N$ comb (differentiator) stages with a rate change between them. The frequency response has a sinc$^N$ shape, providing good rejection of aliased components near multiples of the output rate. CIC filters are the first stage of decimation in sigma-delta ADCs, reducing the sample rate by factors of 32--256 before a more precise FIR filter handles the final shaping.
+
+\section{Adaptive Filtering: The LMS Algorithm}
+The Least Mean Squares (LMS) adaptive filter automatically adjusts its coefficients to minimize the error between its output and a desired signal. The update rule:
+\begin{equation}
+\mathbf{w}[n+1] = \mathbf{w}[n] + \mu \cdot e[n] \cdot \mathbf{x}[n]
+\end{equation}
+where $\mathbf{w}$ is the coefficient vector, $\mu$ is the step size (learning rate), $e[n] = d[n] - y[n]$ is the error, and $\mathbf{x}$ is the input vector.
+
+The most common application: \textbf{noise cancellation}. A reference microphone captures the ambient noise. The adaptive filter models the acoustic path from the noise source to the primary microphone. The filter's output is subtracted from the primary signal, canceling the noise while preserving the desired signal. This is the technology behind noise-canceling headphones.
+
+In instrumentation, adaptive filtering can cancel vibration interference, remove 60\,Hz hum using a reference from the power line, or compensate for time-varying sensor characteristics.
+\section{Real-Time Filter Implementation Checklist}
+Before deploying a digital filter in a control or monitoring system, verify:
+
+(1) \textbf{Coefficient precision}: simulate the filter with the actual numerical precision of the target platform (32-bit float, 64-bit double, or 16-bit fixed). Compare the frequency response to the ideal design. If the response deviates: use biquad cascade (not direct form), increase precision, or redesign with less aggressive specifications.
+
+(2) \textbf{Initialization}: set the filter state (shift register values) to the first sample value, not zero. Initializing to zero causes a startup transient as the filter ``fills'' with data. Initializing to the first sample assumes the signal was at this value for all past time, which produces a much smaller transient.
+
+(3) \textbf{Overflow}: for fixed-point, verify that intermediate accumulator values do not exceed the word size. Use saturation arithmetic (clip at max/min) rather than wraparound arithmetic (which produces catastrophic sign flips).
+
+(4) \textbf{Latency}: measure the actual output delay from input change to output response. For FIR: exactly $M/2$ samples. For IIR: frequency-dependent (measure at the frequency of interest).
+
+(5) \textbf{Computational load}: measure the execution time of the filter operation. Verify it completes within the sample period ($T_s = 1/f_s$). If not: reduce the filter order, increase the sample period, or use a faster processor.
+
+\section{Filter Banks}
+A \textbf{filter bank} splits a signal into multiple frequency bands, each processed independently. The octave filter bank (used in acoustic measurement and vibration analysis) divides the spectrum into bands whose bandwidth is proportional to center frequency: 1\,Hz band at 1\,Hz, 10\,Hz band at 10\,Hz, 100\,Hz band at 100\,Hz, etc. This matches human perception (which is logarithmic in frequency) and the characteristics of many physical processes.
+
+In MEGN~300, filter banks are encountered in the context of 1/3-octave analysis for noise measurement (ANSI S1.11) and vibration severity assessment (ISO 10816). LabVIEW's Sound and Vibration Toolkit includes octave analysis VIs.
+
+\section{Hilbert Transform Filter}
+A Hilbert transform filter produces a 90-degree phase shift at all frequencies, converting a cosine to a sine (and vice versa) without changing the amplitude. Combined with the original signal, it produces the \textbf{analytic signal}, whose magnitude is the instantaneous envelope and whose phase derivative is the instantaneous frequency.
+
+FIR implementation: the ideal Hilbert transform impulse response is $h[n] = 2\sin^2(\pi n/2)/(\pi n)$ for $n \neq 0$, $h[0] = 0$. Truncate and window (like any FIR design). Typical order: 31--63 taps.
+
+Application in instrumentation: envelope detection for bearing fault diagnosis, demodulation of AM signals, and instantaneous frequency tracking for speed-varying machinery.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Design a 10-point moving average filter for a signal sampled at 1\,kS/s. What is the effective cutoff frequency? By how much does it reduce random noise?
+\item Explain why a moving average filter is poor at removing a specific frequency (like 60\,Hz) compared to a notch filter.
+\item You need a digital low-pass filter with a cutoff of 100\,Hz, linear phase, and a sampling rate of 10\,kS/s. Would you choose FIR or IIR? Why?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item A 10-point moving average has its first null at $f_s/N = 1000/10 = 100$\,Hz. The $-3$\,dB frequency is approximately $0.443 \times f_s/N = 44.3$\,Hz. Noise reduction: $\sqrt{10} = 3.16\times$ ($10$\,dB).
+\item A moving average has a $\sin(x)/x$ frequency response with broad, shallow notches at multiples of $f_s/N$. Unless $f_s/N$ happens to equal exactly 60\,Hz, the 60\,Hz component is only partially attenuated. A notch filter, by contrast, has a very narrow, deep rejection specifically at 60\,Hz (and its harmonics if designed correctly).
+\item FIR. The linear-phase requirement rules out IIR filters, which inherently have nonlinear phase. A FIR filter with symmetric coefficients provides exactly linear phase. At $f_s = 10$\,kS/s with $f_c = 100$\,Hz, the filter will need many taps (perhaps 200--500 for a sharp cutoff), but this is computationally feasible in LabVIEW on a modern PC.
+\end{enumerate}
+
+
+% ################################################################
+% PART III: ELECTRONICS FOR INSTRUMENTATION
+% ################################################################

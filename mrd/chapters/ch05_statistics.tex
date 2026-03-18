@@ -1,0 +1,254 @@
+% Chapter 5: Statistics and Experimental Data Analysis
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Statistics and Experimental Data Analysis}
+\label{ch:stats}\index{statistics!descriptive}\index{confidence interval}\index{hypothesis testing}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={Measurement Value}, ylabel={Probability Density},
+    xmin=-4, xmax=4, ymin=0, ymax=0.45,
+    axis lines=left, axis line style={MinesBlue},
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    xtick={-3,-2,-1,0,1,2,3},
+    xticklabels={$\bar{x}-3s$,$\bar{x}-2s$,$\bar{x}-s$,$\bar{x}$,$\bar{x}+s$,$\bar{x}+2s$,$\bar{x}+3s$},
+    xticklabel style={font=\tiny\sffamily},
+    ytick=\empty,
+]
+% Full normal curve
+\addplot[domain=-4:4, samples=200, thick, MinesBlue] {exp(-x^2/2)/sqrt(2*pi)};
+% 95% CI shading
+\addplot[domain=-1.96:1.96, samples=100, fill=AccentTeal!25, draw=none] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+% 68% CI shading (darker)
+\addplot[domain=-1:1, samples=100, fill=MinesBlue!20, draw=none] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+% Annotations
+\draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, AccentTeal, thick] (-1.96,-0.04) -- (1.96,-0.04);
+\node[font=\scriptsize\sffamily\bfseries, AccentTeal] at (0,-0.07) {95\% CI ($\pm 1.96s$)};
+\draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, MinesBlue, thick] (-1,-0.1) -- (1,-0.1);
+\node[font=\scriptsize\sffamily, MinesBlue] at (0,-0.13) {68\% ($\pm 1s$)};
+% Mean line
+\addplot[dashed, WarnOrange, thin] coordinates {(0,0) (0,0.4)};
+\node[font=\scriptsize\sffamily, WarnOrange] at (axis cs:0.5,0.42) {$\bar{x}$ (mean)};
+\end{axis}
+\end{tikzpicture}
+\caption{Normal (Gaussian) distribution showing the 68\% ($\pm 1s$) and 95\% ($\pm 1.96s$) confidence intervals. For MEGN~300 reporting, always use the 95\% CI: $\bar{x} \pm t_{0.025,\nu} \cdot s/\sqrt{n}$.}
+\label{fig:normal_dist}
+\end{figure}
+
+\section{Why Statistics Matters for Engineers}
+Every measurement contains noise. Every experiment has limited sample size. Every conclusion drawn from data carries a probability of being wrong. Statistics provides the mathematical framework for quantifying these realities, making honest claims about measurement quality, and designing experiments that efficiently answer engineering questions. This chapter covers the statistical tools most directly applicable to MEGN~300 laboratory work.
+
+\section{Descriptive Statistics}
+\subsection{Measures of Central Tendency}
+The \textbf{arithmetic mean} $\bar{x} = (1/N)\sum x_i$ is the best estimate of the true value when errors are symmetric and random. It minimizes the sum of squared deviations from the data.
+
+The \textbf{median} is the middle value when data is sorted. It is robust to outliers: a single extreme measurement shifts the mean but barely affects the median. Use the median when you suspect outliers or when the data distribution is skewed.
+
+The \textbf{mode} is the most frequently occurring value. It is primarily useful for categorical data or for identifying the peak of a multi-modal distribution (which may indicate two distinct populations in the data, such as measurements taken before and after a calibration shift).
+
+\subsection{Measures of Spread}
+The \textbf{sample standard deviation} $s = \sqrt{(1/(N-1))\sum(x_i - \bar{x})^2}$ quantifies the typical scatter of individual measurements. It has the same units as the data.
+
+The \textbf{range} (max $-$ min) is the simplest measure of spread but is sensitive to outliers and increases with sample size. It is useful for quick quality checks but should not be used for formal uncertainty analysis.
+
+The \textbf{interquartile range (IQR)} = Q3 $-$ Q1 (75th percentile minus 25th percentile) is a robust measure of spread. Data points more than 1.5$\times$IQR beyond Q1 or Q3 are conventionally classified as outliers.
+
+\subsection{Standard Error of the Mean}
+The standard error $\text{SE} = s/\sqrt{N}$ quantifies the uncertainty of the \emph{mean}, not of individual measurements. While individual measurements scatter by $\pm s$, the mean is known to within $\pm s/\sqrt{N}$. This is why averaging improves measurement quality: 100 measurements reduce the uncertainty of the mean by $\sqrt{100} = 10\times$ compared to a single measurement.
+
+\section{Probability Distributions in Instrumentation}
+\subsection{Normal (Gaussian) Distribution}
+The most important distribution in measurement science. Random errors from many independent sources combine to produce a normal distribution (Central Limit Theorem). Properties: symmetric, bell-shaped, fully characterized by mean $\mu$ and standard deviation $\sigma$. 68.3\% of data falls within $\pm 1\sigma$, 95.4\% within $\pm 2\sigma$, 99.7\% within $\pm 3\sigma$.
+
+In instrumentation, the normal distribution models: thermal noise voltages, repeated measurement scatter, calibration residuals, and manufacturing tolerances. When a datasheet specifies ``accuracy: $\pm$1\% (3$\sigma$),'' it means 99.7\% of units meet the specification, but 0.3\% may exceed it.
+
+\subsection{Uniform (Rectangular) Distribution}
+Equal probability across the range $[a, b]$. Mean $= (a+b)/2$. Standard deviation $= (b-a)/\sqrt{12}$. In instrumentation, the uniform distribution models: quantization error ($\pm$0.5\,LSB), rounding error, and manufacturer specifications when no distribution information is given. Per GUM convention, when a datasheet says ``$\pm a$'' with no further information, assume a rectangular distribution: $u = a/\sqrt{3}$.
+
+\subsection{Student's t-Distribution}
+When estimating the mean from a small sample ($N < 30$), the normal distribution underestimates the tails. The $t$-distribution, with $\nu = N-1$ degrees of freedom, provides wider confidence intervals that account for the uncertainty in estimating $\sigma$ from $s$. As $N \to \infty$, $t \to$ normal. For $N = 5$: the 95\% $t$-factor is 2.78 (vs.\ 1.96 for normal). For $N = 10$: 2.26. For $N = 30$: 2.04.
+
+\subsection{Chi-Squared Distribution}
+The distribution of the sample variance $s^2$ scaled by $(N-1)/\sigma^2$. Used to construct confidence intervals for the variance itself and for goodness-of-fit testing. In MEGN~300, you encounter it when assessing whether the scatter in your calibration data is consistent with the claimed sensor accuracy.
+
+\section{Confidence Intervals}
+A confidence interval provides a range within which the true value is expected to lie with a specified probability. The 95\% confidence interval for the mean:
+\begin{equation}
+\bar{x} \pm t_{0.975, N-1} \cdot \frac{s}{\sqrt{N}}
+\end{equation}
+where $t_{0.975, N-1}$ is the critical value from the $t$-distribution.
+
+\begin{examplebox}[ThermoRig: Confidence Interval for Calibration]
+At the 50\,\degC{} calibration point, 10 measurements yield: mean $= 50.12$\,\degC{}, $s = 0.18$\,\degC{}. The 95\% CI: $50.12 \pm 2.262 \times 0.18/\sqrt{10} = 50.12 \pm 0.13$\,\degC{}. We are 95\% confident that the true mean reading at 50\,\degC{} is between 50.00 and 50.25\,\degC{}. The 0.12\,\degC{} offset from the true value (50.00\,\degC{}) is the systematic calibration residual.
+\end{examplebox}
+
+\section{Hypothesis Testing}
+\subsection{The t-Test}
+The most common hypothesis test in engineering: is the mean of a dataset significantly different from a reference value (one-sample $t$-test), or are the means of two datasets significantly different from each other (two-sample $t$-test)?
+
+\textbf{One-sample $t$-test}: test statistic $t = (\bar{x} - \mu_0)/(s/\sqrt{N})$ where $\mu_0$ is the hypothesized value. If $|t| > t_{\text{critical}}$, the difference is statistically significant (reject the null hypothesis that the mean equals $\mu_0$).
+
+\textbf{Two-sample $t$-test}: compares two independent groups. Test statistic:
+\begin{equation}
+t = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{s_1^2/N_1 + s_2^2/N_2}}
+\end{equation}
+Use this to determine whether two measurement methods give significantly different results, whether a design change significantly affected performance, or whether two batches of sensors have different characteristics.
+
+\subsection{p-Values}
+The $p$-value is the probability of observing a test statistic at least as extreme as the one computed, assuming the null hypothesis is true. Convention: $p < 0.05$ (5\% significance level) is considered statistically significant. $p < 0.01$ is highly significant. $p > 0.1$ is not significant.
+
+\begin{warningbox}[Statistical Significance vs.\ Practical Significance]
+A statistically significant result is not necessarily practically important. With enough data ($N = 10{,}000$), even a 0.001\,\degC{} difference between two sensors is statistically significant ($p < 0.05$). But if your accuracy requirement is $\pm$1\,\degC{}, this difference is irrelevant. Always evaluate whether the observed effect size matters for your application, not just whether $p < 0.05$.
+\end{warningbox}
+
+\section{Regression Analysis}
+\subsection{Linear Regression}
+Fitting a straight line $y = mx + b$ to calibration data using least-squares minimization:
+\begin{equation}
+m = \frac{N\sum x_i y_i - \sum x_i \sum y_i}{N\sum x_i^2 - (\sum x_i)^2}, \qquad b = \bar{y} - m\bar{x}
+\end{equation}
+The \textbf{coefficient of determination} $R^2$ measures the fraction of variance in $y$ explained by the linear model. $R^2 = 1$: perfect fit. $R^2 = 0$: no linear relationship. For sensor calibrations, $R^2 > 0.999$ is typical for linear sensors (RTDs, LVDTs). $R^2 < 0.99$ suggests nonlinearity requiring a polynomial model.
+
+\subsection{Residual Analysis}
+After fitting, plot the residuals $e_i = y_i - \hat{y}_i$ vs.\ $x_i$. If the model is correct, residuals should be randomly scattered around zero with no pattern. Systematic patterns indicate: curvature (need higher-order polynomial), heteroscedasticity (variance changes with $x$, requiring weighted regression), or outliers (bad data points requiring investigation).
+
+\subsection{Polynomial Regression}
+For nonlinear sensors (thermistors, thermocouples over wide ranges): fit $y = a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n$. Choose the minimum order $n$ that reduces residuals below the target accuracy. Overfitting (too many terms for the available data points) creates oscillations between data points and poor interpolation accuracy. A useful rule: $n < N/3$ (at least 3 data points per coefficient).
+
+\section{Outlier Detection and Treatment}
+Outliers are data points that deviate significantly from the rest. They may indicate: genuine extreme values (valid but rare), measurement errors (sensor glitch, operator mistake, recording error), or equipment malfunction (intermittent connection, ADC overflow).
+
+\textbf{Chauvenet's criterion}: reject a data point if the probability of observing a value that extreme (or more extreme) is less than $1/(2N)$. For $N = 10$: reject if the point is more than 1.96$\sigma$ from the mean. For $N = 100$: reject if more than 2.81$\sigma$.
+
+\textbf{Modified Thompson tau test}: a more rigorous statistical test for outlier rejection in small samples. Compares the deviation of the suspected outlier to a critical value that depends on $N$ and the significance level.
+
+\textbf{Rule}: never discard data without documenting the reason. ``It looked wrong'' is not acceptable. Valid reasons include: known equipment malfunction during that measurement, operator error recorded in the lab notebook, or failure of a formal statistical test.
+
+\section{Design of Experiments (DOE) Fundamentals}
+\subsection{One-Factor-at-a-Time (OFAT)}
+The traditional approach: vary one factor while holding all others constant. Simple but inefficient: it requires many experiments to cover all combinations and cannot detect interactions between factors.
+
+\subsection{Factorial Design}
+Test all combinations of two or more factors at two or more levels. A $2^k$ factorial tests $k$ factors at 2 levels each. For $k = 3$ factors (e.g., excitation voltage, sample rate, filter cutoff): $2^3 = 8$ experiments. The factorial design reveals not only the main effect of each factor but also interactions (e.g., the effect of sample rate depends on the filter cutoff). This information is invisible in OFAT experiments.
+
+\subsection{Replication and Randomization}
+\textbf{Replication}: repeat each experimental condition multiple times to estimate the experimental error and enable statistical testing. Without replication, you cannot distinguish real effects from noise.
+
+\textbf{Randomization}: run the experiments in random order to prevent systematic errors (drift, fatigue, environmental changes) from being confounded with the factors under study. If you test all ``low'' settings first and all ``high'' settings later, any time-dependent drift appears as a factor effect.
+
+\begin{tipbox}[Sample Size Planning]
+Before running an experiment, estimate how many measurements you need to detect the effect you care about. The minimum sample size depends on: (1) the effect size you want to detect (smaller effects need more data), (2) the measurement noise ($s$), (3) the desired confidence level (95\% typical), and (4) the desired power (80\% typical, meaning 80\% probability of detecting a real effect). For a two-sample $t$-test: $N \approx 2(z_{\alpha/2} + z_{\beta})^2 s^2 / \delta^2$ where $\delta$ is the minimum detectable difference. Planning ahead prevents the frustration of collecting data that is insufficient to answer the question.
+\end{tipbox}
+
+\section{Graphical Data Presentation}
+\textbf{Scatter plots}: the default for showing the relationship between two continuous variables. Add error bars ($\pm$1 SE or $\pm$1$\sigma$) to every data point. Include the regression line and $R^2$ value.
+
+\textbf{Residual plots}: always plot residuals after a regression fit. Patterns in residuals reveal model inadequacy that $R^2$ alone may not show.
+
+\textbf{Histograms}: show the distribution of a dataset. Use 10--20 bins for $N > 50$. Overlay the theoretical distribution (normal curve) to assess normality.
+
+\textbf{Box plots}: compact display of median, IQR, and outliers. Excellent for comparing multiple groups (e.g., measurements from different sensors or different operators).
+
+\textbf{Time series plots}: for data collected over time, plot the raw values with a moving average overlay. Look for trends (drift), cycles (periodic errors), and step changes (calibration shifts).
+
+\begin{warningbox}[Error Bars Are Not Optional]
+A data point without an error bar is a claim without evidence. Every plotted measurement should include error bars representing either the standard deviation (individual measurement scatter), the standard error (uncertainty of the mean), or the 95\% confidence interval (most conservative). State which type of error bar you are using in the figure caption or legend.
+\end{warningbox}
+
+\section{The Central Limit Theorem}
+The Central Limit Theorem (CLT) is arguably the most important result in applied statistics. It states: regardless of the distribution of individual measurements, the distribution of the sample mean approaches a normal distribution as the sample size $N$ increases. The approximation is excellent for $N \geq 30$, and surprisingly good for $N \geq 10$ unless the underlying distribution is extremely skewed.
+
+Practical consequence: even if individual sensor readings have a non-normal distribution (e.g., the rectangular distribution of quantization noise, or the skewed distribution of a saturating sensor), the mean of $N$ readings is approximately normally distributed. This justifies using normal-distribution-based confidence intervals and hypothesis tests for averaged measurements.
+
+\subsection{CLT in Averaging}
+When you average $N$ measurements: (1) the mean converges toward the true value (law of large numbers), (2) the distribution of the mean becomes normal (CLT), and (3) the standard deviation of the mean is $s/\sqrt{N}$. All three facts together justify the standard practice of ``measure $N$ times and report the mean with uncertainty $\pm t \cdot s/\sqrt{N}$.''
+
+\section{Analysis of Variance (ANOVA)}
+When comparing more than two groups (e.g., three calibration methods, four sensor brands, five operators), the two-sample $t$-test is insufficient (running multiple $t$-tests inflates the false-positive rate). ANOVA tests whether the means of $k$ groups are all equal simultaneously.
+
+The key insight: ANOVA partitions the total variance in the data into \textbf{between-group variance} (due to actual differences among the groups) and \textbf{within-group variance} (due to random measurement scatter). The $F$-statistic is the ratio:
+\begin{equation}
+F = \frac{\text{Between-group variance}}{\text{Within-group variance}} = \frac{MS_{\text{between}}}{MS_{\text{within}}}
+\end{equation}
+If $F$ exceeds the critical value from the $F$-distribution (at significance level $\alpha = 0.05$ with $k-1$ and $N-k$ degrees of freedom), at least one group mean is significantly different from the others. A post-hoc test (Tukey HSD) then identifies which specific pairs differ.
+
+\begin{examplebox}[ThermoRig: Comparing Three Thermocouple Batches]
+Three batches of Type~K thermocouples are tested at 80\,\degC{}. Batch A ($N=8$): mean $= 80.12$, $s = 0.21$. Batch B ($N=8$): mean $= 79.85$, $s = 0.18$. Batch C ($N=8$): mean $= 80.05$, $s = 0.23$. ANOVA: $MS_{\text{between}} = 0.146$, $MS_{\text{within}} = 0.043$, $F = 3.40$. $F_{\text{crit}}(2, 21, 0.05) = 3.47$. Since $F < F_{\text{crit}}$: fail to reject the null hypothesis. The three batches do not have significantly different mean readings. They are interchangeable for this application.
+\end{examplebox}
+
+\section{Propagation of Distributions (Monte Carlo Method)}
+When the measurement equation is nonlinear or complex, propagating uncertainties analytically (RSS formula) may give inaccurate results. The Monte Carlo approach simulates the measurement process numerically:
+
+(1) Assign a probability distribution to each input variable based on calibration data or datasheet specifications. (2) Generate $M$ random samples from each distribution ($M \geq 10{,}000$). (3) Evaluate the measurement equation $M$ times, once for each set of random inputs. (4) The resulting $M$ output values form the output distribution. (5) Report the mean and the 2.5th and 97.5th percentiles as the 95\% coverage interval.
+
+Advantages over RSS: handles nonlinear equations correctly, provides the full output distribution shape (which may be asymmetric), and requires no partial derivatives. Disadvantage: requires a computer (but this is trivial in MATLAB, Python, or LabVIEW).
+
+\section{Goodness-of-Fit Testing}
+After fitting a model to calibration data, how do you know the model is adequate?
+
+\textbf{$R^2$ (coefficient of determination)}: fraction of variance explained by the model. $R^2 > 0.999$ is typical for a good linear calibration. However, $R^2$ alone can be misleading: a high $R^2$ does not guarantee the model form is correct (a linear fit to clearly curved data can have $R^2 > 0.99$ if the curvature is small).
+
+\textbf{Residual analysis}: plot residuals ($e_i = y_i - \hat{y}_i$) vs.\ $x$. Random scatter around zero: model is adequate. Systematic curvature: need a higher-order polynomial. Increasing spread: heteroscedasticity (need weighted regression or data transformation). Clusters of positive/negative residuals: model misspecification.
+
+\textbf{Chi-squared test}: $\chi^2 = \sum(e_i/u_i)^2$ where $u_i$ is the uncertainty of each data point. If $\chi^2/(N-p) \approx 1$ (where $p$ is the number of fitted parameters): the model fits the data within the expected uncertainty. $\chi^2/(N-p) \gg 1$: the model does not fit (or the uncertainties are underestimated). $\chi^2/(N-p) \ll 1$: the model overfits (or the uncertainties are overestimated).
+
+\section{Time Series Analysis Basics}
+Laboratory data is often collected as a time series (sequential measurements over time). Beyond the standard statistics above, time series data has temporal structure:
+
+\textbf{Trend}: a long-term drift in the mean (sensor aging, environmental change). Detected by: linear regression on the time series, or comparing means of the first and last thirds of the data.
+
+\textbf{Periodicity}: oscillation at a specific frequency (60\,Hz pickup, diurnal temperature cycle, periodic machine operation). Detected by: FFT of the time series.
+
+\textbf{Autocorrelation}: dependence between successive samples. If sample $n$ is above the mean, is sample $n+1$ also likely above the mean? The autocorrelation function $R[\tau]$ quantifies this. High autocorrelation means successive samples are not independent, which violates the assumption underlying $\text{SE} = s/\sqrt{N}$. The effective number of independent samples is $N_{\text{eff}} = N / (1 + 2\sum_{k=1}^{\infty} R[k])$, which can be much less than $N$. For heavily filtered or slowly sampled data: $N_{\text{eff}}$ may be 10--100$\times$ less than $N$, meaning the true uncertainty of the mean is much larger than $s/\sqrt{N}$ suggests.
+
+\begin{warningbox}[The Autocorrelation Trap]
+If you sample a slow signal (temperature, pressure) at a high rate (1\,kS/s) and average 1000 samples, you do \textbf{not} get $\sqrt{1000} = 31.6\times$ noise reduction. The successive samples are highly correlated because the signal has not changed appreciably between samples. The effective improvement is determined by the number of independent measurements, which is approximately $T_{\text{acquisition}} / \tau_{\text{signal}}$. For a signal with $\tau = 30$\,s sampled for 1\,s: you have $N_{\text{eff}} \approx 1/30 \approx 0.03$ independent measurements, less than one. Averaging 1000 highly correlated samples gives almost no improvement. To improve the mean: acquire for longer ($T \gg \tau$), not faster.
+\end{warningbox}
+\section{Nonparametric Methods}
+When the normality assumption does not hold (small samples from unknown distributions, heavily skewed data, ordinal data), nonparametric tests provide valid alternatives:
+
+\textbf{Wilcoxon signed-rank test}: nonparametric replacement for the one-sample $t$-test. Ranks the absolute deviations from the hypothesized median and sums the ranks of positive and negative deviations separately. Does not assume normality.
+
+\textbf{Mann-Whitney U test}: nonparametric replacement for the two-sample $t$-test. Compares the ranks of observations from two groups. Tests whether one group tends to have larger values than the other.
+
+\textbf{Kruskal-Wallis test}: nonparametric replacement for one-way ANOVA. Compares ranks across three or more groups.
+
+These tests have lower statistical power than their parametric counterparts (they need more data to detect the same effect), but they are valid regardless of the data distribution.
+
+\section{Multiple Testing Correction}
+When performing multiple hypothesis tests simultaneously (e.g., comparing 10 sensors pairwise: 45 comparisons), the probability of at least one false positive increases dramatically. With 45 tests at $\alpha = 0.05$: the probability of at least one false positive is $1 - (1-0.05)^{45} = 90\%$.
+
+\textbf{Bonferroni correction}: divide the significance level by the number of tests. For 45 tests: use $\alpha = 0.05/45 = 0.0011$ per test. Conservative but simple.
+
+\textbf{Holm-Bonferroni}: a step-down procedure that is less conservative than Bonferroni. Sort the $p$-values from smallest to largest. Compare the smallest to $\alpha/m$, the second to $\alpha/(m-1)$, etc.
+
+\textbf{False Discovery Rate (FDR)}: controls the expected proportion of false positives among rejected hypotheses (rather than the probability of any false positive). The Benjamini-Hochberg procedure is the standard FDR method. It is more powerful than Bonferroni when many tests are performed.
+
+\section{Effect Size and Practical Significance}
+Statistical significance ($p < 0.05$) answers: ``Is the observed effect likely real (not due to chance)?'' But it does not answer: ``Is the effect large enough to matter?'' Effect size measures answer the second question.
+
+\textbf{Cohen's $d$}: for comparing two means: $d = (\bar{x}_1 - \bar{x}_2)/s_{\text{pooled}}$. $d = 0.2$: small effect. $d = 0.5$: medium. $d = 0.8$: large. A $p < 0.001$ result with $d = 0.1$ means the difference is real but tiny; likely not worth acting on.
+
+\textbf{$R^2$} (from regression): the fraction of variance explained by the model. $R^2 = 0.01$ means the model explains 1\% of the data variability; the effect is real but inconsequential.
+
+In MEGN~300: always report both the $p$-value (statistical significance) and the effect size (practical significance). A measurement system improvement that is statistically significant but reduces uncertainty by only 0.01\% is not worth the implementation cost.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Twenty measurements of a resistor yield a mean of 99.87\,$\Omega$ and a standard deviation of 0.15\,$\Omega$. Compute the 95\% confidence interval for the true resistance. Is the resistor consistent with a nominal value of 100\,$\Omega$?
+\item Two calibration methods are compared for a pressure sensor. Method~A ($N = 12$): mean residual $= 0.35$\,psi, $s = 0.20$\,psi. Method~B ($N = 15$): mean residual $= 0.22$\,psi, $s = 0.18$\,psi. Perform a two-sample $t$-test to determine whether the methods give significantly different mean residuals at the 5\% level.
+\item A strain gauge calibration produces the data points $(0, 0.001)$, $(500, 1.012)$, $(1000, 2.005)$, $(1500, 3.021)$, $(2000, 4.008)$ in $(\mu\epsilon,\,$mV). Fit a linear model, compute $R^2$, and plot the residuals. Is a linear model adequate?
+\item Explain the difference between correlation and causation using an instrumentation example. Two sensor readings are strongly correlated ($r = 0.95$). Does this mean one is causing the other?
+\item You are planning an experiment to determine whether a new filter design reduces measurement noise by at least 20\%. Your current noise standard deviation is 0.5\,mV. How many measurements of each filter do you need to detect a 20\% reduction with 80\% power at the 5\% significance level?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item SE $= 0.15/\sqrt{20} = 0.0335\,\Omega$. $t_{0.975,19} = 2.093$. CI: $99.87 \pm 2.093 \times 0.0335 = 99.87 \pm 0.07\,\Omega = [99.80, 99.94]\,\Omega$. Since $100.0\,\Omega$ is outside the CI, the measured mean is statistically significantly different from 100\,$\Omega$ at the 95\% level, suggesting a systematic offset of $-0.13\,\Omega$ (0.13\%).
+\item Pooled SE $= \sqrt{0.20^2/12 + 0.18^2/15} = \sqrt{0.00333 + 0.00216} = 0.0741$\,psi. $t = (0.35 - 0.22)/0.0741 = 1.75$. Approximate $\nu = 22$. $t_{\text{crit}} = 2.074$. Since $1.75 < 2.074$: fail to reject the null hypothesis. The methods do not give significantly different results at the 5\% level.
+\item Linear fit: $y = 0.002003x + 0.0018$, $R^2 = 0.99998$. Residuals: $+0.001, +0.005, -0.003, +0.009, -0.010$\,mV. Maximum residual is 0.010\,mV. No systematic pattern. The linear model is excellent.
+\item Two sensors measuring temperature in the same environment will be strongly correlated because they respond to the same physical temperature changes, not because one causes the other. A third variable (actual temperature) drives both. Correlation does not imply causation.
+\item For two-sample $t$-test detecting $\delta = 0.1$\,mV ($20\% \times 0.5$) from $s = 0.5$\,mV: $N \approx 2(1.96 + 0.84)^2 \times 0.5^2 / 0.1^2 = 2 \times 7.84 \times 2.5 = 392$ per group. This is a large number because the effect (20\%) is small relative to the noise. If the expected improvement were 50\%, $N$ drops to approximately 63 per group.
+\end{enumerate}

@@ -1,0 +1,235 @@
+% Chapter 17: Systematic Debugging
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Systematic Debugging and Troubleshooting}
+\label{ch:debugging}\index{debugging!methodology}\index{debugging!pyramid}\index{signal walk}
+
+\begin{warningbox}[Read This Chapter First]
+Read this chapter \textbf{before your first lab session}. The debugging methodology here will save you more time than any other single chapter in this document. Students who read this chapter first report spending 60--70\% less time on integration problems.
+\end{warningbox}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    level/.style={trapezium, draw=MinesBlue, thick, fill=LightBG,
+                  trapezium left angle=75, trapezium right angle=75,
+                  minimum width=#1, minimum height=1.1cm,
+                  align=center, font=\small\sffamily\bfseries, text=MinesBlue},
+    note/.style={font=\scriptsize\sffamily, text=MinesSilver, align=left, anchor=west}
+]
+\node[level=11cm] (L1) at (0,0) {Level 1: Component Verification};
+\node[level=8.5cm] (L2) at (0,1.5) {Level 2: Interface Testing};
+\node[level=6cm] (L3) at (0,3.0) {Level 3: Subsystem Integration};
+\node[level=3.5cm] (L4) at (0,4.5) {Level 4: System Validation};
+\node[note] at (6.2,0) {Does each component work alone?\\Power, sensor, amp, DAQ, actuator};
+\node[note] at (5.0,1.5) {Do connected pairs communicate?\\Sensor$\to$amp, amp$\to$ADC, DAQ$\to$motor};
+\node[note] at (3.8,3.0) {Does sensor-to-display work?\\Does control loop respond?};
+\node[note] at (2.5,4.5) {Full system under\\real conditions};
+\draw[-{Stealth[length=3mm]}, thick, WarnOrange] (-6.5,0) -- (-6.5,4.5);
+\node[font=\small\sffamily\bfseries, WarnOrange, rotate=90, anchor=south] at (-7.0,2.25) {Debug bottom-up};
+\end{tikzpicture}
+\caption{The debugging pyramid. Always start at Level~1 (component verification) and work upward. Skipping levels is the most common cause of wasted debugging time.}
+\label{fig:debug_pyramid}
+\end{figure}
+
+A working system is never assembled all at once. It is built in layers, verified at each layer, and only then combined into the full system. Debugging is not what you do when something goes wrong; it is the disciplined verification process you follow at every stage so that when something does go wrong, you can find it in minutes instead of hours. This chapter establishes the methodology: start at the lowest level, verify each component in isolation, then work upward through subsystems to the integrated system. Students who skip this process and assemble everything at once (``big-bang integration'') consistently spend 5--10$\times$ more time debugging than students who follow the bottom-up approach.
+
+\section{Why Bottom-Up Debugging Matters}
+
+Consider a system with five components: a sensor, an amplifier, an ADC, a microcontroller running firmware, and an actuator with its driver. If you wire everything together and power on, and the system does not work, the fault could be in any of the five components, any of the four interfaces between them, the power supply, the wiring, or the firmware. That is at least 15 possible failure locations. You have no way to isolate the problem without disconnecting things, which is exactly what you should have done from the start.
+
+Bottom-up debugging reduces the search space at every step. If you verify the sensor alone and it works, the sensor is eliminated. If you verify the amplifier with a known input and it works, the amplifier is eliminated. By the time you connect the full chain, you have already verified every component and most interfaces. If the system fails at integration, the fault is almost certainly at the most recently added interface, not buried deep in a component you already tested.
+
+\begin{keyconceptbox}[The Debugging Pyramid]
+\textbf{Level 1: Component verification.} Test each component in isolation with known inputs and expected outputs. Does the sensor produce the right voltage? Does the amplifier have the correct gain? Does the MOSFET switch? Does the firmware blink an LED?
+
+\textbf{Level 2: Interface verification.} Connect two adjacent components and verify the signal crosses the boundary correctly. Does the amplifier correctly amplify the sensor output? Does the ADC read the correct voltage from the amplifier? Does the MCU command produce the expected driver output?
+
+\textbf{Level 3: Subsystem verification.} Connect a functional chain (e.g., sensor $\to$ amplifier $\to$ ADC $\to$ MCU display) and verify end-to-end signal flow. Does the displayed value match the physical input?
+
+\textbf{Level 4: System integration.} Connect all subsystems and verify the complete system. Does the controller read the sensor, compute the correct output, and drive the actuator to the desired setpoint?
+
+Never advance to the next level with failures at the current level. Failures compound; a wiring error at Level~1 that is not caught becomes an inexplicable intermittent failure at Level~4 that takes hours to trace.
+\end{keyconceptbox}
+
+\section{Debugging Hardware}
+
+Hardware debugging follows a systematic process. Resist the urge to start changing things randomly; that creates new problems faster than it solves old ones.
+
+\subsection{Visual Inspection}
+Before applying power, inspect the physical assembly. Check for: solder bridges (adjacent pads connected by a blob of solder, especially on fine-pitch ICs), cold joints (dull, grainy solder that did not flow properly), missing components, wrong component orientation (electrolytic capacitors, diodes, ICs), loose wires, and pinched or abraded insulation. A 10$\times$ magnifier or loupe is essential. Many hardware failures are visible before any electrical test.
+
+\subsection{Continuity and Short-Circuit Check}
+With power off, use the multimeter's continuity mode to verify: (1) power and ground are not shorted (beep between VCC and GND means a dead short that will destroy the supply or blow a fuse), (2) all ground connections are continuous (no open ground paths), and (3) signal connections reach their intended destinations (probe both ends of each wire or trace).
+
+\subsection{Power-Up Sequence}
+Apply power through a current-limited bench supply. Set the current limit to 50\,mA initially. If the circuit draws more than expected, something is wrong; do not increase the limit until you find out why. Monitor the supply current as you increase the voltage to the operating level. A healthy circuit draws a predictable current; a fault draws either zero (open connection) or excessive current (short circuit). Measure every power rail voltage with a multimeter and compare to the expected values before connecting any ICs or modules.
+
+\subsection{Signal Tracing}
+Once power is verified, inject a known signal at the input and trace it through each stage of the signal chain with an oscilloscope or multimeter. At each node, compare the measured signal to the expected value (calculated from the circuit design). When the measured value deviates from the expected value, you have localized the fault to the stage between the last good node and the first bad node.
+
+\begin{tipbox}[The Signal Walk]
+Start at the sensor (or a signal generator substituting for the sensor). Measure the output voltage. Move the probe one stage downstream: after the voltage divider, after the amplifier, at the ADC input pin. At each point, verify the signal is correct in amplitude, offset, and frequency content. When you find the first point where the signal is wrong, the fault is between that point and the previous (good) point. This narrows the search to one component or one interface.
+\end{tipbox}
+
+\subsection{Common Hardware Faults and Their Signatures}
+
+\textbf{Open connection} (broken wire, cracked solder joint, missing via): signal is present on the upstream side, absent or floating on the downstream side. The oscilloscope shows the downstream node either at ground (pulled down by a load) or floating with 60\,Hz pickup.
+
+\textbf{Short circuit} (solder bridge, pinched wire): two nodes that should be at different voltages are at the same voltage. The supply current is higher than expected. If VCC is shorted to GND, the current limit on the bench supply prevents damage (this is why current limiting is mandatory).
+
+\textbf{Wrong component value} (wrong resistor, wrong capacitor): the circuit functions but with incorrect gain, incorrect cutoff frequency, or incorrect bias point. Compare measured values at each node to calculated values from the schematic.
+
+\textbf{Component installed backwards} (electrolytic capacitor, diode, IC): behavior depends on the component. A reversed electrolytic may heat up, swell, or vent. A reversed diode conducts in the wrong direction (appears as a short in one direction). A reversed IC draws excessive current and may be destroyed. Always verify orientation before power-up.
+
+\textbf{Dead IC} (ESD damage, overvoltage, overheating): outputs do not respond to inputs. Supply current may be abnormally high or low. Replace the IC with a known-good part to confirm.
+
+\begin{warningbox}[Change One Thing at a Time]
+The cardinal rule of debugging: change only one variable between tests. If you swap a component AND change a wire AND modify the firmware simultaneously, and the system starts working, you do not know which change fixed it. Worse, one of the other changes may have introduced a new latent fault that will appear later. Make one change, test, record the result, then decide the next change.
+\end{warningbox}
+
+\section{Debugging Software and Firmware}
+
+Firmware bugs are at least as common as hardware bugs in MEGN~300 projects, and they interact with hardware in ways that create confusing symptoms. A timing bug in the ADC read routine can look like a noisy sensor. A missing pullup configuration can look like a dead I2C bus.
+
+\subsection{Incremental Development}
+Write and test firmware in small, testable increments. The sequence should mirror the hardware debugging pyramid:
+
+\textbf{Step 1: Blink.} Verify the toolchain, upload process, and basic MCU function. If the LED blinks at the expected rate, the MCU is running, the clock is correct, and the upload path works.
+
+\textbf{Step 2: Serial output.} Add serial print statements to confirm the firmware reaches each section of code. Print variable values, state machine transitions, and function entry/exit markers. This is the firmware equivalent of the oscilloscope probe.
+
+\textbf{Step 3: Single peripheral.} Initialize and test one peripheral at a time. Read a single ADC channel and print the raw value. Toggle a single GPIO and verify with a multimeter. Send a single I2C command and verify the response. Do not initialize multiple peripherals until each one works individually.
+
+\textbf{Step 4: Peripheral combinations.} Add peripherals one at a time to the working base. After each addition, verify that previously working peripherals still function correctly (regression testing).
+
+\textbf{Step 5: Control logic.} Add the control algorithm (PID, state machine, decision logic) only after all I/O peripherals are verified. If the control loop misbehaves, you know the fault is in the algorithm, not in the I/O.
+
+\subsection{Common Firmware Bugs}
+
+\textbf{Wrong pin assignment}: GPIO number in code does not match the physical wiring. Symptoms: output has no effect, input reads constant value. Fix: print the pin number and verify against the wiring diagram.
+
+\textbf{Missing initialization}: peripheral not configured before use. Symptoms: ADC reads zero or random values, I2C bus hangs, PWM output is static. Fix: verify every peripheral has its initialization call before the main loop.
+
+\textbf{Blocking calls in the main loop}: using \texttt{delay()} stops all processing. Symptoms: system is unresponsive, sensor reads are stale, PID output updates are irregular. Fix: use \texttt{millis()}-based timing; check elapsed time each iteration and act only when the interval has passed.
+
+\textbf{Integer overflow}: a 16-bit counter that wraps at 65,535, or an 8-bit variable that truncates values above 255. Symptoms: values jump unexpectedly, timing wraps, calculations produce wrong results. Fix: use appropriately sized data types (\texttt{uint32\_t} for millis, \texttt{float} for analog values).
+
+\textbf{Race conditions}: two interrupts or tasks accessing the same variable without synchronization. Symptoms: occasional corrupted readings, intermittent glitches. Fix: disable interrupts briefly while reading/writing shared variables, or use \texttt{volatile} qualifier and atomic operations.
+
+\textbf{I2C bus hang}: a sensor that does not respond holds the SDA line low, preventing further communication. Symptoms: all I2C communication stops after a failed transaction. Fix: implement a bus recovery routine (toggle SCL 9 times to release SDA), and use timeouts on all I2C reads.
+
+\begin{tipbox}[The Serial Monitor Is Your Oscilloscope for Code]
+Print everything during development: ADC raw values, computed engineering units, PID error and output, state machine transitions, loop execution time. When behavior is unexpected, the serial log tells you exactly which variable has the wrong value and when it went wrong. Remove or reduce print statements only after the system is fully verified (excessive printing slows the loop).
+\end{tipbox}
+
+\subsection{Using the LabVIEW Debugging Tools}
+LabVIEW provides built-in debugging tools that are more powerful than serial printing:
+
+\textbf{Highlight Execution} (light bulb icon): animates dataflow on the block diagram, showing values moving along wires in real time. Useful for understanding execution order and spotting unexpected data paths. Warning: slows execution dramatically; do not use for timing-critical debugging.
+
+\textbf{Probes}: right-click any wire and select ``Probe'' to watch its value update in real time without stopping execution. Place probes at the output of every major processing stage to monitor the signal chain live.
+
+\textbf{Breakpoints}: pause execution at a specific node. Inspect all wire values at that moment. Step forward one node at a time to trace the exact point where values diverge from expectations.
+
+\textbf{Error clusters}: the pink error wire that chains through DAQmx functions carries detailed error codes and descriptions. Always wire the error output to a ``Simple Error Handler'' outside the loop. If you leave error wires unwired, errors propagate silently and produce inexplicable behavior downstream.
+
+\section{Debugging Integrated Systems}
+
+Once individual hardware and software components are verified, integration debugging follows a structured protocol.
+
+\subsection{The Integration Test Sequence}
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Power rail verification.} Before connecting any active components, verify all supply voltages under load. Connect a dummy load (a power resistor drawing the expected current) and measure each rail. Verify that the rails remain stable and within specification.
+
+\item \textbf{Sensor-to-display path.} Connect only the sensor, its signal conditioning, and the ADC/MCU. Verify that a known physical input produces the correct displayed or logged value. This tests the entire measurement chain without any actuator complications.
+
+\item \textbf{Command-to-actuator path.} Disconnect the sensor feedback. Send a fixed command (hardcoded PWM value, fixed relay state) and verify that the actuator responds correctly. This tests the output chain without feedback loop complications.
+
+\item \textbf{Open-loop dry run.} Connect both paths but keep the controller in open-loop mode (manual setpoints). Vary the setpoint manually and observe both the actuator response and the sensor reading. Verify that the sensor correctly reflects the actuator's effect on the process.
+
+\item \textbf{Closed-loop commissioning.} Enable the feedback controller (PID) with conservative gains ($K_p$ at 25\% of the expected value, $K_i$ and $K_d$ at zero). Gradually increase gains while monitoring stability. This is the final step, not the first.
+\end{enumerate}
+
+\subsection{Common Integration Failures}
+
+\textbf{Ground loops}: motor return current flows through the sensor ground path, injecting noise into the measurement. Symptom: sensor readings become noisy when the motor runs. Fix: star grounding (Chapter~14). Run separate ground conductors for sensor and motor circuits, joined at a single point near the power supply.
+
+\textbf{Power supply sag (brown-out)}: actuator inrush current (motor starting, relay pulling in) causes the supply voltage to dip momentarily, resetting the MCU. Symptom: MCU reboots when actuator activates. Fix: separate power rails for MCU and actuators, bulk capacitors ($>$470\,$\mu$F) on the MCU rail, or a dedicated regulated supply for the MCU.
+
+\textbf{EMI from switching}: PWM-driven motors and switching regulators generate high-frequency noise that couples into sensor signals through wiring or PCB traces. Symptom: sensor readings have high-frequency spikes synchronized with PWM switching. Fix: add snubber circuits on the motor, decouple the sensor supply, separate analog and digital wiring physically, use shielded cable for sensitive signals.
+
+\textbf{Timing conflicts}: the firmware tries to read a sensor, update a display, and communicate over WiFi in the same loop iteration, and the total execution time exceeds the control loop period. Symptom: PID performance degrades, sensor readings are stale, communication drops. Fix: measure actual loop execution time (print \texttt{millis()} at start and end of each iteration); prioritize time-critical tasks (sensor read, PID compute, actuator write) and defer non-critical tasks (display update, data logging) to separate intervals.
+
+\textbf{Feedback polarity error}: the sensor signal increases when the actuator output increases, creating positive feedback instead of negative feedback. Symptom: the system immediately saturates (output goes to maximum or minimum and stays there). Fix: verify that increasing the controller output drives the process variable toward the setpoint. If the sensor reads higher when the actuator output is higher, the controller must decrease output as the process variable increases (negative feedback). Swap the sign of $K_p$ or invert the error calculation.
+
+\subsection{The Five-Step Debugging Protocol}
+When an integrated system fails, follow this protocol before making any changes:
+
+\textbf{Step 1: Reproduce.} Make the failure happen reliably. Note the exact conditions: what inputs, what state, what sequence of events. A failure you cannot reproduce is a failure you cannot systematically fix.
+
+\textbf{Step 2: Isolate.} Disconnect subsystems one at a time until the failure stops. The last subsystem disconnected (or its interface) is the prime suspect. Alternatively, substitute a known-good signal (signal generator for the sensor, fixed command for the controller) to bypass suspect components.
+
+\textbf{Step 3: Measure.} Use the oscilloscope, multimeter, and serial monitor to measure actual signals at the suspected fault location. Compare measured values to the expected values from your design calculations. The discrepancy between measured and expected is the clue.
+
+\textbf{Step 4: Hypothesize and test.} Form a specific hypothesis (``the amplifier gain is wrong because $R_f$ is the wrong value'') and design a test that confirms or refutes it (``measure $R_f$ with a multimeter''). Do not guess randomly; each test should eliminate at least one hypothesis.
+
+\textbf{Step 5: Fix and regression test.} Implement the fix. Verify that the original failure is resolved. Then re-run all previously passing tests to confirm the fix did not break anything else. A fix that solves one problem and creates two new ones is not a fix.
+
+\begin{warningbox}[Document Every Debug Session]
+Keep a debug log: date, symptom observed, tests performed, measurements taken, hypothesis, fix applied, and result. This log is invaluable when a similar failure appears later (``we saw this before; it was a ground loop, see entry from March 3''). It also demonstrates professional engineering practice in your final report.
+\end{warningbox}
+
+\section{Debugging Tools and Their Proper Use}
+
+\subsection{Multimeter}
+The first instrument you reach for. Measures DC/AC voltage, current, resistance, and continuity. Use it for: power rail verification, static signal levels, resistance checks, and continuity. Limitation: cannot capture transient events or waveform shape.
+
+\subsection{Oscilloscope}
+Essential for: viewing signal waveforms, measuring timing relationships, capturing transient events (glitches, spikes, ringing), verifying PWM duty cycle and frequency, diagnosing communication protocols (SPI clock, I2C timing). Learn to set the trigger correctly; an untriggered oscilloscope display is useless noise. Use the ``Single'' trigger mode to capture one-time events (power-on transients, fault spikes).
+
+\subsection{Logic Analyzer}
+For digital communication debugging (SPI, I2C, UART). Captures multiple digital signals simultaneously and decodes protocol frames. Many affordable USB logic analyzers ($<$\$20) work with free software (PulseView/sigrok). Use when: I2C devices are not responding, SPI data is corrupted, UART baud rate mismatch is suspected.
+
+\subsection{Bench Power Supply}
+Use the current-limit feature as a diagnostic tool, not just a safety feature. A circuit that draws 50\,mA normally but suddenly draws 500\,mA has a fault. The current limit prevents damage while you investigate. Vary the supply voltage slowly and observe when the circuit starts and stops functioning; this reveals voltage margin issues.
+
+\subsection{Serial Terminal / Data Logger}
+For firmware debugging: capture timestamped variable values over extended periods to identify intermittent failures, drift, and timing anomalies. Use a serial terminal (PuTTY, screen, Arduino Serial Monitor) for real-time observation, and log to a file for post-analysis.
+
+\section{Building a Debugging Mindset}
+
+Effective debugging is a skill that improves with deliberate practice. Five principles distinguish expert debuggers from novices:
+
+\textbf{1. Expect problems.} No circuit works on the first try. No firmware is bug-free on the first compile. Plan for debugging time in your schedule. A project plan that allocates zero time for debugging will consume all available time for debugging.
+
+\textbf{2. Trust your measurements, not your assumptions.} ``The sensor should output 2.5\,V'' is an assumption. ``The multimeter reads 0.3\,V at the sensor output'' is a measurement. When assumptions and measurements disagree, the measurement wins. Every time.
+
+\textbf{3. Binary search.} When the signal chain has $N$ stages, do not check them in sequence (worst case: $N$ checks). Measure at the midpoint first. If the signal is correct there, the fault is downstream; if not, it is upstream. Recurse. This halves the search space with each measurement, finding the fault in $\log_2(N)$ checks.
+
+\textbf{4. Rubber duck debugging.} Explain the problem aloud (to a teammate, a rubber duck, or an empty chair). Articulating the problem forces you to organize your understanding, and the act of explaining often reveals the assumption you have been making that is wrong.
+
+\textbf{5. Walk away.} If you have been debugging the same problem for more than 30 minutes without progress, take a 10-minute break. Fatigue causes fixation on a single hypothesis. A fresh perspective (yours after a break, or a teammate's) often spots the obvious error that tunnel vision concealed.
+
+\begin{keyconceptbox}[Requirements Mapping: Debugging and Verification]
+``Each subsystem shall be individually verified with documented test results before integration into the next-higher assembly.'' ``The debug log shall record all faults encountered, diagnostic steps performed, root cause identified, and corrective actions taken during integration.'' ``The system integration sequence shall follow a bottom-up protocol with defined entry and exit criteria at each level.'' ``All power rails shall be verified under load before active components are connected.''
+\end{keyconceptbox}
+
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item You connect your complete system (sensor, amplifier, ADC, MCU, motor driver, motor) and the motor runs at full speed regardless of the sensor input. Describe the systematic debugging steps you would follow to isolate the fault, starting from the debugging pyramid.
+\item Your thermocouple readings are accurate when the motor is off, but show $\pm$5\,\degC{} noise when the motor is running. The noise appears as 25\,kHz spikes on the oscilloscope. What is the likely root cause, and what are three mitigation strategies?
+\item A teammate says ``I changed the wiring and the firmware and replaced the op-amp, and now it works.'' Why is this a problem, and what should they have done differently?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item Start at Level 2 (interface verification). Disconnect the motor driver from the MCU. Measure the MCU's PWM output pin with an oscilloscope: is the duty cycle varying with sensor input? If yes, the fault is downstream (driver or motor). If the PWM output is stuck at 100\%, the fault is upstream. Next, disconnect the sensor and substitute a known voltage from a bench supply: does the MCU PWM output change? If yes, the sensor path is the problem. If the PWM output is still stuck at 100\% with a known input, the fault is in the firmware (likely the PID output is saturated, the PWM pin is misconfigured, or the control loop has positive feedback). Isolate by checking one variable at a time.
+\item The 25\,kHz frequency matches the PWM switching frequency of the motor driver. The motor's switching current is coupling into the thermocouple signal path, likely through a ground loop or shared ground conductor. Three mitigations: (1) Star grounding: run separate ground conductors for the thermocouple amplifier and the motor driver, joined at a single point near the supply. (2) Add a low-pass filter (RC, $f_c \approx 100$\,Hz) at the amplifier input to reject 25\,kHz noise. (3) Use twisted-pair wire for the thermocouple leads and route them physically away from the motor power wiring.
+\item They changed three variables simultaneously. The system works, but they do not know which change fixed the problem. Worse, one or two of the changes may have introduced latent faults that will appear later. The correct approach: revert all three changes, then apply them one at a time, testing after each. The first change that fixes the system is the actual solution. The other changes should be evaluated independently to confirm they do not introduce new problems.
+\end{enumerate}
+
+
+% ################################################################
+% PART IV: CONTROL SYSTEMS
+% ################################################################

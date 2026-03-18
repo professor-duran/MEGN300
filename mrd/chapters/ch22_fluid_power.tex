@@ -1,0 +1,187 @@
+% Chapter 22: Fundamentals of Fluid Power
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Fundamentals of Fluid Power}
+\label{ch:fluid}\index{fluid power}\index{Bernoulli equation}\index{flow measurement}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    comp/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                 minimum width=2.2cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
+    pipe/.style={MinesBlue, thick},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, AccentTeal},
+    sensor/.style={draw=WarnOrange, fill=WarnOrange!10, thick, rounded corners=2pt,
+                   minimum width=1.4cm, minimum height=0.7cm, align=center, font=\tiny\sffamily\bfseries},
+]
+\node[comp] (res) at (0,0) {Reservoir};
+\node[comp] (pump) at (3.5,0) {Pump};
+\node[comp] (valve) at (7,0) {Control\\Valve};
+\node[comp] (act) at (10.5,0) {Actuator\\(Cylinder)};
+
+\draw[arr] (res) -- (pump);
+\draw[arr] (pump) -- (valve);
+\draw[arr] (valve) -- (act);
+\draw[pipe] (act.south) -- (10.5,-1.5) -- (0,-1.5) -- (res.south);
+\node[font=\tiny\sffamily\itshape, MinesSilver] at (5.25,-1.8) {Return line};
+\draw[arr] (5.25,-1.5) -- (3,-1.5);
+
+% Sensors
+\node[sensor] (ps) at (5.25,1.2) {Pressure\\sensor};
+\node[sensor] (fs) at (8.75,1.2) {Flow\\sensor};
+\draw[WarnOrange, thick, dashed] (ps) -- (5.25,0.5);
+\draw[WarnOrange, thick, dashed] (fs) -- (8.75,0.5);
+
+% FRL
+\node[font=\tiny\sffamily, AccentTeal, align=center] at (1.75,0.8) {Filter-Regulator-\\Lubricator (FRL)};
+\draw[AccentTeal, thick, ->] (1.75,0.5) -- (1.75,0.15);
+\end{tikzpicture}
+\caption{Basic hydraulic system schematic showing the flow path from reservoir through pump, control valve, and actuator, with return line. Pressure and flow sensors (orange) provide the measurement signals for monitoring and closed-loop control. Pneumatic systems follow the same topology but add a filter-regulator-lubricator (FRL) unit upstream.}
+\label{fig:hydraulic_system}
+\end{figure}
+
+Fluid power systems use pressurized liquids (hydraulics) or gases (pneumatics) to transmit force and motion. While MEGN~300 focuses on electrical instrumentation, many measurement and control systems interface with fluid systems: pressure sensors monitor hydraulic circuits, flow sensors meter process streams, and control valves regulate flow in response to PID commands. This chapter provides the fluid mechanics and system-level knowledge needed to instrument, model, and control fluid power systems.
+
+\section{Fluid Properties and Fundamentals}
+
+\textbf{Pressure} ($P$, measured in pascals, Pa $= $ N/m$^2$, or psi $=$ lbf/in$^2$): force per unit area. Gauge pressure is referenced to atmospheric; absolute pressure is referenced to vacuum: $P_{\text{abs}} = P_{\text{gauge}} + P_{\text{atm}}$. Standard atmosphere: 101.325\,kPa $=$ 14.696\,psi $=$ 1.013\,bar $=$ 760\,mmHg.
+
+\textbf{Density} ($\rho$, kg/m$^3$): mass per unit volume. Water: 998\,kg/m$^3$ at 20\,\degC{}. Hydraulic oil: 850--900\,kg/m$^3$. Air at sea level: 1.225\,kg/m$^3$.
+
+\textbf{Viscosity}: resistance to flow. \textbf{Dynamic viscosity} ($\mu$, Pa$\cdot$s): water at 20\,\degC{} is $1.002 \times 10^{-3}$\,Pa$\cdot$s; hydraulic oil is 10--100$\times$ higher. \textbf{Kinematic viscosity} ($\nu = \mu/\rho$, m$^2$/s): determines flow regime (laminar vs. turbulent) via the Reynolds number.
+
+\textbf{Compressibility}: liquids are nearly incompressible (bulk modulus of water: 2.2\,GPa; hydraulic oil: 1.4--1.7\,GPa). Gases are highly compressible. This fundamental difference drives the design split between hydraulic and pneumatic systems.
+
+\textbf{Pascal's Law}: pressure applied to a confined fluid is transmitted equally in all directions. This is the operating principle of hydraulic presses, brakes, and jacks: a small force on a small piston generates a large force on a large piston ($F_2 = F_1 \times A_2/A_1$).
+
+\section{Hydrostatics: Pressure in Stationary Fluids}
+
+In a stationary fluid, pressure increases with depth:
+\begin{equation}
+P = P_0 + \rho g h
+\end{equation}
+where $P_0$ is the surface pressure, $\rho$ is the fluid density, $g = 9.81$\,m/s$^2$, and $h$ is the depth below the surface. For water: pressure increases by 9.81\,kPa per meter of depth (approximately 1\,psi per 2.3\,ft).
+
+\textbf{Manometers} exploit this relationship: a U-tube containing a liquid of known density measures pressure difference as a height difference. The differential pressure is $\Delta P = \rho_{\text{manometer}} g \Delta h$. Mercury manometers (mmHg) and water manometers (cmH$_2$O) are traditional calibration references.
+
+\section{Fluid Dynamics: Flow in Pipes and Channels}
+
+\subsection{Reynolds Number and Flow Regime}
+The Reynolds number determines whether flow is laminar (smooth, parallel streamlines) or turbulent (chaotic, mixing):
+\begin{equation}
+\text{Re} = \frac{\rho v D}{\mu} = \frac{v D}{\nu}
+\end{equation}
+where $v$ is the average flow velocity, $D$ is the pipe inner diameter, and $\mu$ is dynamic viscosity. For pipe flow: $\text{Re} < 2300$ is laminar, $2300 < \text{Re} < 4000$ is transitional, and $\text{Re} > 4000$ is turbulent. Most industrial flows are turbulent.
+
+\subsection{Bernoulli's Equation}
+For steady, incompressible, inviscid flow along a streamline:
+\begin{equation}
+P_1 + \frac{1}{2}\rho v_1^2 + \rho g z_1 = P_2 + \frac{1}{2}\rho v_2^2 + \rho g z_2
+\end{equation}
+This conservation of energy equation connects pressure, velocity, and elevation. It is the foundation of many flow measurement devices: Venturi meters, orifice plates, and Pitot tubes all create a velocity change that produces a measurable pressure difference.
+
+\subsection{Continuity Equation}
+For incompressible flow, mass conservation requires:
+\begin{equation}
+A_1 v_1 = A_2 v_2 = Q \quad \text{(volumetric flow rate)}
+\end{equation}
+where $Q$ is in m$^3$/s (or L/min, GPM). If a pipe narrows, velocity increases and pressure decreases (Bernoulli). This acceleration is what creates the pressure drop in a Venturi tube.
+
+\subsection{Pressure Drop in Pipes}
+Real fluids have viscosity, which causes energy loss as fluid flows through pipes. The Darcy-Weisbach equation gives the pressure drop for fully developed flow:
+\begin{equation}
+\Delta P = f \frac{L}{D} \frac{\rho v^2}{2}
+\end{equation}
+where $f$ is the Darcy friction factor (from the Moody chart: depends on Re and pipe roughness), $L$ is the pipe length, and $D$ is the diameter. Fittings (elbows, tees, valves) add equivalent lengths or loss coefficients: $\Delta P_{\text{fitting}} = K \frac{\rho v^2}{2}$.
+
+\begin{tipbox}[Quick Pipe Sizing]
+For water in smooth pipe at moderate flow rates: pressure drop of approximately 1--2\,psi per 10\,ft of pipe at recommended velocities (3--8\,ft/s for water, 1--3\,ft/s for hydraulic oil). If pressure drop is excessive, increase pipe diameter; doubling the diameter reduces $\Delta P$ by 32$\times$ (Darcy-Weisbach scales as $D^{-5}$ for fixed flow rate).
+\end{tipbox}
+
+\section{Flow Measurement}
+
+\subsection{Differential Pressure Methods}
+These methods create a constriction that accelerates the fluid, producing a pressure drop related to flow velocity by Bernoulli's equation.
+
+\textbf{Orifice plate}: a flat plate with a circular hole installed in the pipe. Simplest and cheapest. $Q = C_d A_o \sqrt{2\Delta P/\rho}$ where $C_d$ is the discharge coefficient ($\sim$0.6 for a sharp-edge orifice) and $A_o$ is the orifice area. Permanent pressure loss is high (40--90\% of measured $\Delta P$).
+
+\textbf{Venturi tube}: a gradually converging section followed by a gradual divergence. Higher $C_d$ ($\sim$0.98) and much lower permanent pressure loss (5--15\%). More expensive and larger than an orifice plate.
+
+\textbf{Pitot tube}: measures the difference between stagnation pressure (total) and static pressure at a point in the flow: $v = \sqrt{2\Delta P/\rho}$. Measures velocity at a single point; must traverse the cross-section to find average velocity.
+
+\subsection{Positive Displacement Flowmeters}
+Trap a fixed volume of fluid per revolution or cycle and count the cycles. Examples: oval gear, nutating disc, and piston meters. Very accurate ($\pm$0.1--0.5\%) and measure total volume directly. Used for custody transfer (fuel dispensing, water metering).
+
+\subsection{Turbine Flowmeters}
+A rotor spins at a speed proportional to flow velocity. A magnetic pickup generates one pulse per blade passage. Frequency output is proportional to flow rate. Good accuracy ($\pm$0.5--1\%) and fast response. Requires clean fluid (particles damage bearings).
+
+\subsection{Ultrasonic Flowmeters}
+Transit-time type: measure the difference in ultrasonic pulse travel time upstream vs. downstream. Clamp-on versions require no pipe modification. Doppler type: measure frequency shift of ultrasonic pulses reflected off particles or bubbles (requires some particulate in the fluid).
+
+\subsection{Electromagnetic Flowmeters}
+A conductive fluid flowing through a magnetic field generates a voltage proportional to velocity (Faraday's law): $V = BDv$ where $B$ is the magnetic flux density and $D$ is the pipe diameter. No moving parts, no obstruction, works with dirty or corrosive fluids. Requires conductive fluid (water, brine, slurries; not hydrocarbons).
+
+\begin{examplebox}[ThermoRig: Cooling Loop Flow Measurement]
+The ThermoRig cooling loop circulates water at 2\,L/min through a 10\,mm ID tube. To measure flow rate: a small turbine flowmeter (Gems FT-110, pulse output) installed in the tube produces 2700 pulses per liter. At 2\,L/min: $2 \times 2700 = 5400$ pulses/min $= 90$\,Hz. The ESP32 measures the pulse frequency with a hardware timer/counter and converts to flow rate. Flow velocity: $v = Q/A = (2/60 \times 10^{-3})/((\pi/4)(0.01)^2) = 0.42$\,m/s. Reynolds number: $\text{Re} = 998 \times 0.42 \times 0.01/0.001 = 4192$ (transitional). The flow measurement resolution depends on the counting interval: over 1\,s, the resolution is $1/2700 = 0.37$\,mL, or $\pm$0.02\,L/min.
+\end{examplebox}
+
+\section{Hydraulic Systems}
+
+Hydraulic systems use pressurized oil (typically 100--350\,bar, 1500--5000\,psi) to transmit large forces through compact actuators. Key components:
+
+\textbf{Pump}: converts mechanical energy (from an electric motor or engine) into fluid flow at pressure. Types: gear (fixed displacement, simple, tolerant of contamination), vane (variable displacement, quieter), and piston (highest pressure and efficiency, most expensive).
+
+\textbf{Actuators}: hydraulic cylinders (linear motion) and hydraulic motors (rotary motion). A 50\,mm bore cylinder at 200\,bar produces $F = P \times A = 200 \times 10^5 \times (\pi/4)(0.05)^2 = 39.3$\,kN ($\sim$8800\,lbf) from a compact package.
+
+\textbf{Directional control valves}: route fluid to actuators. Described by number of ports and positions (4/3 = four ports, three positions). Center condition (what happens when the valve is centered) affects system behavior: closed-center locks the actuator in place; open-center allows free movement; tandem-center unloads the pump while holding the actuator.
+
+\textbf{Pressure relief valve}: limits maximum system pressure by diverting flow back to the tank when pressure exceeds the set point. This is the primary safety device in any hydraulic circuit.
+
+\textbf{Reservoir (tank)}: stores fluid, allows air separation, and dissipates heat. Rule of thumb: tank capacity = 3$\times$ pump flow rate (a 10\,L/min pump needs a 30\,L tank).
+
+\begin{warningbox}[Hydraulic Safety]
+Hydraulic systems operate at pressures that can cause severe injury or death. A 200\,bar (3000\,psi) pinhole leak produces a jet that can penetrate skin and inject fluid into tissue (fluid injection injury, a surgical emergency). Never use your hand to check for leaks; use a piece of cardboard. Always relieve pressure before disconnecting fittings. Wear safety glasses when working near pressurized lines.
+\end{warningbox}
+
+\section{Pneumatic Systems}
+
+Pneumatic systems use compressed air (typically 4--8\,bar, 60--120\,psi) for force transmission and automation. Advantages over hydraulics: air is free, clean, and non-flammable; leaks are not messy; systems are simpler and cheaper. Disadvantages: lower force density (lower pressure), compressible fluid makes precise speed and position control difficult, and air must be dried and filtered (moisture causes corrosion and freezing in exhaust).
+
+\textbf{Compressor}: generates compressed air. Types: reciprocating (piston), rotary screw, and diaphragm. Compressed air is stored in a receiver tank that smooths pressure pulsations.
+
+\textbf{Air preparation unit (FRL)}: Filter (removes particles and water), Regulator (reduces and stabilizes pressure), Lubricator (adds oil mist for lubrication of downstream components). Always install an FRL before pneumatic actuators.
+
+\textbf{Pneumatic cylinders}: same principle as hydraulic cylinders but at lower pressure. A 50\,mm bore cylinder at 6\,bar produces $F = 6 \times 10^5 \times (\pi/4)(0.05)^2 = 1.18$\,kN ($\sim$265\,lbf). Adequate for clamping, pushing, and light automation.
+
+\textbf{Proportional control}: unlike hydraulics, pneumatic systems are challenging to control proportionally due to air compressibility. Proportional valves and electronic pressure regulators enable closed-loop pressure and position control, but with lower bandwidth and precision than hydraulic equivalents.
+
+\section{Control Valves for Process Control}
+
+A \textbf{control valve} is the ``final control element'' in a feedback loop that regulates flow, pressure, or level. The PID controller (Chapter~17) sends a command signal (typically 4--20\,mA or 0--10\,V), and the valve adjusts its opening to achieve the desired flow rate.
+
+\textbf{Valve characteristics}: describe the relationship between valve opening (0--100\%) and flow. \textbf{Linear}: flow is proportional to opening (used when the system pressure drop is primarily across the valve). \textbf{Equal-percentage}: each increment of opening changes flow by a constant percentage of the current flow (used when the system pressure drop varies with flow, which is most common). \textbf{Quick-opening}: large flow change at small openings (used for on/off service).
+
+\textbf{Valve sizing}: the flow coefficient $C_v$ relates flow rate to pressure drop: $Q = C_v \sqrt{\Delta P/SG}$ where $Q$ is in GPM and SG is specific gravity. Select a valve with $C_v$ large enough for the maximum required flow, but not so large that the valve operates below 20\% opening at normal flow (poor control resolution).
+
+\begin{keyconceptbox}[Requirements Mapping: Fluid Power Instrumentation]
+``The hydraulic pressure sensor shall measure 0--250\,bar with $\pm$0.5\% FS accuracy and a 4--20\,mA output.'' ``The flow control valve shall have an equal-percentage characteristic with $C_v = 12$ and a pneumatic actuator with 4--20\,mA positioner input.'' ``The cooling loop flow sensor shall measure 0.5--5.0\,L/min with $\pm$3\% accuracy and a digital pulse output.'' ``Pneumatic supply pressure shall be regulated to $6.0 \pm 0.2$\,bar at the FRL unit.''
+\end{keyconceptbox}
+
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Water flows through a 25\,mm ID pipe at 3\,L/min. Calculate the flow velocity, the Reynolds number (at 20\,\degC{}), and determine if the flow is laminar or turbulent.
+\item An orifice plate with a 10\,mm bore is installed in a 25\,mm pipe carrying water. If the differential pressure across the orifice is 15\,kPa, what is the volumetric flow rate? Use $C_d = 0.62$.
+\item A hydraulic cylinder has a bore of 75\,mm and operates at 150\,bar. What force does it produce? If the piston must extend 200\,mm in 2\,s, what pump flow rate is needed?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $A = (\pi/4)(0.025)^2 = 4.91 \times 10^{-4}$\,m$^2$. $v = Q/A = (3/60 \times 10^{-3})/4.91 \times 10^{-4} = 0.102$\,m/s. $\text{Re} = 998 \times 0.102 \times 0.025/0.001 = 2540$. This is in the transitional regime ($2300 < \text{Re} < 4000$); flow may be laminar or turbulent depending on pipe roughness and upstream conditions.
+\item $A_o = (\pi/4)(0.01)^2 = 7.85 \times 10^{-5}$\,m$^2$. $Q = C_d A_o \sqrt{2\Delta P/\rho} = 0.62 \times 7.85 \times 10^{-5} \times \sqrt{2 \times 15000/998} = 4.87 \times 10^{-5} \times 5.48 = 2.67 \times 10^{-4}$\,m$^3$/s $= 16.0$\,L/min.
+\item $A = (\pi/4)(0.075)^2 = 4.42 \times 10^{-3}$\,m$^2$. $F = P \times A = 150 \times 10^5 \times 4.42 \times 10^{-3} = 66.3$\,kN ($\sim$14{,}900\,lbf). Volume for 200\,mm extension: $V = A \times L = 4.42 \times 10^{-3} \times 0.2 = 8.84 \times 10^{-4}$\,m$^3 = 0.884$\,L. Flow rate: $Q = V/t = 0.884/2 = 0.442$\,L/s $= 26.5$\,L/min. Select a pump rated for at least 30\,L/min to allow for leakage and margin.
+\end{enumerate}
+
+
+% ================================================================
+% APPENDIX: GLOSSARY
+% ================================================================

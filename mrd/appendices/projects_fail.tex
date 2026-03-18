@@ -1,0 +1,45 @@
+% Why Instrumentation Projects Fail
+% Auto-generated from megn300_master_reference.tex
+
+\chapter*{Why Instrumentation Projects Fail}
+\label{ch:projects_fail}
+\addcontentsline{toc}{chapter}{Why Instrumentation Projects Fail}
+
+The following failure patterns are drawn from over a decade of observing student projects in instrumentation, controls, and capstone design courses. They are listed in approximate order of frequency.
+
+\section*{1. Aliasing from Insufficient Sampling or Missing Anti-Alias Filter}
+The most common technical failure. Students sample at a rate barely above the signal of interest, observe strange low-frequency artifacts in the data, and spend hours debugging the sensor when the problem is in the DAQ configuration. The fix is straightforward: sample at 5--10$\times$ the highest frequency of interest and place an analog low-pass filter before the ADC with $f_c$ at or below $f_s/2$.
+
+\section*{2. Ground Loops and Noise from Poor Wiring Practice}
+The second most common failure. Symptoms: noisy sensor readings that change when you touch the wires, 60\,Hz interference patterns in FFT plots, readings that shift when a motor turns on. The root cause is almost always daisy-chained ground connections or signal and power wires running in parallel. Star grounding, twisted-pair signal wiring, and physical separation of power and signal conductors eliminate most noise problems without expensive shielding.
+
+\section*{3. Sensor Selected Without Checking Output Compatibility}
+Students select a sensor from an online tutorial without verifying that the output voltage range matches the ADC input range, that the output impedance is compatible with the ADC input impedance, or that the sensor's response time is fast enough for the measurement. A 10\,V sensor connected to a 3.3\,V ADC saturates the reading and may damage the ADC. A high-impedance sensor connected to a low-impedance ADC input produces a severe loading error.
+
+\section*{4. PID Tuned Without Understanding the Process}
+Students type Z-N tuning parameters into a PID block, observe overshoot or oscillation, and respond by randomly adjusting gains without a systematic approach. The Z-N method produces aggressive starting parameters that are intended to be refined. Begin with proportional-only control to understand the process response, then add integral action slowly to eliminate steady-state error, and add derivative only if the process dynamics require damping.
+
+\section*{5. Uncertainty Analysis Omitted or Applied Incorrectly}
+Raw measurements reported without uncertainty bounds are scientifically meaningless, yet many students skip uncertainty analysis entirely or apply the formulas incorrectly (most commonly: adding uncertainties linearly instead of in quadrature, or confusing precision and accuracy). Every reported measurement should include an uncertainty estimate following the GUM framework.
+
+\section*{6. Filter Design Based on Rules of Thumb Instead of Requirements}
+Students apply a ``standard'' 10\,Hz low-pass filter to every signal without analyzing what frequencies are actually present, what the noise spectrum looks like, or what frequency content must be preserved. The result is either insufficient filtering (noise passes through) or excessive filtering (the signal of interest is attenuated or phase-shifted). Always start by examining the signal's frequency content (FFT), then design the filter to preserve the signal band and reject the noise band.
+
+\section*{7. Power Supply Inadequate for Actuator Loads}
+A bench supply or USB port that works fine with sensors alone browns out when a motor or heater activates, causing the MCU to reset. The fix: calculate total system current including actuator inrush, select a supply with 50\% margin, and separate the actuator power rail from the sensor/MCU rail with independent regulation.
+
+\section*{8. Documentation Insufficient for Reproduction}
+The system works on demo day, but the report lacks the wiring diagram, DAQ channel assignments, LabVIEW block diagram screenshots, calibration data, and sampling parameters needed for someone else to reproduce the results. If a competent peer cannot replicate your setup from your report alone, the documentation has failed.
+
+\section*{9. Safety Ignored Until Something Breaks}
+No fuse on the power input, no flyback diode on the relay coil, no current limit on the bench supply. The first failure destroys a component (or several). Adding protection after a failure costs time and money that prevention would have avoided. Design the protection circuit first, then add the functional circuit inside the protected envelope.
+
+\section*{10. Scope Creep and Feature Addition Without Requirements Traceability}
+Students add features (wireless data logging, color displays, additional sensors) that were not in the original requirements, consuming time that should have been spent on verification and documentation. Every addition should trace to a requirement; if there is no requirement, there should be no feature.
+
+
+% ================================================================
+% APPENDIX: ABET OUTCOME MAPPING
+% ================================================================
+
+

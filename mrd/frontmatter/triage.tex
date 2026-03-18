@@ -1,0 +1,70 @@
+% What Should I Be Reading Right Now?
+% Auto-generated from megn300_master_reference.tex
+
+\chapter*{What Should I Be Reading Right Now?}
+\addcontentsline{toc}{chapter}{What Should I Be Reading Right Now?}
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{l X p{4.5cm}}
+\toprule
+\textbf{If you are\ldots} & \textbf{Your problem} & \textbf{Go to} \\
+\midrule
+Just starting the course & Need the big picture & Ch.~\ref{ch:measurement_theory}, p.\,\pageref{ch:measurement_theory} \\
+Calibrating a sensor & Need procedure and equations & Ch.~\ref{ch:static}, p.\,\pageref{ch:static} \\
+Sensor too slow for your signal & Dynamic response limiting you & Ch.~\ref{ch:dynamic}, p.\,\pageref{ch:dynamic} \\
+Reporting a measurement & Need uncertainty and CI & Ch.~\ref{ch:error}, p.\,\pageref{ch:error} \\
+Selecting a sensor or actuator & Need transduction principles & Ch.~\ref{ch:sensors}, p.\,\pageref{ch:sensors} \\
+Choosing ADC settings & Bits, sample rate, range & Ch.~7 (Analog vs.\ Digital) \\
+Seeing noisy data & Need to improve SNR & Ch.~\ref{ch:snr}, p.\,\pageref{ch:snr} \\
+Running an FFT in LabVIEW & Need parameters and windows & Ch.~\ref{ch:fft}, p.\,\pageref{ch:fft} \\
+Getting aliased data & False frequencies appearing & Ch.~\ref{ch:dsp}, p.\,\pageref{ch:dsp} \\
+Designing an anti-alias filter & Need cutoff and order & Ch.~\ref{ch:analog_filters}, p.\,\pageref{ch:analog_filters} \\
+Need circuit fundamentals & Ohm's Law, KVL/KCL, dividers & Ch.~\ref{ch:circuits}, p.\,\pageref{ch:circuits} \\
+Signal too small for the ADC & Need amplification & Ch.~\ref{ch:amplifiers}, p.\,\pageref{ch:amplifiers} \\
+Driving a motor or heater & Need switching circuits & Ch.~\ref{ch:highpower}, p.\,\pageref{ch:highpower} \\
+System not working after assembly & Need debugging methodology & Ch.~\ref{ch:debugging}, p.\,\pageref{ch:debugging} \\
+Control loop oscillating & PID gain too high & Ch.~\ref{ch:pid}, p.\,\pageref{ch:pid} \\
+PID has steady-state offset & Missing integral action & Ch.~\ref{ch:pid}, p.\,\pageref{ch:pid} \\
+PID overshoots massively & Integral windup & Ch.~\ref{ch:pid}, p.\,\pageref{ch:pid} \\
+Working with fluid systems & Flow, pressure, hydraulics & Ch.~\ref{ch:fluid}, p.\,\pageref{ch:fluid} \\
+LabVIEW VI broken & DAQ or code error & Appendix (LabVIEW Reference) \\
+Preparing for lab practical & Need formula summary & Quick Ref tables \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Essential Formulas Quick Reference}
+\begin{multicols}{2}
+\small
+\textbf{Filters:} $f_c = 1/(2\pi RC)$
+
+\textbf{ADC Resolution:} LSB $= V_{\text{range}}/2^n$
+
+\textbf{SNR:} $20\log_{10}(V_s/V_n)$\,dB
+
+\textbf{Max ADC SNR:} $6.02n + 1.76$\,dB
+
+\textbf{Nyquist:} $f_s > 2 f_{\max}$ (practical: $\geq 10\times$)
+
+\textbf{FFT Resolution:} $\Delta f = f_s / N$
+
+\textbf{Alias:} $f_{\text{alias}} = |f - n \cdot f_s|$
+
+\textbf{Non-inv.\ amp:} $G = 1 + R_f/R_g$
+
+\textbf{INA gain:} $G = 1 + 2R/R_G$
+
+\textbf{Bridge (quarter):} $\Delta V = V_{ex} \cdot (\Delta R/R) / 4$
+
+\textbf{First-order:} $f_{-3\text{dB}} = 1/(2\pi\tau)$
+
+\textbf{Bandwidth $\times$ rise time:} $\approx 0.35$
+
+\textbf{Uncertainty (RSS):} $u_R = \sqrt{\Sigma(\partial f/\partial x_i)^2 u_i^2}$
+
+\textbf{Std.\ error:} $s_{\bar{x}} = s/\sqrt{n}$
+
+\textbf{PID:} $u = K_p e + K_i \int e\,dt + K_d\, de/dt$
+\end{multicols}
+
+\newpage

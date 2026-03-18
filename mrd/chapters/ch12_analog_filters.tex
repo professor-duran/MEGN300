@@ -1,0 +1,352 @@
+% Chapter 12: Analog Filter Design
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Analog Filter Design}
+\label{ch:analog_filters}\index{filter!low-pass}\index{filter!Butterworth}\index{filter!Chebyshev}\index{filter!Bessel}\index{cutoff frequency}\index{Sallen-Key}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{scope}[shift={(-4.5,0)}]
+\draw[MinesBlue, thick] (0,0) -- (0.5,0);
+\draw[MinesBlue, thick, fill=LightBG] (0.5,-0.25) rectangle (2.0,0.25);
+\node[font=\small\sffamily] at (1.25,0) {$R$};
+\draw[MinesBlue, thick] (2.0,0) -- (3.5,0);
+\draw[MinesBlue, thick] (3.0,0.3) -- (4.0,0.3);
+\draw[MinesBlue, thick] (3.0,0.45) -- (4.0,0.45);
+\draw[MinesBlue, thick] (3.5,0) -- (3.5,0.3);
+\draw[MinesBlue, thick] (3.5,0.45) -- (3.5,0.8);
+\node[font=\small\sffamily] at (4.3,0.38) {$C$};
+\draw[MinesBlue, thick] (3.2,0.8) -- (3.8,0.8);
+\draw[MinesBlue, thick] (3.3,0.9) -- (3.7,0.9);
+\draw[MinesBlue, thick] (3.4,1.0) -- (3.6,1.0);
+\node[font=\small\sffamily, MinesBlue] at (0,-0.5) {$V_{\text{in}}$};
+\node[font=\small\sffamily, AccentTeal] at (3.5,-0.5) {$V_{\text{out}}$};
+\node[font=\scriptsize\sffamily, MinesSilver] at (1.75,-1.0) {$f_c = 1/(2\pi RC)$};
+\end{scope}
+\begin{scope}[shift={(3.0,-1.5)}]
+\begin{axis}[
+    width=7.5cm, height=5cm,
+    xlabel={$f/f_c$}, ylabel={Magnitude (dB)},
+    xmode=log, xmin=0.1, xmax=100, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    legend style={font=\tiny\sffamily, at={(0.02,0.02)}, anchor=south west},
+]
+\addplot[domain=0.1:100, samples=200, thick, MinesBlue] {-10*log10(1+x^2)};
+\addlegendentry{1st order}
+\addplot[domain=0.1:100, samples=200, thick, AccentTeal] {-20*log10(1+x^2)};
+\addlegendentry{2nd order}
+\addplot[dashed, MinesSilver, thin] coordinates {(0.1,-3) (100,-3)};
+\end{axis}
+\end{scope}
+\end{tikzpicture}
+\caption{Left: first-order passive RC low-pass filter. Right: Bode magnitude response comparing 1st order ($-20$\,dB/dec) and 2nd order ($-40$\,dB/dec). A first-order filter is often insufficient for anti-aliasing.}
+\label{fig:rc_bode}
+\end{figure}
+
+\section{What Filters Do}
+A filter selectively passes or rejects frequency components of a signal. Four basic types:
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Low-pass}: passes frequencies below cutoff $f_c$; attenuates above. The most common in instrumentation (anti-aliasing, noise reduction).
+\item \textbf{High-pass}: passes frequencies above $f_c$; attenuates below. Removes DC offset and low-frequency drift.
+\item \textbf{Band-pass}: passes a band between $f_L$ and $f_H$; attenuates outside. Isolates a signal of interest.
+\item \textbf{Band-stop (notch)}: rejects a narrow band around a center frequency. Removes a specific interference (e.g., 60\,Hz hum).
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    ftype/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                  minimum width=2.8cm, minimum height=1.6cm, align=center, font=\scriptsize\sffamily},
+]
+\node[ftype] (lp) at (0,0) {\textbf{Low-Pass}\\Passes $f < f_c$\\Blocks $f > f_c$};
+\node[ftype] (hp) at (3.8,0) {\textbf{High-Pass}\\Blocks $f < f_c$\\Passes $f > f_c$};
+\node[ftype] (bp) at (7.6,0) {\textbf{Band-Pass}\\Passes $f_L < f < f_H$\\Blocks outside};
+\node[ftype] (bs) at (11.4,0) {\textbf{Band-Stop}\\Blocks $f_L < f < f_H$\\Passes outside};
+% Iconic magnitude shapes below each
+\foreach \x/\shape in {0/lp, 3.8/hp, 7.6/bp, 11.4/bs} {
+    \begin{scope}[shift={(\x,-2.0)}]
+        \draw[MinesSilver, ->] (-1,0) -- (1.3,0) node[right, font=\tiny\sffamily] {$f$};
+        \draw[MinesSilver, ->] (-0.9,-0.1) -- (-0.9,1.0);
+    \end{scope}
+}
+% LP shape
+\draw[MinesBlue, thick] (-1,-2) -- (-0.2,-2) -- (0.1,-2.8) -- (1,-2.8);
+% HP shape
+\draw[MinesBlue, thick] (2.8,-2.8) -- (3.5,-2.8) -- (3.8,-2) -- (4.8,-2);
+% BP shape
+\draw[MinesBlue, thick] (6.6,-2.8) -- (7.2,-2.8) -- (7.4,-2) -- (7.8,-2) -- (8.0,-2.8) -- (8.6,-2.8);
+% BS shape
+\draw[MinesBlue, thick] (10.4,-2) -- (11.0,-2) -- (11.2,-2.8) -- (11.6,-2.8) -- (11.8,-2) -- (12.4,-2);
+\end{tikzpicture}
+\caption{Four filter types with idealized magnitude response shapes. Low-pass is the most common in MEGN~300 (anti-aliasing, noise reduction). Band-stop (notch) is used to remove specific interference frequencies (e.g., 60\,Hz mains hum).}
+\label{fig:filters}
+\end{figure}
+
+\section{Passive RC Filters}
+The simplest filter: one resistor and one capacitor.
+
+\subsection{First-Order Low-Pass}
+RC in series; output across the capacitor.
+\begin{equation}
+f_c = \frac{1}{2\pi RC}, \qquad H(j\omega) = \frac{1}{1 + j\omega RC}
+\end{equation}
+Magnitude rolls off at $-20$\,dB/decade above $f_c$. Phase shifts from 0\ang{} (DC) to $-90$\ang{} (high frequency), passing through $-45$\ang{} at $f_c$.
+
+\subsection{First-Order High-Pass}
+Same components; output across the resistor.
+\begin{equation}
+f_c = \frac{1}{2\pi RC}, \qquad H(j\omega) = \frac{j\omega RC}{1 + j\omega RC}
+\end{equation}
+Passes frequencies above $f_c$; $-20$\,dB/decade roll-off below $f_c$.
+
+\section{Active Filters}
+Active filters use operational amplifiers to provide gain, buffering, and steeper roll-off without the signal attenuation inherent in passive filters. The Sallen-Key topology is the most common for second-order sections.
+
+\subsection{Filter Response Types}
+\textbf{Butterworth}: maximally flat magnitude in the passband. No ripple. The standard choice when flat amplitude response is more important than sharp cutoff. Roll-off: $-20n$\,dB/decade for $n$-th order.
+
+\textbf{Chebyshev Type I}: steeper roll-off than Butterworth for the same order, but introduces ripple in the passband. Use when sharp cutoff is more important than flat passband.
+
+\textbf{Bessel}: maximally flat group delay (linear phase). The best choice for time-domain measurements (pulse shapes, step responses) where phase distortion must be minimized.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={$f/f_c$}, ylabel={Magnitude (dB)},
+    xmode=log, xmin=0.1, xmax=10, ymin=-60, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\small\sffamily, at={(0.98,0.5)}, anchor=east},
+]
+% 4th-order Butterworth: H = 1/sqrt(1+x^8)
+\addplot[domain=0.1:10, samples=300, thick, MinesBlue] {-10*log10(1+x^8)};
+\addlegendentry{Butterworth (flat)}
+% 4th-order Chebyshev (1 dB ripple approximation)
+\addplot[domain=0.1:10, samples=300, thick, WarnOrange]
+    {x<0.85 ? -0.5+0.5*cos(deg(8*x)) : -10*log10(1+x^10)-3};
+\addlegendentry{Chebyshev (sharp)}
+% 4th-order Bessel (gentler rolloff)
+\addplot[domain=0.1:10, samples=300, thick, AccentTeal] {-10*log10(1+x^4*0.5+x^8*0.1)};
+\addlegendentry{Bessel (linear phase)}
+% -3 dB line
+\addplot[dashed, MinesSilver, thin] coordinates {(0.1,-3) (10,-3)};
+\node[font=\tiny\sffamily, MinesSilver] at (axis cs:0.15,-5) {$-3$\,dB};
+\end{axis}
+\end{tikzpicture}
+\caption{Bode magnitude comparison of 4th-order Butterworth, Chebyshev, and Bessel low-pass filters. Chebyshev has the steepest rolloff but passband ripple. Bessel has the gentlest rolloff but preserves pulse shape (linear phase). Butterworth is the default.}
+\label{fig:filter_compare}
+\end{figure}
+
+\begin{tipbox}[Choosing a Filter Type]
+For anti-aliasing: Butterworth (flat passband). For isolating a specific frequency: Chebyshev (sharp cutoff). For preserving pulse shape: Bessel (linear phase). When in doubt, use Butterworth.
+\end{tipbox}
+
+
+\section{Designing Active Filters with Op-Amps}
+
+\subsection{Sallen-Key Low-Pass (Second-Order)}
+The Sallen-Key topology uses a single op-amp in a non-inverting configuration with positive feedback through capacitors. For a unity-gain second-order Butterworth low-pass:
+\begin{equation}
+f_c = \frac{1}{2\pi\sqrt{R_1 R_2 C_1 C_2}}
+\end{equation}
+For Butterworth response (maximally flat), set $C_2 = 2C_1$ and $R_1 = R_2 = R$:
+\begin{equation}
+f_c = \frac{1}{2\pi R \sqrt{2C_1^2}} = \frac{1}{2\pi R C_1 \sqrt{2}}
+\end{equation}
+
+\textbf{Design procedure} for a 2nd-order Butterworth LP at $f_c$:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Choose $C_1$ (typically 1--100\,nF for audio/instrumentation frequencies).
+\item Set $C_2 = 2 C_1$.
+\item Calculate $R = R_1 = R_2 = 1/(2\pi f_c C_1 \sqrt{2})$.
+\item Select the nearest standard resistor value.
+\item Use a unity-gain stable op-amp (e.g., TL072, OPA2134, or MCP6002 for 3.3\,V systems).
+\end{enumerate}
+
+\subsection{Higher-Order Filters}
+Higher-order filters are built by cascading second-order sections. A 4th-order Butterworth = two cascaded 2nd-order Sallen-Key stages, each with a specific $Q$ value (1st stage: $Q = 0.541$; 2nd stage: $Q = 1.307$). Filter design tables (or software like FilterPro, Analog Devices Filter Wizard) provide the component values for each stage.
+
+\begin{tipbox}[Use Filter Design Software]
+Do not calculate high-order filter components by hand. Use Texas Instruments FilterPro, Analog Devices Filter Wizard, or the MathWorks Filter Designer. Input your requirements (type, order, cutoff, passband ripple) and the tool outputs a complete schematic with component values. Verify in SPICE simulation before building.
+\end{tipbox}
+
+
+\section{Why Analog Filters Are Essential}
+Digital filters (Chapter 11) operate on digitized signals only. Before the ADC, the only noise removal tool is an analog filter. The anti-alias filter (analog LP before ADC) is mandatory; without it, aliasing permanently corrupts digital data.
+
+\section{First-Order RC Low-Pass Filter}
+$f_c = 1/(2\pi RC)$. At $f_c$: $-3$\,dB. Above: $-20$\,dB/decade. Rarely adequate for anti-aliasing; at $10\times f_c$, only $-20$\,dB attenuation passes through. Choose $R$ in 1--100\,k$\Omega$ range (balance current draw vs.\ thermal noise).
+
+\section{Sallen-Key Active Filters}
+Second-order ($-40$\,dB/decade) with one op-amp. Equal-component design ($R_1 = R_2$, $C_1 = C_2$): $f_c = 1/(2\pi RC)$. For Butterworth response ($Q = 0.707$), set gain $G = 1.586$. Cascade two stages for 4th order ($-80$\,dB/decade).
+
+\section{Filter Types}
+\textbf{Butterworth}: maximally flat passband. No ripple. Default for general-purpose and anti-aliasing. $|H(f)| = 1/\sqrt{1+(f/f_c)^{2n}}$.
+
+\textbf{Chebyshev Type I}: steepest rolloff for given order. Accepts 0.5--3\,dB passband ripple. Use when maximum rejection of a nearby interferer is needed.
+
+\textbf{Bessel}: most linear phase (constant group delay). Preserves pulse shape. Gentlest rolloff. Use for time-domain transient measurements.
+
+\begin{warningbox}[Phase Delay and Control Stability]
+Higher-order filters introduce more phase lag. A 4th-order Butterworth at 100\,Hz has $\sim$180$^\circ$ lag at cutoff. In control loops, this reduces phase margin and can cause instability. Limit filter order and set cutoff well above control bandwidth.
+\end{warningbox}
+
+\section{Notch Filters}
+A notch (band-reject) filter removes a specific frequency (e.g., 60\,Hz) while passing all others. Twin-T passive topology achieves $-40$ to $-60$\,dB rejection. However, if interference has harmonics, each needs its own notch. Fixing grounding and shielding is often a better solution.
+
+\section{Design Workflow}
+(1) Determine $f_{\max}$ and $f_s$. (2) Set $f_c$ between $f_{\max}$ and $f_s/2$ (common: $f_c = f_s/4$). (3) Required stopband attenuation at $f_s/2$: $\geq 6n$\,dB for $n$-bit ADC. (4) Choose filter type. (5) Calculate order: $n \geq \text{attenuation}/(20\log_{10}(f_s/(2f_c)))$ for Butterworth. (6) Implement with cascaded Sallen-Key stages. (7) Measure actual response.
+
+
+\section{Component Selection for Filters}
+Real components have parasitic properties that affect filter performance. Resistors have parasitic inductance (wire-wound types: 1--10\,$\mu$H) and capacitance (0.1--1\,pF). Carbon film and thin-film resistors are preferred for filter applications. Capacitors have parasitic ESR (equivalent series resistance) and ESL (inductance). Ceramic (C0G/NP0) are best for filter applications: low ESR, low temperature coefficient, stable capacitance. Avoid Y5V and Z5U ceramics (capacitance varies 20--80\% with temperature and voltage).
+
+\section{Active Filter Power Supply Considerations}
+The op-amp in a Sallen-Key filter needs headroom above and below the signal swing. For a 0--5\,V signal, use $\pm$12\,V or $\pm$15\,V bipolar supply (or a single 12\,V supply with mid-rail virtual ground). Single-supply op-amps (rail-to-rail input/output) can operate on 5\,V, but the signal must be biased to mid-supply for maximum dynamic range.
+
+\section{Measuring Filter Response}
+After building a filter, verify its frequency response experimentally: (1) Apply a sine wave from a function generator. (2) Sweep the frequency from $0.1 f_c$ to $10 f_c$ in 10--20 steps. (3) At each frequency, measure the input and output amplitudes (RMS voltmeters or oscilloscope). (4) Compute the gain $G = V_{\text{out}}/V_{\text{in}}$ and convert to dB. (5) Plot the Bode magnitude diagram and verify it matches the design. Deviations indicate component tolerances, parasitic effects, or wiring errors.
+
+\section{Switched-Capacitor Filters}
+An alternative to traditional RC active filters, switched-capacitor filters use a clock signal to simulate resistors with capacitor-switch networks. The ``resistance'' is $R_{\text{eq}} = 1/(f_{\text{clk}} C)$, so the cutoff frequency scales linearly with the clock frequency. This allows easy, precise frequency tuning by changing a single clock signal. Available as complete ICs (e.g., MAX291/MAX292 for 8th-order Butterworth). Ideal for applications needing multiple filter frequencies or temperature-insensitive cutoff.
+\section{Active Filter Component Sensitivity}
+Real components have tolerances (1\% for standard resistors, 5--10\% for ceramic capacitors). These tolerances shift the actual filter cutoff frequency and $Q$ from the design values.
+
+For a Sallen-Key filter with equal components ($R$, $C$): the cutoff frequency $f_c = 1/(2\pi RC)$ has a sensitivity of $-1$ to both $R$ and $C$: a 1\% increase in $R$ decreases $f_c$ by 1\%. With 1\% resistors and 5\% capacitors, the worst-case $f_c$ deviation is approximately $\pm$6\%. For anti-aliasing, this means designing with a safety margin: set $f_c$ at 80\% of the desired value to ensure the actual cutoff never exceeds the target.
+
+For the $Q$ factor, sensitivity depends on the topology. In the Sallen-Key, $Q$ is sensitive to the gain-setting resistors. A 1\% mismatch can shift $Q$ by 5--10\%, potentially causing peaking or reduced rolloff in a Butterworth design. Solution: use 0.1\% resistors for the gain network, or use a topology less sensitive to $Q$ (Multiple Feedback or State Variable).
+
+\section{Multiple Feedback (MFB) Topology}
+The MFB is an alternative to Sallen-Key that provides an inverting output and has lower sensitivity to component variations for high-$Q$ designs. The transfer function:
+\begin{equation}
+H(s) = \frac{-1/(R_1 R_3 C_1 C_2)}{s^2 + s(1/R_1 + 1/R_3)/(C_2) + 1/(R_2 R_3 C_1 C_2)}
+\end{equation}
+The MFB is preferred when $Q > 2$ because the Sallen-Key requires gain close to 3, which makes it sensitive to gain-resistor tolerance. The MFB achieves high $Q$ without high gain, reducing sensitivity.
+
+\section{State Variable Filter}
+The state-variable (or biquad) topology uses two integrators and a summing amplifier to provide simultaneous low-pass, band-pass, and high-pass outputs from a single circuit. Advantages: $f_c$ and $Q$ can be adjusted independently (by changing different component values), and the circuit is less sensitive to component tolerances than Sallen-Key at high $Q$. Disadvantage: requires three op-amps per second-order section (vs.\ one for Sallen-Key).
+
+The state variable is the topology of choice for tunable filters, notch filters (by summing the LP and HP outputs), and precision band-pass filters used in vibration analysis.
+
+\section{Switched-Capacitor Filters}
+Switched-capacitor (SC) filters simulate resistors using capacitors and electronic switches: $R_{\text{eq}} = 1/(f_{\text{clk}} \cdot C)$. By changing the clock frequency, the cutoff frequency changes proportionally. Available as complete ICs:
+
+\textbf{MAX291/MAX292}: 8th-order Butterworth or Bessel LP. Clock-to-cutoff ratio of 100:1. For $f_c = 1$\,kHz: apply a 100\,kHz clock. For $f_c = 10$\,Hz: apply a 1\,kHz clock. No external components needed beyond a clock source and decoupling capacitors.
+
+\textbf{LTC1068}: quad 2nd-order sections configurable as LP, HP, BP, or notch. For complex filter shapes.
+
+SC filters are ideal for anti-aliasing in systems where the sample rate (and therefore the required $f_c$) changes dynamically. They introduce clock feedthrough noise at $f_{\text{clk}}$ and its harmonics, which must be removed by a simple RC post-filter.
+
+\section{Filter Design Software Tools}
+Analog Devices Filter Wizard (\url{https://tools.analog.com/en/filterwizard/}): enter the specifications (type, order, cutoff, passband ripple), and the tool generates a complete schematic with component values, including specific op-amp recommendations.
+
+Texas Instruments FilterPro: similar capability with TI op-amp recommendations.
+
+MATLAB \texttt{butter()}, \texttt{cheby1()}, \texttt{besself()}: compute the analog prototype coefficients. Use \texttt{[b,a] = butter(n, Wn, 's')} for $n$th-order Butterworth with cutoff $W_n$ (rad/s).
+
+In MEGN~300 labs, use the Analog Devices tool for hardware anti-alias filter design, and LabVIEW's Filter Express VI for digital filters.
+
+\section{Practical Troubleshooting}
+\textbf{Filter oscillates}: the op-amp is not stable at the required gain and phase margin. Check the op-amp's unity-gain stability specification. Use a compensation capacitor or select a different op-amp.
+
+\textbf{Cutoff frequency is wrong}: measure the actual component values ($R$ and $C$) with a multimeter and LCR meter. Recalculate $f_c$ with measured values. Ceramic capacitors (X7R, Y5V) lose significant capacitance at DC bias voltages and elevated temperatures.
+
+\textbf{Passband gain is not flat}: the op-amp's open-loop gain is insufficient at the frequencies of interest. Check that the GBW product exceeds $f_c \times G \times 10$ (a 10$\times$ margin above the minimum).
+
+\textbf{Excessive noise}: check decoupling capacitors. Verify the power supply is clean. Use low-noise op-amps (OPA2277: $e_n = 8$\,nV/$\sqrt{\text{Hz}}$ vs.\ LM741: $e_n = 40$\,nV/$\sqrt{\text{Hz}}$).
+\section{Practical Active Filter Construction Tips}
+\textbf{Component matching}: for each Sallen-Key stage, the two resistors should be from the same batch (matched temperature coefficients), and the two capacitors should be measured and selected to be within 1\% of each other. A 5\% capacitor tolerance can shift $f_c$ by 5\% and $Q$ by up to 15\%.
+
+\textbf{Op-amp selection for filters}: the op-amp's GBW must exceed $f_c \times G \times 10$. For a unity-gain Sallen-Key at $f_c = 10$\,kHz: GBW $> 100$\,kHz (any general-purpose op-amp). For a Sallen-Key at $f_c = 100$\,kHz with $G = 2$: GBW $> 2$\,MHz (use TL072 or better). Insufficient GBW causes premature rolloff and $Q$ peaking.
+
+\textbf{Capacitor types}: for filter circuits, use C0G/NP0 ceramic (stable with temperature and voltage, but limited to small values, typically $< 10$\,nF), polypropylene film (stable, low loss, available to 1\,$\mu$F), or polyester film (acceptable for non-critical applications). Avoid X7R and Y5V ceramics in the signal path (capacitance varies 20--80\% with DC bias and temperature).
+
+\textbf{PCB layout}: keep filter components physically close to the op-amp. Route the input trace away from the output trace to prevent capacitive coupling (which creates positive feedback and oscillation). Use a ground plane under the filter section to minimize stray impedance.
+\section{Complete Anti-Alias Filter Design: Step by Step}
+This section walks through a complete anti-alias filter design for a strain gauge measurement system, demonstrating every design decision.
+
+\textbf{Requirements}: measure strain from 0 to 200\,Hz with 14-bit accuracy. DAQ: NI~USB-6001, max 20\,kS/s.
+
+\textbf{Step 1: Choose sample rate.} Signal bandwidth $f_{\max} = 200$\,Hz. Using the $10\times$ rule: $f_s = 2000$\,S/s. Nyquist frequency $f_N = 1000$\,Hz.
+
+\textbf{Step 2: Determine required stopband attenuation.} For a 14-bit ADC: dynamic range $= 6.02 \times 14 + 1.76 = 86$\,dB. The anti-alias filter must attenuate all content above $f_N = 1000$\,Hz by at least 86\,dB to prevent aliased signals from exceeding the quantization noise floor.
+
+\textbf{Step 3: Choose cutoff frequency and filter type.} Set $f_c = 400$\,Hz (double the signal bandwidth, providing a guard band for the filter's transition region). Choose Butterworth (maximally flat passband, default for anti-aliasing).
+
+\textbf{Step 4: Calculate required order.} The Butterworth magnitude response at frequency $f$: $|H(f)| = 1/\sqrt{1 + (f/f_c)^{2n}}$. Attenuation at $f_N = 1000$\,Hz: $A = 20n\log_{10}(1000/400) = 20n \times 0.398 = 7.96n$\,dB. For 86\,dB: $n \geq 86/7.96 = 10.8$. Use $n = 12$ (6th-order $\times$ 2 for margin, implemented as six cascaded Sallen-Key stages).
+
+\textbf{Step 5: Compute component values.} Each Sallen-Key stage has specific $Q$ values determined by the Butterworth polynomial. For a 6th-order Butterworth, the three second-order section $Q$ values are: $Q_1 = 0.518$, $Q_2 = 0.707$, $Q_3 = 1.932$. For each section with $f_c = 400$\,Hz: choose $C = 10$\,nF (convenient standard value). Then $R = 1/(2\pi f_c C) = 1/(2\pi \times 400 \times 10^{-8}) = 39.8$\,k$\Omega$. Use 39.2\,k$\Omega$ (nearest E96 value). The gain for each section: $G = 3 - 1/Q$. For $Q_3 = 1.932$: $G = 2.482$, so $R_f/R_g = 1.482$. Use $R_f = 14.7$\,k$\Omega$, $R_g = 10.0$\,k$\Omega$ (ratio $= 1.47$, close enough with 1\% resistors).
+
+\textbf{Step 6: Select op-amps.} Each section needs GBW $> f_c \times G \times 10 = 400 \times 2.5 \times 10 = 10$\,kHz (trivial). Use TL072 (GBW $= 3$\,MHz, dual package, 3 packages for 6 sections). For low noise: substitute OPA2277 in the first two sections (closest to the sensor).
+
+\textbf{Step 7: Build, measure, verify.} After construction, sweep a sine wave from 10\,Hz to 5\,kHz and verify the frequency response matches the design within $\pm$1\,dB in the passband and achieves $> 80$\,dB attenuation at 1\,kHz.
+
+\section{Higher-Order Filter Design Tables}
+The following table gives the $Q$ values for each second-order section of Butterworth filters up to 8th order:
+
+\begin{table}[htbp]\centering\small
+\begin{tabular}{c l}
+\toprule
+\textbf{Order $n$} & \textbf{Section $Q$ values} \\
+\midrule
+2 & 0.707 \\
+3 & 1.000 (2nd-order section) + 1st-order section \\
+4 & 0.541, 1.307 \\
+6 & 0.518, 0.707, 1.932 \\
+8 & 0.510, 0.601, 0.900, 2.563 \\
+\bottomrule
+\end{tabular}
+\caption{Butterworth filter section $Q$ values. Higher-$Q$ sections produce peaking near $f_c$; place them last in the cascade to minimize noise amplification.}
+\end{table}
+
+For Chebyshev Type~I filters with 0.5\,dB passband ripple, the section $Q$ values are higher (e.g., 4th-order: $Q_1 = 0.785$, $Q_2 = 3.559$), which demands tighter resistor tolerances in the gain network. Bessel filter $Q$ values are lower than Butterworth (e.g., 4th-order: $Q_1 = 0.522$, $Q_2 = 0.806$), making them easier to implement but with gentler rolloff.
+
+\section{All-Pass Filters for Phase Correction}
+An all-pass filter has flat magnitude response ($|H(f)| = 1$ at all frequencies) but a frequency-dependent phase shift. It is used to correct the phase distortion introduced by other filter stages without affecting their magnitude response. In applications where both sharp cutoff (Chebyshev or Butterworth) and linear phase (for pulse preservation) are needed, cascade the LP filter with an all-pass equalizer designed to linearize the total phase response.
+
+\section{Anti-Alias Filter Implementation Options}
+Three practical approaches for MEGN~300 projects:
+
+\textbf{Discrete components on protoboard}: most educational, teaches filter theory directly. Use for cutoff frequencies $< 10$\,kHz. Component count: 2 resistors + 2 capacitors + 1 op-amp per second-order section.
+
+\textbf{Switched-capacitor IC} (MAX291/MAX292): no external components except clock source and bypass caps. 8th-order Butterworth or Bessel. Set cutoff by clock frequency ($f_c = f_{\text{clk}}/100$). Ideal for variable-frequency applications. Clock feedthrough requires a simple RC post-filter.
+
+\textbf{Integrated signal conditioning module}: many NI DAQ modules (e.g., NI~9234 for vibration) include built-in anti-alias filters, amplifiers, and IEPE sensor excitation. No external analog design needed, but less educational and more expensive.
+\section{Passive vs.\ Active Filters: When to Use Each}
+\textbf{Passive filters} (R, L, C only, no op-amp): cannot provide gain ($|H| \leq 1$ at all frequencies). Advantages: no power supply needed, no noise from active components, can handle high voltages and currents directly. Use for: EMI filtering on power lines, RF filtering above 1\,MHz (where op-amp bandwidth is insufficient), and output reconstruction filters after DACs.
+
+\textbf{Active filters} (op-amp based): can provide gain, sharp rolloff with compact components, and buffered output. Advantages: high $Q$ without inductors (inductors are large, lossy, and expensive at low frequencies), precise cutoff frequency with standard R and C values, cascadable without loading effects. Use for: anti-alias filtering, signal conditioning, and all audio/sub-audio frequency applications.
+
+\textbf{The inductor problem}: a 1\,kHz low-pass filter using passive LC components requires $L \approx 100$\,mH and $C \approx 250$\,nF. A 100\,mH inductor is physically large ($\sim$25\,mm diameter), has significant DC resistance ($> 10\,\Omega$), and couples magnetically with nearby circuits (EMI source). An equivalent Sallen-Key active filter uses two 10\,k$\Omega$ resistors, two 15\,nF capacitors, and one op-amp, all in a few square centimeters. Below 100\,kHz, active filters are almost always preferred.
+
+\section{Elliptic (Cauer) Filters}
+The elliptic filter achieves the absolute steepest rolloff for a given order by allowing ripple in both the passband and the stopband. Where a 4th-order Butterworth provides $-24$\,dB/octave rolloff, a 4th-order elliptic can achieve the same stopband rejection with 2nd order (half the components).
+
+The tradeoff: (1) passband ripple (typically 0.1--1\,dB), (2) finite stopband rejection (the stopband attenuation is not monotonically increasing but has ``notches'' that return to the ripple level), and (3) nonlinear phase (worse than Chebyshev). Use elliptic filters only when the filter order must be minimized and both passband ripple and phase distortion are acceptable.
+
+\section{Group Delay and Its Measurement}
+The \textbf{group delay} $\tau_g(f) = -d\phi/d\omega$ is the time delay experienced by the envelope of a narrow-band signal at frequency $f$. For a linear-phase filter (FIR with symmetric coefficients): $\tau_g$ is constant at all frequencies, meaning all frequency components arrive at the output simultaneously, preserving the waveform shape. For a minimum-phase filter (Butterworth, Chebyshev): $\tau_g$ increases near the cutoff frequency, meaning low frequencies arrive before high frequencies, distorting transient signals.
+
+To measure group delay experimentally: apply a swept sine wave and measure the phase at each frequency. Compute $\tau_g = -\Delta\phi/\Delta\omega$ from adjacent frequency points. In LabVIEW: the ``Group Delay'' VI in the Signal Processing palette computes this from the filter coefficients.
+
+For the ThermoRig anti-alias filter (2nd-order Butterworth at 40\,Hz): group delay at DC $= 1/(2\pi \times 40) = 4$\,ms. At 30\,Hz (near cutoff): group delay increases to approximately 8\,ms. At 10\,Hz (mid-band): approximately 4.5\,ms. The 4\,ms variation is negligible for the 0.1\,Hz control bandwidth but would be significant for a vibration measurement system.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Design a passive RC low-pass filter with $f_c = 1$\,kHz. Specify $R$ and $C$ values. What is the attenuation at 10\,kHz?
+\item Explain why a 4th-order Butterworth low-pass filter has a $-80$\,dB/decade roll-off, while a 1st-order filter has only $-20$\,dB/decade.
+\item You need to remove 60\,Hz interference from a 0--10\,Hz signal. Design a filter strategy: what type(s) of filters do you use, and what are their specifications?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $f_c = 1/(2\pi RC) = 1000$\,Hz. Choose $R = 1.59\,\text{k}\Omega$, $C = 100$\,nF ($f_c = 1/(2\pi \times 1590 \times 10^{-7}) = 1001$\,Hz). At 10\,kHz ($10 \times f_c$): attenuation $= -20\log_{10}(\sqrt{1 + 10^2}) = -20$\,dB.
+\item Each first-order section contributes $-20$\,dB/decade of roll-off. A 4th-order filter cascades four first-order sections (or two second-order Sallen-Key stages), so the combined roll-off is $4 \times (-20) = -80$\,dB/decade.
+\item Use a low-pass filter at $f_c = 15$--$20$\,Hz (Butterworth, 2nd or 4th order) to pass the 0--10\,Hz signal and attenuate 60\,Hz. A 2nd-order Butterworth at 15\,Hz gives $-40\log_{10}(60/15) = -24$\,dB at 60\,Hz. If more rejection is needed, cascade with a 60\,Hz notch filter (twin-T or state-variable topology) for an additional 30--40\,dB of rejection at exactly 60\,Hz.
+\end{enumerate}
+
+
+% ================================================================

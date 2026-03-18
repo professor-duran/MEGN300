@@ -1,0 +1,355 @@
+% Chapter 8: Signal-to-Noise Ratio
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Signal-to-Noise Ratio}
+\label{ch:snr}\index{signal-to-noise ratio}\index{SNR}\index{noise!sources}
+
+\begin{industrybox}{EMI Shielding in EV Test Cells}
+In the Battery Workforce Challenge and EcoCAR Innovation Challenge, student teams instrument hybrid and electric vehicles with dozens of sensors operating alongside 400\,V traction inverters switching at 10--20\,kHz. The shielding, grounding, and filtering principles in this chapter are the difference between clean thermocouple data and a 60\,Hz artifact that makes thermal management analysis useless. Every cable routing decision and filter cutoff traces directly to an EMI requirement in the vehicle integration specification.
+\end{industrybox}
+
+\section{Defining SNR}
+The signal-to-noise ratio quantifies how much useful signal exists relative to unwanted noise:
+\begin{equation}
+\text{SNR} = \frac{P_{\text{signal}}}{P_{\text{noise}}} = \left(\frac{V_{\text{signal,RMS}}}{V_{\text{noise,RMS}}}\right)^2
+\end{equation}
+In decibels:
+\begin{equation}
+\text{SNR}_{\text{dB}} = 10 \log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right) = 20 \log_{10}\left(\frac{V_{\text{signal,RMS}}}{V_{\text{noise,RMS}}}\right)
+\end{equation}
+A 20\,dB SNR means the signal is 10$\times$ the noise voltage. A 40\,dB SNR means 100$\times$. An ADC with $n$ bits has a theoretical maximum SNR of $6.02n + 1.76$\,dB (e.g., 12-bit $\to$ 74\,dB).
+
+\section{Noise Sources in Instrumentation}
+\textbf{Thermal noise} (Johnson-Nyquist): $V_n = \sqrt{4k_B T R \Delta f}$, present in every resistor. Reduced by cooling, lowering resistance, or narrowing bandwidth.
+
+\textbf{Shot noise}: caused by discrete charge carriers crossing a junction. Proportional to $\sqrt{I \cdot \Delta f}$.
+
+\textbf{Flicker noise} ($1/f$ noise): dominant at low frequencies. Reduced by chopper-stabilized amplifiers or AC-coupling.
+
+\textbf{Electromagnetic interference} (EMI): coupled from external sources (power lines at 60\,Hz, switching regulators, motors). Reduced by shielding, twisted pairs, differential signaling, and filtering.
+
+\textbf{Quantization noise}: inherent in ADCs (Chapter~5). Reduced by using higher resolution.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    src/.style={draw=WarnOrange, fill=WarnOrange!10, thick, rounded corners=2pt,
+                minimum width=2.4cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily},
+    fix/.style={draw=AccentTeal, fill=AccentTeal!10, thick, rounded corners=2pt,
+                minimum width=2.4cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily},
+]
+% Noise sources
+\node[font=\small\sffamily\bfseries, WarnOrange] at (-2.5, 1.8) {Noise Sources};
+\node[src] (n1) at (0,1.2) {Thermal\\(Johnson)};
+\node[src] (n2) at (3,1.2) {60\,Hz\\(Mains)};
+\node[src] (n3) at (6,1.2) {EMI\\(Switching)};
+\node[src] (n4) at (9,1.2) {Quantization\\(ADC)};
+\node[src] (n5) at (12,1.2) {Ground\\Loops};
+% Fixes
+\node[font=\small\sffamily\bfseries, AccentTeal] at (-2.5, -0.7) {Countermeasures};
+\node[fix] (f1) at (0,-0.3) {Low-noise\\components};
+\node[fix] (f2) at (3,-0.3) {Shielding\\notch filter};
+\node[fix] (f3) at (6,-0.3) {Filtering\\cable routing};
+\node[fix] (f4) at (9,-0.3) {More bits\\averaging};
+\node[fix] (f5) at (12,-0.3) {Star\\grounding};
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n1) -- (f1);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n2) -- (f2);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n3) -- (f3);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n4) -- (f4);
+\draw[-{Stealth[length=2mm]}, MinesSilver] (n5) -- (f5);
+% Key insight box
+\node[draw=MinesBlue, thick, fill=MinesBlue!5, rounded corners=3pt, text width=12cm,
+      align=center, font=\small\sffamily\itshape, text=MinesBlue] at (6,-1.8)
+    {Key insight: amplify the signal \textbf{before} noise enters the chain. Noise added after amplification is divided by the gain, improving SNR.};
+\end{tikzpicture}
+\caption{Five noise sources in the measurement chain and their countermeasures. Amplify early to maximize SNR.}
+\label{fig:noise_sources}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    dev/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                minimum width=1.8cm, minimum height=0.8cm, align=center, font=\scriptsize\sffamily\bfseries},
+]
+% Bad: daisy chain
+\begin{scope}[shift={(-5,0)}]
+\node[font=\small\sffamily\bfseries, WarnOrange] at (1.5,2.8) {Daisy-Chain (BAD)};
+\node[dev] (s1) at (0,1.5) {Sensor};
+\node[dev] (a1) at (3,1.5) {Amp};
+\node[dev] (d1) at (0,0) {DAQ};
+\node[dev] (m1) at (3,0) {Motor};
+\draw[WarnOrange, thick] (s1.south) -- (0,0.9) -- (3,0.9) -- (a1.south);
+\draw[WarnOrange, thick] (0,0.9) -- (0,0.4) -- (d1.north);
+\draw[WarnOrange, thick] (3,0.9) -- (3,0.4) -- (m1.north);
+\node[font=\tiny\sffamily, WarnOrange] at (1.5,-0.6) {Motor current flows through};
+\node[font=\tiny\sffamily, WarnOrange] at (1.5,-0.9) {sensor ground wire!};
+\filldraw[WarnOrange] (1.5,0.9) circle (2pt);
+\draw[WarnOrange, thick] (1.5,0.9) -- (1.5,-0.2);
+\node[font=\tiny\sffamily, WarnOrange] at (2.2,-0.2) {GND bus};
+\end{scope}
+% Good: star ground
+\begin{scope}[shift={(5,0)}]
+\node[font=\small\sffamily\bfseries, AccentTeal] at (1.5,2.8) {Star Ground (GOOD)};
+\node[dev] (s2) at (0,1.5) {Sensor};
+\node[dev] (a2) at (3,1.5) {Amp};
+\node[dev] (d2) at (0,0) {DAQ};
+\node[dev] (m2) at (3,0) {Motor};
+% Star point
+\filldraw[AccentTeal] (1.5,-0.5) circle (3pt);
+\node[font=\tiny\sffamily\bfseries, AccentTeal] at (1.5,-0.9) {Star point};
+\draw[AccentTeal, thick] (s2.south) -- (0,0.9) -- (0,-0.5) -- (1.5,-0.5);
+\draw[AccentTeal, thick] (a2.south) -- (3,0.9) -- (3,-0.5) -- (1.5,-0.5);
+\draw[AccentTeal, thick] (d2.south) -- (0,-0.3) -- (0,-0.5);
+\draw[AccentTeal, thick] (m2.south) -- (3,-0.3) -- (3,-0.5);
+\draw[AccentTeal, thick] (1.5,-0.5) -- (1.5,-1.2);
+\draw[AccentTeal, thick] (1.2,-1.2) -- (1.8,-1.2);
+\draw[AccentTeal, thick] (1.3,-1.3) -- (1.7,-1.3);
+\draw[AccentTeal, thick] (1.4,-1.4) -- (1.6,-1.4);
+\end{scope}
+\end{tikzpicture}
+\caption{Grounding topologies. Daisy-chain grounding (left) allows motor return current to flow through the sensor ground wire, creating noise. Star grounding (right) gives each device a dedicated return path to a single common point, eliminating ground-loop noise.}
+\label{fig:star_ground}
+\end{figure}
+
+\section{Improving SNR}
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Amplify the signal before the noise is added}. Place the amplifier as close to the sensor as possible.
+\item \textbf{Filter out-of-band noise}. If your signal is 0--100\,Hz, a low-pass filter at 100\,Hz removes all higher-frequency noise.
+\item \textbf{Average repeated measurements}. $n$ averages improve SNR by $\sqrt{n}$ ($10\log_{10}(n)$\,dB).
+\item \textbf{Use shielded cables and differential signaling}. Rejects common-mode noise.
+\item \textbf{Reduce bandwidth}. Noise power is proportional to bandwidth. Narrower measurement bandwidth $=$ less noise.
+\end{enumerate}
+
+\begin{warningbox}[60\,Hz Hum]
+The most common noise source in lab measurements is 60\,Hz pickup from AC power lines. Symptoms: a clean-looking signal with a 60\,Hz ripple superimposed. Fixes: use shielded cables, ground the shield at one end only, keep signal wires away from power cables, use differential inputs on the DAQ, and add a 60\,Hz notch filter in software.
+\end{warningbox}
+
+
+\section{Dynamic Range}
+The \textbf{dynamic range} of a measurement system is the ratio of the largest measurable signal to the smallest detectable signal (noise floor):
+\begin{equation}
+\text{DR}_{\text{dB}} = 20 \log_{10}\left(\frac{V_{\text{max}}}{V_{\text{noise floor}}}\right)
+\end{equation}
+For an ideal $n$-bit ADC: $\text{DR} = 6.02n + 1.76$\,dB. A 16-bit ADC has a theoretical dynamic range of 98\,dB, meaning it can resolve signals spanning a 79,000:1 voltage ratio.
+
+\section{Grounding Best Practices for Low-Noise Measurements}
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Single-point (star) ground}: all ground returns meet at one physical point near the power supply. Prevents ground loops.
+\item \textbf{Differential inputs}: measure the voltage difference between two wires, rejecting common-mode noise (60\,Hz hum, ground offsets). Always use differential mode on NI DAQs when measuring bridge circuits, thermocouples, or any sensor in a noisy environment.
+\item \textbf{Shielded cables}: the shield connects to ground at \emph{one end only} (typically the DAQ end). Grounding at both ends creates a ground loop that couples noise.
+\item \textbf{Twisted pairs}: twisting the signal and return wires reduces magnetic pickup because induced voltages cancel in adjacent twists.
+\item \textbf{Physical separation}: route signal cables at least 30\,cm from power cables. Cross at right angles if they must cross.
+\end{enumerate}
+
+\begin{examplebox}[ThermoRig: Diagnosing 60\,Hz Noise]
+The ThermoRig thermocouple signal shows a clean 25\,\degC{} reading on the benchtop but develops $\pm$0.3\,\degC{} oscillation when the heater is powered on. FFT reveals a dominant 60\,Hz peak. Root cause: the heater power cable runs parallel to the thermocouple extension wire for 50\,cm. Fix: (1) reroute the thermocouple wire away from the heater cable, (2) switch the DAQ to differential input mode, (3) add a 50-point moving average in LabVIEW (effective cutoff well below 60\,Hz given the slow thermal process). Result: noise drops to $\pm$0.02\,\degC{}.
+\end{examplebox}
+
+
+\section{Defining Signal and Noise}
+The signal carries information about the measurand; noise is everything else. Noise is present at every stage and can never be eliminated completely. The goal is to make the signal large relative to the noise.
+
+\section{The Decibel Scale}
+SNR in decibels: $\text{SNR} = 20\log_{10}(V_s/V_n)$\,dB. Reference: 0\,dB means signal equals noise. 20\,dB means $10\times$. 40\,dB means $100\times$. 60\,dB means $1000\times$. Maximum theoretical ADC SNR: $6.02n + 1.76$\,dB. Doubling signal power adds 3\,dB; doubling voltage adds 6\,dB; $10\times$ voltage adds 20\,dB.
+
+\section{Noise Classification}
+\textbf{Thermal noise}: $V_n = \sqrt{4k_BTR B}$. At 300\,K, a 10\,k$\Omega$ resistor over 10\,kHz: $V_n = 1.28$\,$\mu$V. This is the fundamental noise floor.
+
+\textbf{Shot noise}: $I_n = \sqrt{2qI_{DC}B}$. Appears in semiconductor junctions.
+
+\textbf{Flicker (1/f) noise}: increases at low frequencies. Dominant below $\sim$1\,kHz in semiconductors. Makes precision DC measurements harder than AC.
+
+\textbf{EMI}: 60\,Hz from power lines (capacitive and inductive coupling), switching supply harmonics (100\,kHz--1\,MHz), motor commutation, fluorescent lighting. EMI has specific frequencies visible as FFT spikes.
+
+\section{Grounding Best Practices}
+\textbf{Single-point (star) ground}: all grounds connect at one point. Prevents ground loops.
+
+\textbf{Separate analog/digital grounds}: digital switching noise must not contaminate analog signal paths. Connect grounds only at the star point.
+
+\textbf{Shield grounding}: connect cable shields at one end only (DAQ end). Both-end grounding creates a ground loop.
+
+\textbf{Decoupling}: 100\,nF ceramic at every IC power pin, 10\,$\mu$F electrolytic at each rail entry point.
+
+\begin{examplebox}[ThermoRig: Diagnosing 60 Hz Noise]
+Initial testing showed $\pm$2\,\degC{} oscillation at 60\,Hz (visible in FFT with harmonics at 120, 180, 240\,Hz). Root cause: heater cable ran parallel to thermocouple cable, coupling 60\,Hz capacitively. Fix: separated cables by 15\,cm, used shielded TC wire (shield grounded at DAQ), switched to Differential mode. Result: 60\,Hz spike dropped from 2\,\degC{} to 0.01\,\degC{}. Cost: \$0 and 10 minutes.
+\end{examplebox}
+
+\section{Noise in the Signal Chain}
+Noise at the sensor end is amplified by the full system gain and dominates the output. Noise at the DAQ end is not amplified. \textbf{Golden rule}: amplify as early as possible, as close to the sensor as possible.
+
+For a two-stage system with gains $G_1$ and $G_2$ and stage noise $V_{n,1}$, $V_{n,2}$: $V_{n,\text{out}} = \sqrt{(G_1 G_2 V_{n,\text{src}})^2 + (G_2 V_{n,1})^2 + V_{n,2}^2}$. The first stage's noise is amplified by $G_2$; the second stage's noise appears directly.
+
+\section{SNR Improvement Techniques}
+\textbf{Averaging}: $N$ averages reduces random noise by $\sqrt{N}$, improving SNR by $10\log_{10}(N)$\,dB. 100 averages $= +$20\,dB. Does not help with systematic errors or correlated noise.
+
+\textbf{Filtering}: noise power $\propto$ bandwidth. Halving BW improves SNR by 3\,dB. Use the narrowest BW consistent with the signal.
+
+\textbf{Differential inputs}: rejects common-mode interference (60\,Hz, ground offsets).
+
+\textbf{Shielding}: Faraday cage around sensitive circuits blocks electric field coupling.
+
+\textbf{Synchronous detection (lock-in)}: modulate signal at known frequency, extract with narrow-band detection. Can measure signals 60\,dB below the noise floor.
+
+
+\section{Noise Spectral Density}
+Noise is characterized by its power spectral density (PSD), measured in V$^2$/Hz (or equivalently nV/$\sqrt{\text{Hz}}$ for voltage noise density). The total noise voltage in a measurement with bandwidth $B$ is $V_n = e_n \sqrt{B}$ where $e_n$ is the noise density. This is why reducing measurement bandwidth directly reduces noise.
+
+Op-amp noise density is specified on the datasheet as $e_n$ (input-referred voltage noise) and $i_n$ (input-referred current noise). For an op-amp with $e_n = 10$\,nV/$\sqrt{\text{Hz}}$ and bandwidth $B = 10$\,kHz: $V_n = 10 \times \sqrt{10000} = 1$\,$\mu$V RMS input-referred noise.
+
+\section{Dynamic Range}
+The dynamic range is the ratio between the largest and smallest signals the system can measure simultaneously: $\text{DR} = 20\log_{10}(V_{\max}/V_{\min,\text{detectable}})$\,dB. For an ideal $n$-bit ADC, $\text{DR} = 6.02n + 1.76$\,dB. In practice, noise limits the minimum detectable signal, reducing the effective dynamic range.
+
+\section{Ground Loops: Diagnosis and Cure}
+A ground loop occurs when two or more ground connections create a closed current path. Current flowing through the finite impedance of the ground conductor creates a voltage drop that appears as noise. Symptoms: large 60\,Hz component in the FFT, noise that changes when you touch the cable, noise that depends on the position of nearby equipment.
+
+Diagnosis: disconnect the sensor. If the noise disappears, the ground loop is between the sensor and DAQ. If it persists, the loop is internal to the DAQ/computer.
+
+Cure: (1) use differential inputs (measures between two signal wires, ignoring ground). (2) Use a single-point ground topology. (3) Insert an isolation amplifier or optocoupler to break the galvanic path. (4) Use battery-powered (floating) sensor excitation.
+
+\section{EMI Shielding Effectiveness}
+Cable shielding is characterized by its transfer impedance $Z_t$ (in $\Omega$/m), which describes how much external interference voltage appears on the inner conductor per unit length. Lower is better. Single-braid shield: $Z_t \approx 10$\,m$\Omega$/m at low frequencies. Double-braid: $\approx 1$\,m$\Omega$/m. Foil shield: excellent at high frequencies but poor at low frequencies due to limited coverage. For best performance, use a foil + braid combination.
+\section{Noise Budget Analysis}
+Just as an error budget allocates measurement uncertainty across the signal chain, a \textbf{noise budget} allocates the noise contribution of each component. The total output-referred noise is:
+\begin{equation}
+V_{n,\text{total}} = \sqrt{(G_{\text{total}} \cdot e_{n,\text{sensor}})^2 + (G_2 G_3 \cdot e_{n,\text{amp1}})^2 + (G_3 \cdot e_{n,\text{amp2}})^2 + e_{n,\text{ADC}}^2}
+\end{equation}
+where $G_i$ are the gains of each stage and $e_{n,i}$ are the input-referred noise voltages. The key insight: the first stage's noise is amplified by the full remaining gain, while later stages contribute progressively less.
+
+\subsection{Worked Example}
+Consider: sensor noise $e_n = 2\,\mu$V/$\sqrt{\text{Hz}}$, first amplifier (INA128) $e_n = 8$\,nV/$\sqrt{\text{Hz}}$ at gain $G_1 = 100$, second stage filter buffer $e_n = 15$\,nV/$\sqrt{\text{Hz}}$ at gain $G_2 = 1$, ADC noise floor 200\,$\mu$V RMS. System bandwidth 100\,Hz.
+
+Sensor contribution at output: $100 \times 1 \times 2\,\mu\text{V} \times \sqrt{100} = 2{,}000\,\mu$V.
+INA128 contribution: $1 \times 8\,\text{nV} \times \sqrt{100} = 0.08\,\mu$V (negligible).
+Buffer contribution: $15\,\text{nV} \times \sqrt{100} = 0.15\,\mu$V (negligible).
+ADC: 200\,$\mu$V (fixed).
+Total: $\sqrt{2000^2 + 0.08^2 + 0.15^2 + 200^2} = 2010\,\mu$V.
+
+The sensor dominates completely (99.5\% of noise power). A lower-noise amplifier would not improve the system. Reducing the sensor noise (e.g., by using a less noisy sensor type) or reducing the bandwidth (e.g., filtering at 10\,Hz instead of 100\,Hz, reducing sensor noise by $\sqrt{10} = 3.16\times$) are the only effective strategies.
+
+\section{Common-Mode Rejection in Practice}
+Common-mode voltage ($V_{CM}$) is the average voltage at the two differential inputs relative to ground. It represents ground offsets, 60\,Hz pickup, and other interference that appears equally on both input wires. The differential amplifier (or INA) rejects this common-mode signal while amplifying the differential signal.
+
+CMRR is typically specified at DC (e.g., 120\,dB for INA128 at $G = 100$) but degrades at higher frequencies. At 60\,Hz, CMRR might be only 80--90\,dB. This is still excellent: 80\,dB CMRR means a 1\,V common-mode voltage at 60\,Hz produces only $1\,\text{V}/10{,}000 = 100\,\mu$V of interference at the output. For a thermocouple producing 4\,mV, this is a 2.5\% error, which is significant. Higher CMRR or better shielding/grounding is needed.
+
+\section{Noise Figure}
+The noise figure ($NF$) quantifies how much a component degrades the SNR:
+\begin{equation}
+NF = 10\log_{10}\left(\frac{\text{SNR}_{\text{in}}}{\text{SNR}_{\text{out}}}\right) \text{ dB}
+\end{equation}
+An ideal amplifier has $NF = 0$\,dB (adds no noise). Real amplifiers have $NF = 1$--$10$\,dB. The system noise figure is dominated by the first stage (Friis formula):
+\begin{equation}
+NF_{\text{total}} \approx NF_1 + \frac{NF_2 - 1}{G_1} + \frac{NF_3 - 1}{G_1 G_2} + \cdots
+\end{equation}
+With $G_1 = 100$: even if the second stage has $NF_2 = 10$\,dB ($F_2 = 10$), its contribution is $(10-1)/100 = 0.09$, adding only 0.04\,dB to the system noise figure. This mathematically confirms the golden rule: the first amplifier determines the system noise performance.
+
+\section{Noise Measurement Techniques}
+To characterize the noise of your measurement system: (1) Short the input (connect the two differential inputs together). (2) Acquire $N \geq 10{,}000$ samples at the normal operating sample rate. (3) Compute the RMS of the acquired data: this is the total system noise floor. (4) Compute the FFT: peaks at specific frequencies indicate EMI (60\,Hz, switching noise); a flat floor indicates thermal/shot noise.
+
+Compare the measured noise to the theoretical prediction from the noise budget. If the measured noise significantly exceeds the prediction, look for: ground loops, EMI pickup, inadequate decoupling, or oscillating amplifiers.
+
+\section{Signal Recovery from Noise}
+\textbf{Coherent averaging (signal averaging)}: for repetitive signals (triggered waveforms), average $N$ acquisitions. Random noise cancels; the signal accumulates. SNR improves by $\sqrt{N}$. Used in oscilloscopes, vibration analyzers, and evoked-potential medical instruments.
+
+\textbf{Correlation}: cross-correlate the measured signal with a reference waveform. The correlation peak indicates the presence and timing of the signal, even when buried in noise. This is the mathematical basis of lock-in amplification and GPS signal detection.
+
+\textbf{Matched filtering}: design a filter whose impulse response matches the expected signal shape. The matched filter maximizes the SNR at the output for a known signal in white noise. Used in radar and communications.
+\section{Noise Measurement Procedure for MEGN 300 Labs}
+A systematic noise characterization should be performed as the first step in any lab:
+
+(1)~\textbf{Short-input test}: connect AI+ to AI$-$ at the DAQ terminal block (zero signal). Acquire 10,000 samples at the operating sample rate. Compute the standard deviation: this is your system noise floor. Compare to the theoretical LSB noise: $\text{LSB}/\sqrt{12}$. If measured noise is $>3\times$ theoretical, there is excess noise from grounding, EMI, or power supply issues.
+
+(2)~\textbf{Resistor-terminated test}: connect a precision resistor across the differential inputs equal to the sensor's output impedance. This includes the thermal noise of the resistor. Compare to the short-input noise: the increase is the thermal noise contribution.
+
+(3)~\textbf{Sensor-connected test}: connect the actual sensor in the actual mounting configuration. Acquire with the same settings. This captures all real-world noise sources: sensor noise, cable pickup, ground loops, and environmental interference.
+
+(4)~\textbf{FFT analysis}: compute the FFT of the noise data. Identify discrete peaks (60\,Hz, switching frequencies, resonances) vs.\ broadband floor. Address the discrete peaks first (grounding, shielding, filtering), then evaluate whether the broadband floor meets the SNR requirement.
+
+\section{SNR Requirements for Different Measurement Types}
+\textbf{Temperature monitoring ($\pm$1\,\degC{})}: SNR $> 40$\,dB is adequate. Easy to achieve with any modern DAQ.
+
+\textbf{Strain measurement ($\pm$10\,$\mu\epsilon$)}: requires SNR $> 60$\,dB. Demands careful grounding, shielded cabling, and a low-noise INA.
+
+\textbf{Vibration analysis (resolving 60\,dB dynamic range)}: requires SNR $> 80$\,dB. Requires IEPE accelerometers with built-in signal conditioning, differential transmission, and proper anti-alias filtering.
+
+\textbf{Audio-quality measurement}: SNR $> 90$\,dB. Requires precision ADCs (24-bit sigma-delta), balanced signal paths, and low-noise power supplies.
+\section{Quantifying EMI: Conducted vs. Radiated}
+EMI enters the measurement circuit through two mechanisms:
+
+\textbf{Conducted EMI}: noise current flowing on power supply lines, ground wires, or signal cables. The noise originates from switching power supplies, motor drives, or digital circuits, and propagates through shared conductors. Mitigation: ferrite beads on power lines, LC filters at power entry points, separate power supplies for analog and digital circuits.
+
+\textbf{Radiated EMI}: electromagnetic fields from nearby sources (power lines, transformers, motors, RF transmitters, switching converters) couple into cables and circuits acting as antennas. Mitigation: shielding (Faraday cages, shielded cables), reducing cable loop area (twisted pair), increasing distance from the source (field strength decreases as $1/r^2$ for near-field sources).
+
+The distinction matters for diagnosis: if noise disappears when you disconnect the signal cable (leaving the DAQ connected to nothing), the noise is conducted on the cable. If noise persists with the cable disconnected, it is radiated into the DAQ directly (or conducted on the power supply).
+
+\section{Power Supply Noise}
+The DAQ and signal conditioning circuits require clean power. A switching regulator (buck/boost) produces ripple at the switching frequency (typically 100\,kHz--2\,MHz) and its harmonics. This ripple appears on the power rail as a 10--50\,mV$_{\text{pk-pk}}$ sawtooth waveform that directly modulates the op-amp's output through the Power Supply Rejection Ratio (PSRR).
+
+For an op-amp with PSRR $= 80$\,dB at 100\,kHz, a 20\,mV power supply ripple produces $20 \times 10^{-4} = 0.002$\,mV ($2\,\mu$V) at the output. At gain 1000, this becomes 2\,mV, which may be significant for millivolt-level measurements. Solution: use a linear regulator after the switching regulator (the linear regulator's PSRR further attenuates the switching noise by 40--60\,dB), or power the analog circuits from a separate linear supply.
+
+\section{SNR Improvement: A Quantitative Case Study}
+ThermoRig initial setup: thermocouple ($e_n = 2\,\mu$V$/\sqrt{\text{Hz}}$, measured at sensor), INA128 ($G = 611$), no anti-alias filter, RSE input mode, DAQ at $\pm$10\,V range, 1\,kS/s.
+
+\textbf{Initial SNR}: signal at 80\,\degC{} $= 3.3$\,mV $\times 611 = 2.0$\,V. Noise at output: 120\,mV RMS (dominated by 60\,Hz at 80\,mV and broadband above 100\,Hz at 90\,mV). SNR $= 20\log(2.0/0.12) = 24$\,dB. Terrible.
+
+\textbf{Fix 1}: switch to Differential mode. 60\,Hz drops from 80\,mV to 2\,mV ($\sim$30\,dB improvement in 60\,Hz component).
+
+\textbf{Fix 2}: add 2nd-order anti-alias LP at 40\,Hz. Broadband noise above 40\,Hz removed. Remaining noise: 8\,mV RMS.
+
+\textbf{Fix 3}: change input range from $\pm$10\,V to 0--5\,V ($4\times$ better resolution). Quantization noise drops below 0.3\,mV.
+
+\textbf{Fix 4}: average 100 samples per reading (at 100\,S/s: 1\,s averaging time). Remaining random noise: $8/\sqrt{100} = 0.8$\,mV.
+
+\textbf{Final SNR}: $20\log(2000/0.8) = 68$\,dB. Improved from 24\,dB to 68\,dB, a $44$\,dB ($160\times$) improvement, using only software and configuration changes (no hardware cost).
+\section{Dynamic Range and Effective Bits}
+The \textbf{dynamic range} of a measurement system is the ratio between the largest signal it can measure (without clipping) and the smallest signal it can detect (above the noise floor), expressed in dB:
+\begin{equation}
+\text{DR} = 20\log_{10}\left(\frac{V_{\text{max}}}{V_{\text{noise, RMS}}}\right) \text{ dB}
+\end{equation}
+
+For an ideal $n$-bit ADC: DR $= 6.02n + 1.76$\,dB. For the NI~USB-6001 (14-bit, $\pm$10\,V range): ideal DR $= 86$\,dB. In practice, noise from the signal conditioning chain reduces DR below the ideal. If the total system noise is 2\,mV RMS on a $\pm$10\,V range: DR $= 20\log_{10}(10/0.002) = 74$\,dB, equivalent to ENOB $= (74-1.76)/6.02 = 12.0$ effective bits. The signal conditioning has cost 2 bits of dynamic range.
+
+This is why the noise budget matters: it directly determines how much of the ADC's resolution is actually usable.
+
+\section{Noise Floor and Minimum Detectable Signal}
+The minimum detectable signal (MDS) is typically defined as the signal level equal to the RMS noise floor (SNR $= 0$\,dB) or 3$\times$ the noise floor (SNR $= 10$\,dB, commonly used). Any signal below the MDS is buried in noise and cannot be reliably measured.
+
+For the ThermoRig with 0.8\,mV total output noise (after all improvements): MDS $= 3 \times 0.8 = 2.4$\,mV, corresponding to $2.4/(611 \times 0.041) = 0.096$\,\degC{} at the thermocouple. Any temperature change smaller than 0.1\,\degC{} cannot be reliably detected. This is $10\times$ better than the $\pm$1\,\degC{} requirement, meaning the system has ample SNR margin.
+
+\section{Noise in Data Acquisition Systems}
+The total noise at the DAQ output includes contributions from multiple sources, combined by RSS:
+
+\textbf{Sensor noise}: inherent to the sensor physics (thermal noise in resistive sensors, shot noise in photodiodes). Set by the sensor type and operating conditions.
+
+\textbf{Signal conditioning noise}: op-amp voltage and current noise, resistor thermal noise in the gain and filter networks. Dominated by the first amplifier stage.
+
+\textbf{EMI pickup}: 60\,Hz and harmonics from power lines, switching frequencies from nearby electronics. Reducible by shielding, grounding, and differential inputs.
+
+\textbf{DAQ noise}: quantization noise ($\text{LSB}/\sqrt{12}$), ADC comparator noise, clock jitter. Fixed by the DAQ hardware; the only mitigation is choosing a better DAQ.
+
+\textbf{Software noise}: rounding in calibration calculations, truncation in filter coefficients. Usually negligible with 64-bit double precision.
+
+\section{Lock-In Amplification: Extracting Signals from Noise}
+For the most demanding measurement applications (measuring signals 60--120\,dB below the noise floor), \textbf{lock-in amplification} uses synchronous detection. The principle:
+
+(1) Modulate the measurand at a known reference frequency $f_{\text{ref}}$ (e.g., chop the light beam in an optical measurement). (2) Amplify the sensor signal, which now contains the desired signal at $f_{\text{ref}}$ plus broadband noise. (3) Multiply the amplified signal by a reference sine wave at $f_{\text{ref}}$ (the ``demodulation'' step). This shifts the signal to DC while spreading the noise across all frequencies. (4) Low-pass filter the result with a very narrow bandwidth (0.01--1\,Hz). The filter passes only the DC component (the desired signal) and rejects all noise except in the narrow band around $f_{\text{ref}}$.
+
+The effective noise bandwidth is the LP filter bandwidth, not the signal bandwidth. A lock-in with 0.1\,Hz bandwidth on a system with 10\,kHz signal bandwidth achieves $10\log_{10}(10000/0.1) = 50$\,dB improvement in SNR. This is why lock-in amplifiers can detect nanovolt signals in millivolt noise.
+
+While lock-in amplification is beyond the scope of MEGN~300 labs, understanding the principle illustrates the power of frequency-domain noise rejection and motivates the simpler techniques (averaging, filtering, differential inputs) used in your projects.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A sensor produces 100\,mV\textsubscript{RMS} signal with 2\,mV\textsubscript{RMS} noise. Calculate the SNR in dB.
+\item You average 64 measurements. By how many dB does the SNR improve?
+\item A 14-bit ADC has a theoretical SNR of how many dB? If the noise floor is 0.5\,mV\textsubscript{RMS} and the input range is 0--5\,V, is the system noise-limited or quantization-limited?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item SNR $= 20\log_{10}(100/2) = 20\log_{10}(50) = 34.0$\,dB.
+\item Improvement $= 10\log_{10}(64) = 18.1$\,dB.
+\item Theoretical: $6.02 \times 14 + 1.76 = 86.0$\,dB. ADC LSB $= 5/2^{14} = 0.305$\,mV. Quantization noise RMS $= 0.305/\sqrt{12} = 0.088$\,mV. System noise floor is 0.5\,mV $\gg$ 0.088\,mV; the system is noise-limited, not quantization-limited. The extra ADC bits are wasted unless the noise is reduced.
+\end{enumerate}
+
+
+% ================================================================

@@ -1,0 +1,233 @@
+% Chapter 18: Open-Loop Control
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Open-Loop Control}
+\label{ch:openloop}\index{control!open-loop}\index{feedforward control}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=0.9cm, align=center, font=\small\sffamily},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+]
+\node[font=\sffamily\bfseries, MinesBlue] at (-3, 1.5) {Open-Loop:};
+\node[block] (ctl1) at (0,1.5) {Controller};
+\node[block] (plant1) at (3.5,1.5) {Plant};
+\draw[arr] (-2,1.5) -- (ctl1) node[midway, above, font=\scriptsize\sffamily] {$r$};
+\draw[arr] (ctl1) -- (plant1) node[midway, above, font=\scriptsize\sffamily] {$u$};
+\draw[arr] (plant1) -- (5.5,1.5) node[midway, above, font=\scriptsize\sffamily] {$y$};
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (3.5,2.6) -- (3.5,2.05);
+\node[font=\scriptsize\sffamily, WarnOrange] at (3.5,2.85) {Disturbance $d$};
+\node[font=\scriptsize\sffamily\itshape, WarnOrange] at (6.8,1.5) {No correction};
+\node[font=\sffamily\bfseries, MinesBlue] at (-3, -1.0) {Closed-Loop:};
+\node[block] (ctl2) at (0,-1.0) {Controller};
+\node[block] (plant2) at (3.5,-1.0) {Plant};
+\node[draw=MinesBlue, thick, circle, minimum size=0.5cm, fill=LightBG, font=\scriptsize\sffamily] (sj) at (-1.5,-1.0) {$\Sigma$};
+\node[block, minimum width=1.5cm] (sens) at (1.75,-2.8) {Sensor};
+\draw[arr] (-3,-1.0) -- (sj) node[midway, above, font=\scriptsize\sffamily] {$r$};
+\draw[arr] (sj) -- (ctl2) node[midway, above, font=\scriptsize\sffamily] {$e$};
+\draw[arr] (ctl2) -- (plant2) node[midway, above, font=\scriptsize\sffamily] {$u$};
+\draw[arr] (plant2) -- (5.5,-1.0) node[midway, above, font=\scriptsize\sffamily] {$y$};
+\draw[MinesBlue, thick] (5.0,-1.0) -- (5.0,-2.8) -- (sens);
+\draw[arr] (sens) -| (sj);
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (3.5,0.2) -- (3.5,-0.45);
+\node[font=\scriptsize\sffamily, WarnOrange] at (3.5,0.45) {Disturbance $d$};
+\node[font=\scriptsize\sffamily\itshape, AccentTeal] at (6.8,-1.0) {Self-correcting};
+\end{tikzpicture}
+\caption{Open-loop vs.\ closed-loop control. In open-loop, disturbances cause uncorrected output errors. In closed-loop, the sensor feeds back the actual output, and the controller drives the error toward zero.}
+\label{fig:open_vs_closed}
+\end{figure}
+
+\section{Definition}
+In open-loop control, the controller sends a command to the actuator without measuring the output. There is no feedback; the controller has no way to know if the desired outcome was achieved.
+
+\textbf{Example}: a toaster. You set a timer (the command); the heating element runs for that duration regardless of how toasted the bread actually is. If the bread type, thickness, or initial temperature changes, the result changes, but the controller does not adapt.
+
+\section{Characteristics}
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Simple}: no sensor needed on the output; fewer components; lower cost.
+\item \textbf{Fast}: no processing delay from feedback.
+\item \textbf{No stability issues}: cannot oscillate (no feedback loop to create instability).
+\item \textbf{Cannot compensate for disturbances}: if the environment changes (load, temperature, friction), the output drifts from the desired value with no correction.
+\item \textbf{Accuracy depends on the model}: the controller must have a perfect model of the plant to achieve the desired output. Any model error becomes output error.
+\end{itemize}
+
+\section{Feedforward Control}
+A refined form of open-loop control that measures the disturbance (not the output) and adjusts the command proactively. Example: measuring outdoor temperature and preemptively increasing heater power before the room cools down. Feedforward improves performance but still has no feedback on the actual output.
+
+% [Duplicate open/closed figure removed; see TikZ version fig:open_vs_closed above]
+
+
+\section{Understanding Open-Loop Control}
+In open-loop control, the controller sends a command to the actuator based on a model or schedule, with no measurement of the actual output. The system has no way to detect or correct errors. Examples: a toaster timer (runs for a fixed duration regardless of toast darkness), a washing machine cycle timer (runs predetermined durations for each phase), and a sprinkler timer (waters for a set time regardless of soil moisture).
+
+Open-loop works when the relationship between input and output is well-characterized and disturbances are small or predictable. It is simple, cheap, and inherently stable (no feedback means no oscillation risk). However, it fails when disturbances are significant, when the plant model is inaccurate, or when precise output control is required.
+
+\section{Feedforward Control}
+Feedforward is an enhanced form of open-loop that measures the disturbance (not the output) and adjusts the control action proactively. Example: measuring outdoor temperature and adjusting the furnace output before the room temperature changes. Feedforward cannot correct for unmeasured disturbances or model errors, but it responds faster than feedback because it does not wait for the output to deviate.
+
+In practice, feedforward is often combined with feedback: the feedforward handles the known, measurable disturbances (fast), while the feedback corrects for everything else (robust). This combined approach is standard in industrial process control.
+
+\section{Limitations of Open-Loop}
+\textbf{No disturbance rejection}: any unmodeled influence (load change, supply variation, environmental shift) directly affects the output with no correction.
+
+\textbf{Sensitivity to model errors}: the accuracy of the output depends entirely on the accuracy of the model relating input to output. If the model is wrong, the output is wrong, and the system has no way to know.
+
+\textbf{No steady-state accuracy guarantee}: drift, aging, and environmental changes cause the output to wander from the desired value over time.
+
+\section{When Open-Loop Is Appropriate}
+Despite its limitations, open-loop control is the right choice when: the cost of feedback sensors is prohibitive, the plant behavior is highly predictable and disturbances are negligible, the required accuracy is coarse (e.g., a traffic light timer), or when stability concerns make feedback dangerous (some chemical processes).
+
+
+\section{Feedforward Control}
+Feedforward measures the disturbance (not the output) and adjusts the control action proactively. Example: measuring outdoor temperature and adjusting furnace output before room temperature changes. Advantages: responds faster than feedback (does not wait for error). Limitations: cannot correct for unmeasured disturbances or model errors. In practice, feedforward is combined with feedback for optimal performance.
+
+\section{Calibration Tables as Open-Loop Control}
+A common form of open-loop control in instrumentation is the calibration table or lookup table. Rather than modeling the sensor's response analytically, the controller stores measured input-output pairs and interpolates between them. Example: a thermocouple's voltage-to-temperature relationship stored as a 100-entry table, with linear interpolation between entries. This is ``open-loop'' because it relies on the accuracy of the stored calibration data, with no feedback to verify the output.
+
+\section{State Machines as Open-Loop Controllers}
+Many laboratory instruments use state-machine controllers: a sequence of states (initialize, preheat, measure, cool down, report) with timed transitions. Each state commands specific actuator settings. The sequence runs to completion regardless of the process outcome. This is open-loop because the controller follows a predetermined script. Adding sensor checks that branch to error-handling states converts it to a hybrid open/closed-loop system.
+
+\section{When Open-Loop Fails}
+Example: you calibrate a heater to deliver 80\,\degC{} at 50\% power. Initially, it works. Three months later, the ambient temperature drops from 22\,\degC{} to 10\,\degC{}, and the heater only reaches 68\,\degC{}. The open-loop controller has no way to detect or correct this. A closed-loop controller would measure the 68\,\degC{} output, compute a 12\,\degC{} error, and increase power automatically.
+\section{Mathematical Model of Open-Loop Systems}
+In open-loop control, the output $Y(s) = G_p(s) \cdot G_a(s) \cdot U(s) + G_d(s) \cdot D(s)$ where $G_p$ is the plant transfer function, $G_a$ is the actuator, $U$ is the command, $G_d$ is the disturbance transfer function, and $D$ is the disturbance. The output depends on both the command and the disturbance, with no mechanism to separate or correct for the disturbance contribution.
+
+For a linear system with known plant model: $U = G_p^{-1} \cdot Y_{\text{desired}}$ (invert the plant model to compute the required command). This works perfectly if the model is exact and no disturbances exist. In practice, model uncertainty of $\pm$10\% produces $\pm$10\% output error, and disturbances add directly to the output.
+
+\section{Examples of Open-Loop Systems in Engineering}
+\textbf{CNC machine tool positioning}: the stepper motor receives a commanded number of steps, and the controller assumes the table moves exactly that distance. No position feedback (in basic systems). If the motor skips a step (due to excessive load or acceleration), the error accumulates permanently. High-end CNC machines add encoder feedback (closed-loop).
+
+\textbf{Irrigation timer}: opens the water valve for a programmed duration. Does not measure soil moisture, rainfall, or evapotranspiration. Wastes water during rain and under-waters during heat waves. Smart irrigation systems add soil moisture sensors (closed-loop).
+
+\textbf{Inkjet printer head positioning}: the carriage motor moves based on commanded pulses. Open-loop in the fast-scan direction (relying on motor accuracy). Closed-loop in the slow-scan direction (optical encoder on the paper feed roller).
+
+\textbf{Drug delivery infusion pump}: delivers a programmed flow rate based on motor speed. Open-loop with respect to actual drug concentration in the patient's blood. Closed-loop drug delivery (measuring blood concentration and adjusting the rate) exists in research but is rare clinically due to sensor limitations.
+
+\section{Quantifying Open-Loop Performance}
+The performance of an open-loop system depends entirely on: (1) model accuracy: the relationship between command and output must be precisely characterized, (2) disturbance magnitude: smaller disturbances produce smaller output errors, (3) component repeatability: the actuator must produce the same output for the same command every time, (4) environmental stability: temperature, humidity, and other conditions must remain within the range over which the model is valid.
+
+For the ThermoRig heater in open-loop mode: commanding 50\% PWM duty cycle produces approximately 65\,\degC{} at ambient 22\,\degC{}. If the ambient temperature drops to 15\,\degC{}, the steady-state temperature drops to approximately 58\,\degC{} (a 7\,\degC{} error). If the supply voltage drops from 12\,V to 11\,V (8\% drop), the power drops by 16\% (power $\propto V^2$), and the temperature drops further. The open-loop system cannot detect or correct any of these deviations.
+
+\section{Feedforward Design Procedure}
+For measured disturbance $d$ with known effect on the output: (1) measure $d$ with a sensor. (2) Compute the required compensation: $\Delta u = -G_d(s)/G_p(s) \cdot d$ (the feedforward transfer function). (3) Add $\Delta u$ to the nominal command: $u = u_{\text{nominal}} + \Delta u$.
+
+Example: the ThermoRig measures ambient temperature $T_{\text{amb}}$ with a second thermocouple. The thermal model predicts that a 1\,\degC{} drop in ambient requires 0.8\% more heater power to maintain the setpoint. The feedforward controller adds $0.8\% \times (T_{\text{amb,nominal}} - T_{\text{amb,measured}})$ to the duty cycle. This compensates for ambient temperature changes without waiting for the output temperature to deviate.
+
+Combined feedforward + feedback: the feedforward handles the measured, predictable disturbance (ambient temperature) immediately, while the feedback (PID controller) corrects for unmeasured disturbances (supply voltage variation, heater degradation, model error). The result is faster disturbance rejection than feedback alone and more robust than feedforward alone.
+
+\section{Open-Loop Stability}
+Open-loop systems are always stable (in the BIBO sense) as long as the plant itself is stable. There is no feedback to create oscillation. This is a significant advantage in applications where stability is critical and the accuracy requirement is relaxed (e.g., a simple fan speed controller where $\pm$10\% speed error is acceptable but oscillation would be unacceptable).
+
+However, plants with integrators (e.g., liquid level in a tank with inflow but no outflow) are inherently unstable in open-loop: the level rises without bound unless the inflow is precisely balanced with the outflow. Such systems require closed-loop control.
+\section{Lookup Tables and Interpolation in Open-Loop Control}
+Many open-loop systems use precomputed lookup tables rather than mathematical models. For the ThermoRig in open-loop mode: measure the steady-state temperature at 10 duty cycle values (0\%, 10\%, 20\%, \ldots, 100\%) and store the results in a table. To achieve a desired temperature, look up the nearest duty cycle and interpolate linearly between table entries.
+
+Limitations: (1) the table is valid only at the ambient temperature at which it was measured, (2) any change in heater resistance (aging), supply voltage, or thermal coupling invalidates the table, (3) the temperature can only be set to discrete values (the table resolution), (4) transient behavior is uncontrolled (the system takes whatever path it takes to reach the new steady state).
+
+\section{State Machine Controllers}
+Many laboratory instruments use state-machine (sequential) controllers. A typical sequence for the ThermoRig: INITIALIZE (set outputs to safe state) $\to$ PREHEAT (ramp heater to approximate temperature) $\to$ STABILIZE (wait 5 minutes for thermal equilibrium) $\to$ MEASURE (acquire 1000 samples) $\to$ COOL (turn off heater, wait) $\to$ REPORT (compute statistics, save file).
+
+Each state has a fixed duration or a simple exit condition (e.g., ``temperature within 5\,\degC{} of target''). The controller does not optimize performance within each state; it follows the script. This is robust and predictable but inflexible. If the preheat phase does not reach the target (due to a disturbance), the stabilize phase may not produce equilibrium, and the measurement phase produces incorrect data. A closed-loop controller would detect and correct this; the state machine does not.
+
+\section{Combining Open-Loop and Closed-Loop}
+Practical systems often combine both approaches. The state machine manages the high-level sequence (start, run, stop, error handling), while closed-loop controllers manage the low-level performance within each state. In the ThermoRig: the state machine sequences the test protocol, while a PID controller maintains the temperature within the STABILIZE and MEASURE states. This is the architecture used in most commercial test equipment.
+\section{Characterizing Plant Dynamics in Open Loop}
+Before designing a controller (open or closed-loop), you must know how the plant responds. The standard method: apply a step input and record the output.
+
+For the ThermoRig in open-loop: set the heater to 50\% duty cycle (step from 0\%) and record the temperature vs.\ time. The response curve shows: (1) a transport delay $L$ (dead time) before the temperature begins rising (heat propagating from the heater to the thermocouple), (2) an exponential-like rise toward the steady-state temperature, and (3) a final steady-state temperature $T_{ss}$.
+
+From this step response, extract three parameters: the process gain $K_p = (T_{ss} - T_{\text{ambient}}) / (\text{duty cycle change})$, the time constant $\tau$ (time to reach 63.2\% of $T_{ss} - T_{\text{ambient}}$), and the dead time $L$ (time from the step to the first observable temperature rise). For the ThermoRig: $K_p \approx 1.1$\,\degC{}/\%, $\tau \approx 30$\,s, $L \approx 3$\,s.
+
+These three parameters ($K_p$, $\tau$, $L$) define a First-Order Plus Dead Time (FOPDT) model: $G(s) = K_p e^{-Ls} / (1 + \tau s)$, which is the most common plant model used for PID tuning in process control.
+
+\section{Sensitivity Analysis}
+How much does the open-loop output change when a parameter varies?
+
+\textbf{Supply voltage}: heater power $P = V^2/R$. A 10\% voltage drop reduces power by 19\% (because $P \propto V^2$). For the ThermoRig: $T_{ss}$ drops by approximately 12\,\degC{} for a 10\% voltage reduction. The open-loop controller does not detect this.
+
+\textbf{Ambient temperature}: every 1\,\degC{} change in ambient shifts the steady-state temperature by approximately 0.9\,\degC{} (because the thermal resistance is nearly constant). A 10\,\degC{} seasonal variation produces a 9\,\degC{} output error.
+
+\textbf{Heater aging}: over thousands of hours, the heater element resistance increases (wire oxidation), reducing power. A 5\% resistance increase reduces power by 5\% and $T_{ss}$ by approximately 3\,\degC{}.
+
+These sensitivity calculations quantify why open-loop control is inadequate when precision matters. A closed-loop controller compensates for all of these disturbances automatically.
+
+\section{Hybrid Architectures in Industrial Practice}
+Most real industrial systems use a hierarchy of control:
+
+\textbf{Level 1 (open-loop sequencing)}: a PLC or state machine manages the process sequence (fill tank, heat, hold, cool, drain). This is deterministic and testable.
+
+\textbf{Level 2 (closed-loop regulation)}: PID controllers maintain temperature, pressure, flow, and level within each process step. These respond to disturbances in real time.
+
+\textbf{Level 3 (supervisory optimization)}: a higher-level controller (often model-predictive control, MPC) adjusts the setpoints of the Level~2 controllers to optimize the overall process (minimize energy, maximize throughput, meet quality targets).
+
+Understanding open-loop control as one layer in this hierarchy, rather than as a standalone approach, provides the proper engineering perspective.
+\section{Open-Loop Control in Embedded Systems}
+Many microcontroller-based systems use open-loop control for non-critical functions while reserving closed-loop for critical ones:
+
+\textbf{Stepper motor positioning}: the MCU commands a specific number of step pulses, and the motor is assumed to move one step per pulse. No position feedback. This works for light loads and moderate speeds but fails under high load (motor skips steps) or high acceleration (motor stalls). Adding an encoder closes the loop and enables step-loss detection and recovery.
+
+\textbf{LED brightness control}: PWM duty cycle sets the average LED current. The brightness is assumed proportional to current (approximately true for most LEDs). No light sensor feedback. Adequate for indicator LEDs and displays; insufficient for precision photometric applications where LED aging, temperature, and manufacturing variation affect the current-to-luminance relationship.
+
+\textbf{Timed dispensing}: a solenoid valve opens for a fixed duration to dispense a volume of liquid. The volume is assumed proportional to time (true if pressure and viscosity are constant). Variations in supply pressure, fluid temperature (viscosity changes), or valve wear produce volume errors. Closed-loop dispensing (measuring the actual volume or weight during dispensing) eliminates these errors.
+
+\section{Feedforward Control: Design and Implementation}
+Feedforward control measures a disturbance before it affects the output and applies a preemptive correction. It requires a model of how the disturbance affects the output.
+
+\textbf{Design procedure}: (1) Identify the dominant measurable disturbance. (2) Model its effect on the output: $\Delta y = G_d \cdot d$ where $G_d$ is the disturbance transfer function. (3) Compute the required feedforward correction: $\Delta u_{ff} = -(G_d/G_p) \cdot d$ where $G_p$ is the plant transfer function. (4) Implement: measure $d$ with a sensor, compute $\Delta u_{ff}$, and add it to the nominal control output.
+
+\textbf{Example}: the ThermoRig operates at $T_{\text{sp}} = 80$\,\degC{}. The dominant disturbance is ambient temperature variation. Model: a 1\,\degC{} drop in ambient requires approximately 0.8\% additional heater duty cycle to compensate (determined by measuring the steady-state duty cycle at two ambient temperatures). Feedforward: $\Delta u_{ff} = 0.8\% \times (T_{\text{amb,ref}} - T_{\text{amb,measured}})$. Combined with PID feedback: the feedforward corrects 80\% of the disturbance effect immediately (within one control loop period), while the PID corrects the remaining 20\% (model error, unmeasured disturbances) over the next few time constants.
+
+\section{Model-Based Open-Loop: Inverse Dynamics}
+For systems where the plant dynamics are well-characterized, \textbf{inverse dynamics} computes the exact input needed to produce the desired output trajectory. If the plant transfer function is $G_p(s)$, the required input is $U(s) = Y_{\text{desired}}(s) / G_p(s)$.
+
+For the ThermoRig: to ramp the temperature from 25\,\degC{} to 80\,\degC{} in exactly 60\,s with a linear ramp: the desired trajectory is $T(t) = 25 + 0.917t$ for $0 \leq t \leq 60$\,s. The required heater power includes both the steady-state loss compensation and the transient power to heat the thermal mass: $P(t) = hA(T(t) - T_{\text{amb}}) + mC_p \cdot dT/dt = hA(25 + 0.917t - 22) + 30.6 \times 0.917$. The second term is a constant 28\,W needed to maintain the ramp rate. The first term increases linearly as the temperature rises.
+
+This is open-loop because no temperature measurement is used during the ramp. If the model is perfect, the actual trajectory matches the desired trajectory exactly. In practice, model uncertainty produces a tracking error of 5--15\%, which is why feedforward is almost always combined with feedback.
+
+\section{Gain Scheduling: Quasi-Open-Loop}
+Some systems have nonlinear or operating-point-dependent behavior. A fixed-gain controller cannot perform well across the entire operating range. \textbf{Gain scheduling} adjusts the controller gains based on a measured operating condition (not the controlled variable itself):
+
+For the ThermoRig: the thermal dynamics change with temperature (convective $h$ increases with $\Delta T$, radiation becomes significant above 100\,\degC{}). At $T = 50$\,\degC{}: $K_p = 10$ provides adequate performance. At $T = 150$\,\degC{}: the plant gain has increased and $K_p = 10$ causes oscillation; $K_p = 5$ is needed. A gain schedule: $K_p = 10 - 0.033(T - 50)$ for $T \in [50, 200]$\,\degC{} adjusts the gain based on the measured temperature.
+
+Gain scheduling is ``quasi-open-loop'' because the gain adjustment is based on the measured temperature (feedback), but the scheduling function itself is an open-loop model of how the plant dynamics change with operating point.
+\section{Lookup Table Implementation}
+\subsection{Linear Interpolation}
+For a lookup table with $N$ entries $\{(x_i, y_i)\}_{i=1}^{N}$, linear interpolation between adjacent entries:
+\begin{equation}
+y = y_i + \frac{y_{i+1} - y_i}{x_{i+1} - x_i}(x - x_i) \quad \text{for } x_i \leq x \leq x_{i+1}
+\end{equation}
+In LabVIEW: the ``Interpolate 1D'' VI performs this automatically. On a microcontroller: implement with a binary search to find the bracketing entries (O($\log N$)) followed by the linear interpolation formula.
+
+\subsection{Table Resolution}
+The spacing between table entries determines the interpolation error. For a curve with maximum second derivative $|y''|_{\max}$, the maximum interpolation error with spacing $\Delta x$ is:
+\begin{equation}
+\epsilon_{\max} = \frac{|y''|_{\max} \cdot \Delta x^2}{8}
+\end{equation}
+For a thermocouple lookup table (nearly linear, $|y''| \approx 0.001$\,\degC{}/mV$^2$) with $\Delta x = 0.5$\,mV: $\epsilon \approx 0.00003$\,\degC{}, negligible. For a thermistor ($|y''|$ is large due to exponential nonlinearity): finer spacing is needed in the region of high curvature. Use non-uniform spacing: closely spaced entries where the curve bends sharply, widely spaced where it is nearly linear.
+
+\section{Practical Comparison: Open-Loop vs.\ Closed-Loop Performance}
+The ThermoRig provides an excellent test bed for comparing open and closed-loop control:
+
+\textbf{Open-loop test}: calibrate the duty cycle vs.\ steady-state temperature at ambient $= 22$\,\degC{}. Command 50\% duty cycle (calibrated to produce 80\,\degC{}). Record the temperature over 30 minutes while the HVAC cycles the ambient between 20\,\degC{} and 24\,\degC{}.
+
+\textbf{Result}: the specimen temperature varies between 78\,\degC{} and 82\,\degC{}, tracking the ambient variation with no correction. When a student opens the lab door (creating a 2\,m/s air draft), the temperature drops 5\,\degC{} and does not recover until the door closes.
+
+\textbf{Closed-loop test} (PID at same setpoint): the temperature varies between 79.5\,\degC{} and 80.5\,\degC{} despite the same ambient variation. When the door opens, the temperature dips 1\,\degC{} and recovers within 20\,s as the controller increases heater power.
+
+The quantitative comparison: open-loop variation $= \pm$2\,\degC{}; closed-loop $= \pm$0.5\,\degC{}. A $4\times$ improvement in steady-state accuracy. The door disturbance: open-loop error $= 5$\,\degC{} sustained; closed-loop $= 1$\,\degC{} transient with 20\,s recovery.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Give three real-world examples of open-loop control systems. For each, identify the command, the actuator, and why feedback is not used.
+\item Your team proposes an open-loop motor speed controller that sets PWM duty cycle based on a lookup table. Under what conditions will this work, and under what conditions will it fail?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item (a) Clothes washer: timer sets cycle duration; motor runs for preset times; no sensor measures how clean the clothes are. (b) Sprinkler timer: runs for a set duration regardless of soil moisture. (c) Microwave oven: runs at set power for set time; does not measure food temperature. In all cases, feedback is omitted because the cost/complexity of a sensor exceeds the value of precision, and approximate control is acceptable.
+\item Works when: the load is constant and predictable, the motor characteristics do not change with temperature, and the supply voltage is stable. Fails when: the load varies (e.g., a robot arm picks up different weights), the motor heats up (resistance changes, reducing speed at the same PWM), or the battery voltage drops during discharge.
+\end{enumerate}
+
+
+% ================================================================

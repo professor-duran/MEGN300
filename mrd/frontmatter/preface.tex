@@ -1,0 +1,67 @@
+% Preface: How to Use This Document
+% Auto-generated from megn300_master_reference.tex
+
+\chapter*{How to Use This Document}
+\addcontentsline{toc}{chapter}{How to Use This Document}
+
+This reference document accompanies the MEGN~300 lecture modules and lab exercises. It is organized in four parts that follow the logical progression of instrumentation and control:
+
+\textbf{Part~I: Measurement Fundamentals} covers the physics and mathematics of measurement. These six chapters establish the vocabulary and analytical tools you need before touching any hardware: what measurements are, how sensors behave statically and dynamically, how to quantify uncertainty with variance and covariance analysis, how to apply statistical methods to experimental data, and the physical principles of sensors and actuators.
+
+\textbf{Part~II: Signals and Signal Processing} covers how measured signals are represented, converted between analog and digital domains, decomposed into frequency components, and cleaned up with filters. These chapters bridge measurement theory and practical data acquisition.
+
+\textbf{Part~III: Electronics for Instrumentation} covers the electronic building blocks that condition, amplify, and switch signals in real measurement and control systems. It begins with circuit fundamentals (Ohm's Law, Kirchhoff's Laws, voltage dividers, RC/RL transients, and grounding) before moving to amplifiers, power electronics, DC-DC converters, and a systematic debugging methodology that teaches you to verify hardware, firmware, and integrated systems from the bottom up.
+
+\textbf{Part~IV: Control Systems} covers the fundamentals of open-loop and closed-loop control, culminating in the PID controller that is the workhorse of industrial automation.
+
+
+\subsection*{Generative AI Policy}
+This document includes a ``Modern Tools and AI Use Policy'' (page~\pageref{ch:aipolicy}) with a Green/Yellow/Red traffic-light framework governing the use of ChatGPT, Copilot, and other generative AI tools in MEGN~300. Read it before your first assignment.
+
+\subsection*{About the Requirements Mapping Boxes}
+Throughout this document, blue-bordered \textbf{Requirements Mapping} boxes show how theoretical concepts translate directly into testable ``shall'' statements in a System Design Requirements Document (SDRD). This is the language of professional engineering: every measurement specification, filter design, and control performance target should trace to a formal requirement that can be verified by test, analysis, inspection, or demonstration. When you encounter a Requirements Mapping box, it is showing you how to write the engineering specification for the concept just discussed.
+
+\textbf{Part~V: Engineering Science Reference} provides the heat transfer fundamentals (conduction, convection, radiation, and energy balances) that underpin the ThermoRig worked example and any thermal measurement or control system, plus fluid power fundamentals (hydraulics, pneumatics, flow measurement, and control valves) for students whose projects involve fluid systems.
+
+Every chapter includes worked examples, practice questions with solutions, and Requirements Mapping boxes that connect theory to testable engineering specifications.
+
+\begin{tipbox}[The Running Worked Example: ThermoRig]
+Throughout this document, teal-bordered \textsf{WE} boxes follow a single instrumentation design, the \textbf{ThermoRig} temperature measurement and control system: a thermocouple-based sensor, signal conditioning chain, NI~DAQ data acquisition, and PID-controlled heater. Watch for these boxes to see how each concept applies to a real measurement system.
+\end{tipbox}
+
+
+\subsection*{ThermoRig Worked Example Roadmap}
+The ThermoRig boxes are not random examples; they form a cumulative narrative of a complete measurement and control system:
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Chapter~\ref{ch:static}} (Static Measurements): We calibrate the Type~K thermocouple at known temperature points.
+\item \textbf{Chapter~\ref{ch:dynamic}} (Dynamic Measurements): We measure the thermocouple's time constant and evaluate its bandwidth.
+\item \textbf{Chapter~\ref{ch:error}} (Error Analysis): We propagate uncertainty through the heat flux calculation.
+\item \textbf{Chapter~\ref{ch:snr}} (Signal-to-Noise Ratio): We diagnose 60\,Hz noise from the heater cable and fix it.
+\item \textbf{Chapter~\ref{ch:dsp}} (Digital Signal Processing): We discover aliasing from the 500\,kHz switching regulator.
+\item \textbf{Chapter~\ref{ch:amplifiers}} (Amplifiers): We design the complete signal conditioning chain (bridge, INA, filter, ADC).
+\item \textbf{Chapter~\ref{ch:highpower}} (High-Power Devices): We drive the heater through an SSR with time-proportional PWM.
+\item \textbf{Chapter~\ref{ch:pid}} (PID Control): We tune the PID controller using Ziegler-Nichols and manual refinement.
+\end{itemize}
+Read the boxes in sequence for a complete case study of instrumentation system design.
+
+\subsection*{Week-to-Chapter Mapping}
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{c c X l}
+\toprule
+\textbf{Week} & \textbf{Topic Area} & \textbf{Primary Activities} & \textbf{Chapters} \\
+\midrule
+1--2 & Measurement Fundamentals & Sensor terminology, static characteristics, calibration & Ch.~1--2 \\
+3--4 & Dynamic Measurements \& Error & Time constants, frequency response, uncertainty & Ch.~3--4 \\
+5--6 & Signals \& Digitization & Analog vs.\ digital, sampling, aliasing, SNR & Ch.~5--6 \\
+7--8 & Frequency Analysis & Fourier series, FFT, spectral analysis & Ch.~7--8 \\
+9--10 & Filtering & DSP basics, analog and digital filter design & Ch.~9--11 \\
+11--12 & Signal Conditioning & Amplifiers, instrumentation amps, high-power switches & Ch.~12--13 \\
+13--14 & Control Systems & Open-loop, closed-loop, PID fundamentals & Ch.~14--16 \\
+15--16 & Integration \& Exams & Complete system integration, lab practicals & All \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\newpage

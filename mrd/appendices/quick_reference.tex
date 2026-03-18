@@ -1,0 +1,118 @@
+% Quick Reference Tables
+% Auto-generated from megn300_master_reference.tex
+
+\chapter*{Quick Reference Tables}
+\addcontentsline{toc}{chapter}{Quick Reference Tables}
+
+\section*{Sensor Selection Guide}
+\begin{center}
+\begin{tabular}{p{2.5cm}p{3cm}p{2cm}p{2cm}p{3cm}}
+\toprule
+\textbf{Measurand} & \textbf{Sensor Type} & \textbf{Range} & \textbf{Accuracy} & \textbf{Output} \\
+\midrule
+Temperature & Thermocouple (K) & $-200$ to $1250$\,\degC{} & $\pm 2.2$\,\degC{} & $\mu$V (needs amp) \\
+Temperature & RTD (Pt100) & $-200$ to $850$\,\degC{} & $\pm 0.3$\,\degC{} & Resistance (bridge) \\
+Temperature & Thermistor (NTC) & $-40$ to $125$\,\degC{} & $\pm 0.2$\,\degC{} & Resistance (divider) \\
+Pressure & Piezoresistive & 0--10\,bar & $\pm 0.5\%$ FS & mV/V (bridge) \\
+Strain & Foil gauge & $\pm 5\%$ & $\pm 1\,\mu\epsilon$ & mV/V (bridge) \\
+Acceleration & MEMS (ADXL345) & $\pm 16$\,g & $\pm 0.5\%$ & Digital (I2C/SPI) \\
+Proximity & Ultrasonic & 2\,cm--4\,m & $\pm 3$\,mm & Pulse width \\
+Current & Hall effect (ACS712) & $\pm 30$\,A & $\pm 1.5\%$ & Analog voltage \\
+Light & Photodiode & varies & varies & Current ($\mu$A) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{ADC Resolution and LSB Size}
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Resolution} & \textbf{Levels} & \textbf{LSB (3.3\,V range)} & \textbf{LSB (5\,V range)} \\
+\midrule
+8-bit & 256 & 12.9\,mV & 19.5\,mV \\
+10-bit & 1024 & 3.22\,mV & 4.88\,mV \\
+12-bit & 4096 & 0.806\,mV & 1.22\,mV \\
+16-bit & 65536 & 50.4\,$\mu$V & 76.3\,$\mu$V \\
+24-bit & 16.7M & 0.197\,$\mu$V & 0.298\,$\mu$V \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Filter Type Comparison}
+\begin{center}
+\begin{tabular}{p{2.5cm}p{3cm}p{3cm}p{3.5cm}}
+\toprule
+\textbf{Filter} & \textbf{Passband} & \textbf{Rolloff} & \textbf{Best For} \\
+\midrule
+Butterworth & Maximally flat & $-20n$\,dB/dec & General purpose \\
+Chebyshev I & Ripple in passband & Steeper than Butter. & Sharp cutoff needed \\
+Chebyshev II & Ripple in stopband & Steep, flat passband & Rejecting specific band \\
+Bessel & Maximally flat group delay & Gentlest rolloff & Preserving waveform shape \\
+Elliptic & Ripple in both bands & Steepest possible & Minimum order needed \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Thermocouple Types}
+\begin{center}
+\begin{tabular}{cccl}
+\toprule
+\textbf{Type} & \textbf{Range (\degC)} & \textbf{Sensitivity ($\mu$V/\degC)} & \textbf{Notes} \\
+\midrule
+K & $-200$ to $1250$ & 41 & Most common, general purpose \\
+J & $-40$ to $750$ & 52 & Higher sensitivity, oxidizes above 500\,\degC \\
+T & $-200$ to $350$ & 43 & Best for cryogenic and food applications \\
+E & $-200$ to $900$ & 68 & Highest sensitivity of common types \\
+N & $-270$ to $1300$ & 39 & Improved K-type, better stability \\
+S & $-50$ to $1768$ & 10 & Platinum, high-temperature reference \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Common PID Tuning Starting Points}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & $\boldsymbol{K_p}$ & $\boldsymbol{T_i}$ & $\boldsymbol{T_d}$ \\
+\midrule
+Ziegler-Nichols (P only) & $0.5\,K_u$ & --- & --- \\
+Ziegler-Nichols (PI) & $0.45\,K_u$ & $P_u/1.2$ & --- \\
+Ziegler-Nichols (PID) & $0.6\,K_u$ & $P_u/2$ & $P_u/8$ \\
+Tyreus-Luyben (PID) & $K_u/2.2$ & $2.2\,P_u$ & $P_u/6.3$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Where $K_u$ is the ultimate gain and $P_u$ is the ultimate period. These are starting points; always fine-tune experimentally.
+
+\section*{Key Equations at a Glance}
+
+\textbf{Ohm's Law}: $V = IR$. \textbf{Power}: $P = VI = I^2R = V^2/R$.
+
+\textbf{Voltage divider}: $V_{\text{out}} = V_{\text{in}} \cdot R_2/(R_1 + R_2)$.
+
+\textbf{RC time constant}: $\tau = RC$. \textbf{Cutoff frequency}: $f_c = 1/(2\pi RC)$.
+
+\textbf{Nyquist criterion}: $f_s \geq 2 f_{\max}$ (practical: $f_s \geq 5$--$10 f_{\max}$).
+
+\textbf{Quantization step}: $q = V_{\text{range}} / 2^n$. \textbf{ENOB}: $(\text{SINAD} - 1.76)/6.02$.
+
+\textbf{Uncertainty propagation}: $u_f = \sqrt{\sum (\partial f/\partial x_i)^2 \cdot u_{x_i}^2}$.
+
+\textbf{SNR}: $\text{SNR (dB)} = 20\log_{10}(V_{\text{signal}}/V_{\text{noise}})$.
+
+\textbf{Gain (dB)}: $20\log_{10}(V_{\text{out}}/V_{\text{in}})$. $+6$\,dB $= 2\times$. $-3$\,dB $= 0.707\times$. $-20$\,dB $= 0.1\times$.
+
+\textbf{PID}: $u(t) = K_p\left[e(t) + \frac{1}{T_i}\int e\,dt + T_d\frac{de}{dt}\right]$.
+
+\textbf{Phase lag from latency}: $\phi = -360 \cdot f \cdot \tau_{\text{total}}$ (degrees).
+
+\textbf{Biot number}: $Bi = hL_c/k$. Lumped capacitance valid if $Bi < 0.1$.
+
+\textbf{Thermal time constant}: $\tau = mC_p/(hA_s)$.
+
+\textbf{Steady-state temperature}: $T_{ss} = T_{\text{amb}} + \dot{Q}/(hA)$.
+
+
+% ================================================================
+% APPENDIX: WHY PROJECTS FAIL
+% ================================================================

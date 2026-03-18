@@ -1,0 +1,295 @@
+% Chapter 7: Analog vs. Digital Systems
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Analog vs.\ Digital Systems}
+
+\section{Continuous and Discrete Signals}
+An \textbf{analog signal} is continuous in both time and amplitude: it can take any value at any instant. A \textbf{digital signal} is discrete in both time (sampled at intervals) and amplitude (quantized to finite levels). The real world is analog; computers are digital. The boundary between them is the most critical interface in any measurement system.
+
+\section{Analog-to-Digital Conversion (ADC)}
+An ADC converts a continuous voltage into a binary number. Three key parameters:
+
+\textbf{Resolution} ($n$ bits): determines the number of discrete levels $= 2^n$. A 12-bit ADC divides the input range into 4096 levels. The \textbf{least significant bit} (LSB) voltage:
+\begin{equation}
+\text{LSB} = \frac{V_{\text{range}}}{2^n}
+\end{equation}
+For a $\pm$5\,V range (10\,V span), 12-bit: LSB $= 10/4096 = 2.44$\,mV. Any voltage change smaller than 1 LSB is invisible to the ADC.
+
+\textbf{Sampling rate} ($f_s$): number of conversions per second. Must satisfy the Nyquist criterion (Chapter~9).
+
+\textbf{Input range}: the voltage window the ADC can accept (e.g., 0--5\,V, $\pm$10\,V). Signals outside this range are clipped, losing information and potentially damaging the ADC.
+
+\subsection{Quantization Error}
+Every ADC conversion introduces a rounding error of up to $\pm \frac{1}{2}$\,LSB. This error is inherent and cannot be eliminated; it can only be reduced by using a higher-resolution ADC. Quantization noise power is uniformly distributed; its RMS value is $\text{LSB}/\sqrt{12}$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                  minimum width=2.4cm, minimum height=1.8cm, align=center, font=\scriptsize\sffamily\bfseries},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+    spec/.style={font=\tiny\sffamily, text=MinesSilver, align=center}
+]
+\node[block] (aa) at (0,0) {Anti-Alias\\Filter};
+\node[block] (sh) at (3.5,0) {Sample\\and Hold};
+\node[block] (quant) at (7,0) {Quantizer\\($2^n$ levels)};
+\node[block] (enc) at (10.5,0) {Digital\\Encoder};
+\draw[arr] (-2,0) -- (aa) node[midway, above, font=\scriptsize\sffamily] {$V_{\text{in}}(t)$};
+\draw[arr] (aa) -- (sh); \draw[arr] (sh) -- (quant); \draw[arr] (quant) -- (enc);
+\draw[arr] (enc) -- (12.5,0) node[midway, above, font=\scriptsize\sffamily] {$x[n]$};
+\node[spec, below=8pt] at (aa.south) {$f_c < f_s/2$\\Prevents aliasing};
+\node[spec, below=8pt] at (sh.south) {Rate: $f_s$\\Nyquist: $f_s > 2f_{\max}$};
+\node[spec, below=8pt] at (quant.south) {LSB $= V_{\text{range}}/2^n$\\Error: $\pm$LSB/2};
+\node[spec, below=8pt] at (enc.south) {Binary output\\$n$ bits/sample};
+\end{tikzpicture}
+\caption{The analog-to-digital conversion pipeline. Each stage introduces specific errors: the anti-alias filter must prevent frequency folding, the sample-and-hold sets the temporal resolution, and the quantizer determines amplitude resolution.}
+\label{fig:adc}
+\end{figure}
+
+\section{Digital-to-Analog Conversion (DAC)}
+A DAC converts a digital number back to an analog voltage. Used in control systems (Chapter~16) to drive actuators, in signal generators, and in audio output. Key parameters: resolution (bits), settling time, and output voltage range.
+
+\section{Advantages and Trade-offs}
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\textwidth}{l X X}
+\toprule
+\textbf{Property} & \textbf{Analog} & \textbf{Digital} \\
+\midrule
+Noise immunity & Low; noise accumulates through the chain & High; regenerated at each stage \\
+Precision & Limited by component tolerances & Limited by bit depth; easily $>$16 bits \\
+Storage & Degrades over time (tape, film) & Perfect copies indefinitely \\
+Processing & Real-time, continuous & Requires sampling; introduces latency \\
+Flexibility & Fixed function hardware & Software-reconfigurable \\
+Cost for precision & Expensive (matched components) & Cheap (digital computation) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{tipbox}[Keep the Analog Path Clean, Do the Math Digitally]
+The best practice in modern instrumentation: use high-quality analog signal conditioning (amplification, anti-alias filtering) to bring the signal into the ADC's optimal input range, then do all processing (calibration, filtering, FFT, averaging) in software. This minimizes analog component count and maximizes flexibility.
+\end{tipbox}
+
+
+\section{Sample-and-Hold (S/H)}
+An ADC takes a finite time to complete a conversion (the \textbf{aperture time}). If the input voltage changes during conversion, the result is erroneous. A sample-and-hold circuit captures the analog voltage on a capacitor at the sampling instant and holds it constant while the ADC converts. Most modern ADCs include an internal S/H, but at high sampling rates or with fast-changing signals, the S/H settling time becomes a limitation.
+
+\textbf{Aperture jitter}: random variation in the sampling instant. Creates timing uncertainty that converts to amplitude noise. For a sinusoidal signal of frequency $f$ and amplitude $V_p$:
+\begin{equation}
+V_{\text{noise,jitter}} = 2\pi f \cdot V_p \cdot t_{\text{jitter}}
+\end{equation}
+At high frequencies, jitter becomes the dominant noise source, limiting effective resolution.
+
+\section{Multiplexing}
+A DAQ system often uses a single ADC shared among multiple input channels via an \textbf{analog multiplexer} (MUX). The MUX switches channels sequentially, so the effective per-channel sampling rate is $f_s / N_{\text{channels}}$. This introduces a \textbf{channel-to-channel skew}: adjacent channels are sampled at slightly different times.
+
+\begin{warningbox}[Channel Skew in Multiplexed DAQs]
+If you need simultaneous sampling of multiple channels (e.g., correlating vibration and pressure), a multiplexed DAQ introduces timing errors. The NI~USB-6001 (multiplexed) has channel skew; the NI~USB-6356 (simultaneous sampling) does not. For timing-critical multi-channel measurements, use a simultaneous-sampling DAQ or synchronize channels with an external trigger.
+\end{warningbox}
+
+\section{Common NI DAQ Devices for MEGN 300}
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\textwidth}{l c c c c X}
+\toprule
+\textbf{Device} & \textbf{AI Ch} & \textbf{Resolution} & \textbf{Max Rate} & \textbf{Range} & \textbf{Notes} \\
+\midrule
+USB-6001 & 8 diff / 4 SE & 14-bit & 20\,kS/s & $\pm$10\,V & Basic; multiplexed \\
+USB-6002 & 8 diff / 4 SE & 16-bit & 50\,kS/s & $\pm$10\,V & Higher resolution \\
+USB-6009 & 8 diff / 4 SE & 14-bit & 48\,kS/s & $\pm$10\,V & Common in teaching labs \\
+USB-6356 & 8 AI & 16-bit & 1.25\,MS/s & $\pm$10\,V & Simultaneous sampling \\
+\bottomrule
+\end{tabularx}
+\caption{Common NI DAQ devices for MEGN~300 labs.}
+\end{table}
+
+
+\section{The Analog World and Its Limitations}
+The physical world is inherently analog: temperature, pressure, velocity, and strain are continuous quantities that vary smoothly in both time and amplitude. Analog signals are vulnerable to noise, drift, and degradation during transmission. Every amplifier adds noise, every cable picks up electromagnetic interference, and analog storage degrades with time. This is why modern instrumentation converts signals to digital form as early as possible.
+
+\section{Sampling Theory}
+Sampling converts a continuous-time signal into a discrete-time sequence. The Nyquist-Shannon sampling theorem states: a bandlimited signal with maximum frequency $f_{\max}$ can be perfectly reconstructed from its samples if $f_s > 2f_{\max}$. The frequency $f_s/2$ is the Nyquist frequency. Any content above it aliases into the baseband and cannot be removed digitally. The only defense is an analog anti-alias filter before the ADC.
+
+In practice, use $f_s \geq 10 \times f_{\max}$ for general measurement, $f_s \geq 20 \times f_{\text{bandwidth}}$ for control systems, and $f_s = 2.56 \times f_{\max}$ for vibration analysis.
+
+\begin{warningbox}[Anti-Alias Filter Is Mandatory]
+An analog low-pass filter must be present before the ADC in every properly designed system. It cannot be implemented in software because aliasing occurs at the moment of sampling. Set the cutoff at or below $f_s/2$ with sufficient rolloff (4th order minimum) to attenuate out-of-band content by at least 60\,dB.
+\end{warningbox}
+
+\section{Quantization in Depth}
+An $n$-bit ADC divides $V_{\text{range}}$ into $2^n$ levels. The LSB voltage is $V_{\text{range}}/2^n$. Quantization error is $\pm$0.5\,LSB with RMS value $\text{LSB}/\sqrt{12}$. For $\pm$10\,V range: 12-bit gives 4.88\,mV LSB; 14-bit gives 1.22\,mV; 16-bit gives 0.305\,mV. Each additional bit halves the LSB.
+
+The Effective Number of Bits (ENOB) quantifies actual resolution: ENOB $= (\text{SINAD} - 1.76)/6.02$. A 16-bit ADC may have ENOB of only 13--14 at full speed. Always check ENOB in the datasheet.
+
+\section{Sample-and-Hold and Aperture Effects}
+The ADC needs a stable input during conversion. A sample-and-hold (S/H) captures the signal at a precise instant. Without it, fast-changing signals cause aperture error: $\epsilon = 2\pi f \cdot A \cdot t_a$ where $t_a$ is the aperture time. For $<$0.5\,LSB error: $t_a < \text{LSB}/(2\pi f A)$.
+
+\section{Multiplexing and Channel Skew}
+Most DAQ devices share one ADC among channels via a multiplexer, introducing interchannel delay. For slowly varying signals this is negligible. For fast signals or phase-sensitive measurements, channel skew distorts results. Solutions: reduce active channels, use simultaneous sample-and-hold, or correct mathematically.
+
+\section{Input Configuration}
+\textbf{Differential}: measures $V_+ - V_-$. Rejects common-mode voltages. Mandatory for millivolt signals (thermocouples, bridges). Uses two channels per measurement.
+
+\textbf{RSE (Referenced Single-Ended)}: measures voltage relative to DAQ ground. Suitable for volt-level grounded sources. Susceptible to ground loops.
+
+\textbf{NRSE}: measures relative to a shared analog return. Useful for floating sources.
+
+Always select the smallest input range that encompasses the signal. Using $\pm$10\,V for a 0--2\,V signal wastes 80\% of dynamic range, losing 2.3 bits of effective resolution.
+
+\begin{examplebox}[ThermoRig: DAQ Configuration]
+NI USB-6001: thermocouple signal (amplified to 0--4\,V by INA) on AI0+/AI0$-$ in Differential mode. Range: 0--5\,V. Rate: 100\,S/s ($10\times$ the 10\,Hz signal bandwidth). 14-bit resolution gives LSB $= 0.305$\,mV $\approx 0.007$\,\degC{} (well below sensor uncertainty). Anti-alias: 2nd-order Sallen-Key LP at 40\,Hz before the DAQ.
+\end{examplebox}
+
+\section{Digital-to-Analog Conversion}
+DACs convert digital codes to analog voltages for control signals, excitation waveforms, and test stimuli. Key specs: resolution (bits), settling time, glitch energy, and monotonicity. A reconstruction low-pass filter smooths the DAC's staircase output.
+
+
+\section{Understanding ADC Architectures}
+Different applications require different ADC types. \textbf{Successive Approximation (SAR)}: the most common for data acquisition. Moderate speed (1\,kS/s to 5\,MS/s), moderate resolution (12--18 bits). One sample per conversion clock. Ideal for multiplexed multichannel systems.
+
+\textbf{Sigma-Delta ($\Sigma\Delta$)}: extreme oversampling with noise shaping. Very high resolution (24 bits) at low to moderate bandwidth (10\,S/s to 100\,kS/s). Best for precision DC and low-frequency measurement (bridges, thermocouples). The NI USB-9219 uses sigma-delta.
+
+\textbf{Flash}: fastest (100\,MS/s to 1\,GS/s) but lowest resolution (6--8 bits). Used in oscilloscopes and radar.
+
+\textbf{Pipeline}: high speed with moderate resolution (10--14 bits at 10--200\,MS/s). Used in communications and high-speed data acquisition.
+
+\section{Practical DAQ Considerations}
+\textbf{Trigger modes}: start acquisition on an external signal (rising edge, level), software command, or internal timer. Hardware triggering enables synchronized measurement with external events (impact, valve opening).
+
+\textbf{Buffer management}: the DAQ fills a hardware buffer (typically 4096--65536 samples). If software does not read the buffer before it fills, samples are lost (buffer overflow). In LabVIEW, the DAQ Read VI must execute faster than the buffer fill rate.
+
+\textbf{Timing modes}: finite acquisition (acquire exactly $N$ samples, then stop) vs.\ continuous acquisition (run indefinitely, processing data in blocks). Continuous mode is standard for real-time monitoring and control.
+
+\textbf{Synchronization}: when using multiple DAQ devices or combining analog and digital I/O, ensure all channels share a common clock and trigger to avoid timing skew.
+\section{ADC Architecture Comparison}
+Different applications demand different ADC types, and understanding the tradeoffs is essential for selecting the right DAQ hardware.
+
+\textbf{Successive Approximation Register (SAR)}: uses a binary search algorithm, testing one bit per clock cycle. $n$ bits require $n$ clock cycles. Speed: 1\,kS/s to 5\,MS/s. Resolution: 12--18 bits. Low power. The most common architecture for general-purpose data acquisition. The NI USB-6001 uses a 14-bit SAR ADC.
+
+\textbf{Sigma-Delta ($\Sigma\Delta$)}: oversamples at $64\times$--$256\times$ the output rate, shapes quantization noise to high frequencies, then decimation-filters to the output bandwidth. Very high resolution (24 bits) at low to moderate output rates (10--100\,kS/s). Best for precision DC and low-frequency measurement. The NI USB-9219 uses 24-bit sigma-delta.
+
+\textbf{Flash}: uses $2^n - 1$ comparators operating simultaneously. Fastest (100\,MS/s to multi-GS/s) but limited resolution (6--8 bits) and high power. Used in oscilloscopes.
+
+\textbf{Pipeline}: cascades multiple low-resolution stages, each refining the previous stage's residual error. High speed (10--200\,MS/s) with moderate resolution (10--14 bits). Used in communications and high-speed data acquisition.
+
+\section{Practical DAQ Configuration Details}
+\subsection{Trigger Configuration}
+\textbf{Software trigger}: acquisition starts when the program calls the start function. Simple but introduces variable latency (milliseconds to tens of milliseconds) due to OS scheduling.
+
+\textbf{Hardware trigger}: acquisition starts on an external electrical signal (rising/falling edge on a digital input, or analog level crossing). Precise timing ($<$1\,$\mu$s jitter). Essential for synchronizing acquisition with external events.
+
+\textbf{Pre-trigger}: the DAQ continuously acquires data into a circular buffer and, upon trigger, saves the $N$ most recent samples plus $M$ post-trigger samples. This captures events that happen before the trigger point, which is essential for analyzing what caused the trigger event.
+
+\subsection{Buffer Management and Data Throughput}
+The DAQ writes samples to a hardware FIFO buffer. The software must read this buffer before it overflows. At 100\,kS/s with a 4096-sample buffer: the buffer fills in 41\,ms. The LabVIEW loop must execute a DAQ Read every 41\,ms at minimum. In practice, read every 10\,ms (1000 samples per read) to provide safety margin. If the loop is slower (due to disk I/O, display updates, or heavy computation), increase the buffer size or reduce the sample rate.
+
+\subsection{Clock Sources}
+The DAQ's internal clock provides adequate accuracy ($\pm$50\,ppm typical, or $\pm$5\,Hz at 100\,kS/s) for most applications. For measurements requiring precise frequency accuracy (vibration analysis, phase measurement), use an external clock from a precision oscillator or GPS-disciplined source. For multi-device synchronization, route the master clock from one DAQ to the clock input of the others.
+
+\section{Grounding and Wiring Best Practices for DAQ}
+\textbf{Twisted pair}: twist the signal and return wires together (2--4 turns per inch). This cancels magnetically induced noise because each half-twist receives equal but opposite induced voltage. Use twisted pair for all analog signals longer than 30\,cm.
+
+\textbf{Shielded cable}: use shielded twisted pair for millivolt-level signals (thermocouples, bridges) or in high-EMI environments (near motors, power electronics). Connect the shield at the DAQ end only; leave it unconnected at the sensor end to avoid ground loops.
+
+\textbf{Star grounding}: all analog grounds converge at a single point near the DAQ's analog ground terminal. Never daisy-chain grounds from one sensor to the next; the current from sensor~1 flowing through the shared ground wire creates a voltage drop that offsets sensor~2.
+
+\textbf{Cable routing}: keep analog signal cables at least 30\,cm from power cables, motor cables, and switching circuits. Cross at right angles when cables must intersect. Never bundle analog and power cables in the same conduit.
+
+\begin{warningbox}[The Most Expensive Mistake in Student Projects]
+Using a breadboard for signal conditioning circuits in a final project is the most common cause of mysterious noise, intermittent failures, and unreproducible results. Breadboard contacts have variable resistance (0.01--1\,$\Omega$), parasitic capacitance (2--5\,pF per row), and poor high-frequency behavior. For millivolt-level signals, solder all connections to a protoboard or use a custom PCB. Reserve the breadboard for initial prototyping only.
+\end{warningbox}
+\section{Data Conversion Pipeline}
+The complete data pipeline from analog sensor to engineering units involves multiple conversion stages, each with its own error contribution:
+
+(1)~\textbf{Sensor}: physical quantity $\to$ electrical signal. Error: sensor accuracy, linearity, hysteresis.
+
+(2)~\textbf{Signal conditioning}: raw electrical $\to$ conditioned electrical (amplified, filtered). Error: gain error, offset, noise.
+
+(3)~\textbf{ADC}: conditioned voltage $\to$ digital code. Error: quantization ($\pm$0.5\,LSB), DNL/INL, aperture jitter.
+
+(4)~\textbf{Calibration equation}: digital code $\to$ engineering units. Error: calibration residual, interpolation.
+
+(5)~\textbf{Digital processing}: raw engineering units $\to$ processed result (filtered, averaged, derived quantities). Error: rounding, truncation, filter transients.
+
+Each stage's error can be analyzed independently and combined via RSS to produce the total system uncertainty.
+
+\section{Common ADC Errors}
+\textbf{Differential nonlinearity (DNL)}: the deviation of any ADC step from the ideal 1\,LSB width. DNL $> +1$\,LSB means a missing code (some digital values are never output). For the NI USB-6001: DNL $< \pm$1\,LSB (no missing codes guaranteed).
+
+\textbf{Integral nonlinearity (INL)}: the maximum deviation of the ADC's transfer function from the ideal straight line. INL affects the overall measurement accuracy (not just the step-to-step accuracy). For the NI USB-6001: INL $< \pm$4\,LSB at 14-bit.
+
+\textbf{Aperture jitter}: variation in the exact sampling instant from sample to sample. For a sinusoidal signal at frequency $f$, aperture jitter $\sigma_t$ produces noise: $\text{SNR}_{\text{jitter}} = -20\log_{10}(2\pi f \sigma_t)$\,dB. At $f = 10$\,kHz and $\sigma_t = 50$\,ps: $\text{SNR} = 90$\,dB (adequate for 14-bit). At $f = 1$\,MHz: $\text{SNR} = 50$\,dB (limits effective resolution to $\sim$8 bits).
+
+\section{Oversampling for Improved Resolution}
+When oversampling by a factor $K$ and then digitally low-pass filtering and decimating, the effective resolution improves by approximately $\log_2(\sqrt{K})$ bits. To gain 1 bit of effective resolution: oversample by $4\times$. To gain 2 bits: $16\times$. To gain 4 bits (equivalent to upgrading from 12-bit to 16-bit): $256\times$.
+
+Example: the NI USB-6001 (14-bit) sampling at 40\,kS/s with a 100\,Hz signal bandwidth provides $K = 40000/(2 \times 100) = 200\times$ oversampling. Theoretical resolution improvement: $\log_2(\sqrt{200}) = 3.8$ bits, giving effective 17.8-bit resolution. In practice, noise and INL limit the actual improvement to approximately 2--3 bits (16--17 bit effective). Still, this is a significant improvement from a simple, inexpensive DAQ device.
+\section{Signal Conditioning Integration with DAQ}
+The signal conditioning stage must be designed as a unit with the DAQ, not independently. Key integration points:
+
+\textbf{Voltage range matching}: the maximum output of the signal conditioning must equal the ADC's full-scale input. Wasting 50\% of the input range (e.g., a 0--2.5\,V signal on a 0--5\,V range) costs one bit of effective resolution. Wasting 90\% (0--0.5\,V on 0--5\,V) costs over 3 bits.
+
+\textbf{Impedance matching}: the signal conditioning output impedance must be low enough to charge the ADC's input sampling capacitor within the acquisition time. For a SAR ADC acquiring at 100\,kS/s with $C_{\text{sample}} = 20$\,pF: the source impedance should be $< 1/(2\pi \times 100000 \times 20 \times 10^{-12}) \approx 80$\,k$\Omega$. Most op-amp outputs have $< 100\,\Omega$ impedance, so this is rarely an issue unless you omit the output buffer.
+
+\textbf{Common-mode voltage}: the ADC input has a limited common-mode range (typically $-0.2$\,V to $V_{\text{supply}} + 0.2$\,V for single-supply devices). If the signal conditioning output includes a common-mode voltage outside this range (e.g., a thermocouple referenced to earth ground while the DAQ is on USB ground), the ADC produces erroneous readings or damage. Use differential inputs or add a level-shifting circuit.
+
+\section{Multi-Channel Acquisition Strategies}
+\textbf{Sequential scanning}: the MUX connects each channel to the single ADC in turn. Channel rate $= f_s / N_{\text{channels}}$. For 8 channels at 100\,kS/s total: each channel sampled at 12.5\,kS/s. Interchannel delay $= 1/100000 = 10\,\mu$s.
+
+\textbf{Simultaneous sample-and-hold (SSH)}: all channels have dedicated S/H circuits that capture simultaneously, then the single ADC converts each held value sequentially. No channel skew. Available on higher-end DAQ devices (NI USB-6356).
+
+\textbf{Channel-to-channel crosstalk}: imperfect MUX isolation allows signal from one channel to leak into the next. Typical crosstalk: $-80$\,dB. For a 5\,V signal on channel 0, the leakage onto channel 1 is $5 \times 10^{-4} = 0.5$\,mV. If channel 1 measures a millivolt-level signal, this crosstalk is significant. Solution: separate high-voltage and low-voltage channels, or insert ground channels between them.
+
+\section{Timing Verification}
+In real-time systems, verify that the LabVIEW loop executes within the required period. Add a ``Tick Count'' function at the start and end of the loop and compute the elapsed time. If the loop occasionally exceeds the period (a ``timing violation''), samples may be lost or the control output may be delayed. Common causes: disk I/O (file write), display updates (front panel), and garbage collection. Solutions: move file writes to a separate parallel loop; reduce front panel update rate to 10\,Hz; pre-allocate arrays.
+\section{Real-World DAQ System Examples}
+\subsection{NI USB-6001 (MEGN 300 Standard)}
+14-bit SAR ADC, 8 AI channels (4 differential), $\pm$10\,V or $\pm$1\,V range, 20\,kS/s aggregate (shared among active channels), 2 AO channels (12-bit), 13 DIO lines. USB-powered. Cost: $\sim$\$200. Adequate for temperature, strain, and low-frequency vibration measurements. Limited by: single ADC with multiplexer (channel skew), moderate resolution (14-bit), and USB latency ($\sim$1\,ms).
+
+\subsection{NI USB-9234 (Vibration/Acoustics)}
+24-bit delta-sigma ADC, 4 AI channels with simultaneous sampling, $\pm$5\,V range, 51.2\,kS/s per channel, built-in IEPE excitation for accelerometers, built-in anti-alias filters (software-configurable cutoff). Cost: $\sim$\$1{,}200. The standard for vibration analysis: high resolution, no channel skew, and integrated signal conditioning.
+
+\subsection{Arduino/ESP32 (Embedded/Low-Cost)}
+12-bit SAR ADC (10-bit on older Arduino), 0--3.3\,V input range, $\sim$1--100\,kS/s depending on configuration. No built-in anti-alias filter, no differential input, moderate noise (2--5\,LSB). Cost: \$5--\$15. Suitable for slow, non-critical measurements (ambient temperature monitoring, battery voltage). Inadequate for precision measurement without external signal conditioning.
+
+\section{Practical Input Range Optimization}
+The effective resolution of an ADC depends on how well you use its input range. Define the \textbf{range utilization ratio} $U = V_{\text{signal, pk-pk}} / V_{\text{ADC, range}}$.
+
+If $U = 1.0$ (signal fills the entire range): you use all $n$ bits. If $U = 0.5$ (signal uses half the range): you lose 1 bit (equivalent to $n-1$ bit ADC). If $U = 0.1$ (signal uses 10\%): you lose 3.3 bits.
+
+\textbf{Design strategy}: set the signal conditioning gain so that the maximum expected signal (plus noise margin) reaches 80--90\% of the ADC's full-scale input. Leave 10--20\% headroom for unexpected peaks, noise spikes, and component tolerances. This maximizes the effective resolution while preventing clipping.
+
+Example: thermocouple conditioned by INA128 with $G = 611$. Maximum TC output at 200\,\degC{}: $200 \times 0.041 = 8.2$\,mV. After amplification: $8.2 \times 611 = 5.01$\,V. Using the 0--5\,V DAQ range: $U = 5.01/5.0 = 1.0$. Excellent range utilization. But with the default $\pm$10\,V range: $U = 5.01/20 = 0.25$, losing 2 bits of effective resolution.
+
+\section{Timing Accuracy and Jitter}
+The accuracy of time-domain measurements (period, frequency, phase) depends on the sampling clock accuracy and jitter:
+
+\textbf{Clock accuracy}: the NI~USB-6001 internal clock has $\pm$50\,ppm accuracy. At 10\,kS/s: the actual rate is $10{,}000 \pm 0.5$\,S/s. Over a 10-second acquisition: the timing error accumulates to $\pm$5\,$\mu$s. This is negligible for most measurements but significant for precise frequency measurement (use an external crystal oscillator or GPS-disciplined clock for $< 1$\,ppm accuracy).
+
+\textbf{Clock jitter}: sample-to-sample variation in the sampling instant. Typical: 50--500\,ps for a DAQ internal clock. Jitter produces noise proportional to signal frequency: SNR$_{\text{jitter}} = -20\log_{10}(2\pi f \sigma_j)$. At $f = 1$\,kHz, $\sigma_j = 200$\,ps: SNR $= 118$\,dB (far below the ADC noise floor; negligible). At $f = 10$\,MHz, $\sigma_j = 200$\,ps: SNR $= 58$\,dB (limits effective resolution to $\sim$9 bits). Jitter is only a concern for high-frequency signals.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A 16-bit ADC has an input range of 0--10\,V. Calculate the LSB voltage and the maximum quantization error in millivolts.
+\item Your sensor outputs 0--50\,mV for the full measurement range. Your ADC has a 0--5\,V input range and 12-bit resolution. What amplifier gain do you need, and what is the resulting measurement resolution in terms of the sensor output?
+\item Explain why a digital system has better noise immunity than an analog system for transmitting data over a long cable.
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item LSB $= 10 / 2^{16} = 10/65536 = 0.153$\,mV. Max quantization error $= \pm 0.5 \times 0.153 = \pm 0.076$\,mV.
+\item Gain $= 5\,\text{V} / 0.050\,\text{V} = 100$. Amplified LSB $= 5/(4096) = 1.22$\,mV at the ADC. Referred to the sensor input: $1.22/100 = 0.0122$\,mV $= 12.2$\,$\mu$V. Sensor resolution $= 12.2\,\mu$V $/ (50\,\text{mV}/\text{FS}) = 0.024\%$ FS.
+\item A digital signal has only two states (0 and 1). As long as noise does not push the signal past the decision threshold, the receiver reconstructs the original data perfectly. An analog signal carries information in continuous voltage levels; any noise added to the signal is indistinguishable from the signal itself and permanently corrupts the measurement.
+\end{enumerate}
+
+
+% ================================================================
+
+\begin{masterycheckbox}{Analog vs.\ Digital Systems}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Calculate ADC resolution (LSB) and determine whether it is sufficient for a given measurement.
+\item Apply the Nyquist criterion and explain why practical sampling rates must exceed $10\times f_{\max}$.
+\item Design an anti-alias filter with appropriate cutoff for a given sampling rate.
+\item Select between RSE, differential, and NRSE input configurations.
+\item Calculate quantization error and its contribution to total measurement uncertainty.
+\end{enumerate}
+\end{masterycheckbox}
+

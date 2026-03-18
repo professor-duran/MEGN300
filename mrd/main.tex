@@ -1,0 +1,120 @@
+%% ================================================================
+%% MEGN 300 Instrumentation & Automation
+%% Master Reference Document - Main Build File
+%% ================================================================
+%% 
+%% This is the modular build file for the MEGN 300 MRD.
+%% Each chapter is stored in its own .tex file under chapters/.
+%% Front matter and appendices are under frontmatter/ and appendices/.
+%%
+%% To compile:
+%%   pdflatex main.tex
+%%   makeindex main.idx
+%%   pdflatex main.tex
+%%   pdflatex main.tex
+%%
+%% Or with latexmk:
+%%   latexmk -pdf main.tex
+%%
+%% File structure:
+%%   main.tex              <- this file (preamble + includes)
+%%   frontmatter/          <- title, preface, triage guide, safety
+%%   chapters/             <- ch01 through ch22
+%%   appendices/           <- LabVIEW ref, glossary, quick ref, etc.
+%%   figs/                 <- (reserved for any future external figures)
+%%
+%% ================================================================
+
+\input{preamble}
+
+\begin{document}
+
+% ========== TITLE PAGE ==========
+\input{frontmatter/titlepage}
+
+% ========== TABLE OF CONTENTS ==========
+\frontmatter
+\tableofcontents
+\newpage
+
+% ========== FRONT MATTER ==========
+\input{frontmatter/preface}
+\input{frontmatter/triage}
+\input{frontmatter/survival_guide}
+\input{frontmatter/ai_policy}
+
+% ========== MAIN MATTER ==========
+\mainmatter
+
+\input{frontmatter/safety}
+
+% ================================================================
+% PART I: MEASUREMENT FUNDAMENTALS
+% ================================================================
+\part{Measurement Fundamentals}
+
+\include{chapters/ch01_measurement_theory}
+\include{chapters/ch02_static_measurements}
+\include{chapters/ch03_dynamic_measurements}
+\include{chapters/ch04_error_analysis}
+\include{chapters/ch05_statistics}
+\include{chapters/ch06_sensors_actuators}
+
+% ================================================================
+% PART II: SIGNALS AND SIGNAL PROCESSING
+% ================================================================
+\part{Signals and Signal Processing}
+
+\include{chapters/ch07_analog_digital}
+\include{chapters/ch08_snr}
+\include{chapters/ch09_fourier}
+\include{chapters/ch10_fft}
+\include{chapters/ch11_dsp}
+\include{chapters/ch12_analog_filters}
+\include{chapters/ch13_digital_filters}
+
+% ================================================================
+% PART III: ELECTRONICS FOR INSTRUMENTATION
+% ================================================================
+\part{Electronics for Instrumentation}
+
+\include{chapters/ch14_circuit_fundamentals}
+\include{chapters/ch15_amplifiers}
+\include{chapters/ch16_high_power}
+\include{chapters/ch17_debugging}
+
+\input{appendices/projects_fail}
+
+% ================================================================
+% PART IV: CONTROL SYSTEMS
+% ================================================================
+\part{Control Systems}
+
+\include{chapters/ch18_open_loop}
+\include{chapters/ch19_closed_loop}
+\include{chapters/ch20_pid}
+
+% ================================================================
+% LABVIEW APPENDIX
+% ================================================================
+\input{appendices/labview}
+
+% ================================================================
+% PART V: ENGINEERING SCIENCE REFERENCE
+% ================================================================
+\part{Engineering Science Reference}
+
+\include{chapters/ch21_heat_transfer}
+\include{chapters/ch22_fluid_power}
+
+% ================================================================
+% BACK MATTER
+% ================================================================
+\input{appendices/glossary}
+\input{appendices/quick_reference}
+\input{appendices/abet}
+\input{appendices/references}
+
+\printindex
+
+\end{document}

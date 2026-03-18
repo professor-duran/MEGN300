@@ -5,7 +5,8 @@ on:
     branches: [ main ]
     paths:
       - '**.tex'
-      - 'figs/**'
+      - 'mrd/**'
+      - 'student_guide/**'
       - '.github/workflows/build-pdfs.yml'
   workflow_dispatch:
 
@@ -22,26 +23,29 @@ jobs:
       - name: Build Master Reference Document
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: megn300_master_reference.tex
+          working_directory: mrd
+          root_file: main.tex
           args: -pdf -interaction=nonstopmode -file-line-error
-          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol
+          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol imakeidx microtype bookmark pgfplots
 
       - name: Build Student Guide
-        if: hashFiles('MEGN300_Student_Guide.tex') != ''
         uses: xu-cheng/latex-action@v3
         with:
+          working_directory: student_guide
           root_file: MEGN300_Student_Guide.tex
           args: -pdf -interaction=nonstopmode -file-line-error
-          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol
+          extra_packages: tcolorbox etoolbox pgf environ tikzfill pdfcol microtype
+
+      - name: Copy PDFs to repo root
+        run: |
+          cp mrd/main.pdf megn300_master_reference.pdf
+          cp student_guide/MEGN300_Student_Guide.pdf MEGN300_Student_Guide.pdf
 
       - name: Commit PDFs
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add -f megn300_master_reference.pdf
-          if [ -f MEGN300_Student_Guide.pdf ]; then
-            git add -f MEGN300_Student_Guide.pdf
-          fi
+          git add -f megn300_master_reference.pdf MEGN300_Student_Guide.pdf
           git diff --staged --quiet || {
             git commit -m "Auto-build PDFs [skip ci]"
             git pull --rebase origin main

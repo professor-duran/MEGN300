@@ -1,0 +1,294 @@
+% Chapter 11: Digital Signal Processing
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Fundamentals of Digital Signal Processing}
+\label{ch:dsp}\index{aliasing}\index{Nyquist theorem}\index{sampling}\index{oversampling}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=13cm, height=5.5cm,
+    xlabel={Time (ms)}, ylabel={Amplitude},
+    xmin=0, xmax=20, ymin=-1.3, ymax=1.3,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\scriptsize\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[domain=0:20, samples=500, thick, MinesBlue] {sin(deg(2*pi*0.15*x))};
+\addlegendentry{True signal: 150\,Hz}
+\addplot[domain=0:20, samples=500, thick, dashed, WarnOrange] {sin(deg(2*pi*0.05*x))};
+\addlegendentry{Aliased reconstruction: 50\,Hz}
+\addplot[only marks, mark=*, mark size=2.5pt, WarnOrange] coordinates {
+    (0,0) (5,{sin(deg(2*pi*0.15*5))}) (10,{sin(deg(2*pi*0.15*10))})
+    (15,{sin(deg(2*pi*0.15*15))}) (20,{sin(deg(2*pi*0.15*20))})
+};
+\addlegendentry{Samples at $f_s = 200$\,Hz}
+\end{axis}
+\end{tikzpicture}
+\caption{Aliasing demonstration. A 150\,Hz signal (blue) sampled at $f_s = 200$\,Hz violates Nyquist ($f_s < 2 \times 150$). The samples (orange dots) are consistent with a false 50\,Hz signal (orange dashed). \textbf{An anti-alias filter before the ADC is the only prevention.}}
+\label{fig:aliasing}
+\end{figure}
+
+\section{Sampling Theorem (Nyquist-Shannon)}
+A continuous signal with maximum frequency $f_{\max}$ can be perfectly reconstructed from discrete samples if the sampling rate satisfies:
+\begin{equation}
+f_s > 2 f_{\max}
+\end{equation}
+The frequency $f_s/2$ is the \textbf{Nyquist frequency}. Any signal component above $f_s/2$ will \textbf{alias}: it folds back into the baseband as a false lower-frequency component that is indistinguishable from real data.
+
+\begin{warningbox}[Aliasing Cannot Be Undone]
+Once a signal is sampled, aliased components are permanently mixed into the data. No amount of digital post-processing can separate them. The only defense is an \textbf{anti-aliasing filter}: an analog low-pass filter placed before the ADC that attenuates all signal content above $f_s/2$. This filter is mandatory in every properly designed data acquisition system.
+\end{warningbox}
+
+\subsection{Alias Frequency Calculation}
+If a frequency $f$ is sampled at $f_s$ where $f > f_s/2$, the alias appears at:
+\begin{equation}
+f_{\text{alias}} = |f - n \cdot f_s| \quad \text{where } n \text{ is the nearest integer to } f/f_s
+\end{equation}
+
+% [Duplicate aliasing figure removed; see TikZ version fig:aliasing above]
+
+\begin{examplebox}[ThermoRig: Aliasing from a Switching Regulator]
+The ThermoRig uses a 500\,kHz switching regulator that injects noise at 500\,kHz onto the thermocouple signal. The DAQ samples at 1\,kS/s ($f_s/2 = 500$\,Hz). Without an anti-alias filter, the 500\,kHz noise aliases to $|500000 - 500 \times 1000| = 0$\,Hz; it appears as a DC offset. A 2nd-order anti-alias filter at 400\,Hz attenuates 500\,kHz by $> 100$\,dB, making the alias negligible.
+\end{examplebox}
+
+\section{Practical Sampling Rate Selection}
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Minimum}: $f_s > 2 f_{\max}$ (Nyquist criterion).
+\item \textbf{Practical}: $f_s \geq 5 f_{\max}$ to $10 f_{\max}$ for good waveform reconstruction.
+\item \textbf{For FFT analysis}: $f_s \geq 2.56 f_{\max}$ is common (the ``2.56 rule'' gives 25\% guard band for anti-alias filter roll-off).
+\end{itemize}
+
+\section{Quantization and Effective Number of Bits (ENOB)}
+Real ADCs have noise, nonlinearity, and other imperfections that reduce their effective resolution below the nominal bit count. The ENOB is:
+\begin{equation}
+\text{ENOB} = \frac{\text{SINAD}_{\text{dB}} - 1.76}{6.02}
+\end{equation}
+where SINAD is the signal-to-noise-and-distortion ratio. A nominally 16-bit ADC might have ENOB of 14 bits in practice.
+
+
+\section{Oversampling and Decimation}
+Oversampling means sampling at a rate much higher than Nyquist ($f_s \gg 2f_{\max}$). Benefits:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Relaxes anti-alias filter requirements}: the transition band between the signal and the Nyquist frequency is wider, so a gentle analog filter suffices.
+\item \textbf{Improves effective resolution}: oversampling by a factor of $4^k$ and digitally filtering/decimating adds $k$ bits of effective resolution. Example: a 12-bit ADC oversampled $64\times$ and decimated gains 3 effective bits (acts like a 15-bit ADC).
+\item \textbf{Spreads quantization noise}: the same noise power is distributed over a wider bandwidth; filtering removes the out-of-band portion.
+\end{itemize}
+
+Modern sigma-delta ($\Sigma\Delta$) ADCs (used in precision instruments and audio) achieve 24-bit resolution by oversampling at 256$\times$ or more and using noise shaping to push quantization noise to high frequencies where it is filtered out.
+
+\section{Dithering}
+Adding a small amount of random noise (dither) to the ADC input, with amplitude $\approx$0.5--1\,LSB, actually \emph{improves} the measurement by breaking up quantization artifacts. The dither noise averages out over multiple samples, but it linearizes the ADC response and allows sub-LSB signals to be recovered through averaging. This is counterintuitive but mathematically sound and widely used in precision measurement.
+
+
+\section{The Sampling Process in Detail}
+When sampled at $f_s$, the signal spectrum is replicated at multiples of $f_s$. If content exists above $f_s/2$, replicas overlap the baseband, creating aliases.
+
+\subsection{Alias Frequency Formula}
+$f_{\text{alias}} = |f_{\text{signal}} - n \cdot f_s|$ where $n$ minimizes the result. Example: 900\,Hz at 1\,kS/s aliases to $|900-1000| = 100$\,Hz. Indistinguishable from a real 100\,Hz signal.
+
+\section{Anti-Aliasing Strategy}
+Step 1: determine signal bandwidth $f_{\max}$. Step 2: design analog LP filter with cutoff between $f_{\max}$ and $f_s/2$, sufficient rolloff to attenuate all content above $f_s/2$ below ADC noise floor. Step 3: set $f_s \geq 10 \times f_{\max}$.
+
+\section{Oversampling Benefits}
+Sampling much faster than Nyquist minimum: (1) relaxes anti-alias filter requirements; (2) spreads quantization noise over wider bandwidth, so digital filtering improves resolution ($\sim$0.5 bits per octave of oversampling); (3) improves time-domain resolution.
+
+Sigma-delta ADCs exploit 64--256$\times$ oversampling with noise shaping to achieve 24-bit resolution at modest bandwidth.
+
+\section{Dithering}
+Adding small random noise before quantization linearizes the process when signal amplitude is comparable to LSB. The dither noise is then reduced by averaging, revealing sub-LSB signals.
+
+\section{Reconstruction}
+Converting digital to analog requires a DAC followed by a reconstruction filter (LP filter smoothing the staircase output). The ideal filter is a sinc function (brick-wall at $f_s/2$). In practice, smooth analog filters with zero-order hold compensation are used.
+
+\section{Digital Resampling}
+\textbf{Decimation}: reduce rate by factor $M$ (keep every $M$th sample after digital LP filter at $f_s/(2M)$). \textbf{Interpolation}: increase rate by factor $L$ (insert zeros, LP filter). Used for matching rates between instruments and reducing data size.
+
+\begin{tipbox}[Common Aliasing Mistake]
+Students set sampling rate based on signal frequency alone, forgetting about noise. If the signal is at 10\,Hz but the sensor picks up 60\,Hz and 500\,kHz noise, both will alias unless filtered before the ADC. The anti-alias filter must remove everything above $f_s/2$, not just above $f_{\max}$.
+\end{tipbox}
+
+
+\section{Practical Oversampling Design}
+In many MEGN 300 labs, the DAQ is capable of much higher sample rates than needed. This excess capacity should be exploited. For a temperature signal with $f_{\max} = 1$\,Hz, instead of sampling at the minimum 10\,S/s, sample at 1000\,S/s. Then apply a digital low-pass filter at 5\,Hz and decimate by 100 to produce clean 10\,S/s data. Benefits: (1) the anti-alias filter only needs to attenuate at 500\,Hz (very easy), (2) quantization noise spread over 1000\,Hz band is reduced to the 5\,Hz signal band (23\,dB improvement, $\approx$4 extra bits of effective resolution), (3) the 60\,Hz noise and its harmonics are captured and can be digitally notch-filtered.
+
+\section{Sample Rate for Control Systems}
+In feedback control (Part IV), the controller must update fast enough that the digital sampling delay does not significantly degrade stability. The rule of thumb: $f_s \geq 20 \times f_{\text{crossover}}$ where $f_{\text{crossover}}$ is the loop bandwidth. For the ThermoRig with 0.2\,Hz bandwidth: $f_s \geq 4$\,Hz. We use 10\,Hz ($T_s = 100$\,ms) for comfortable margin. For a motor speed controller with 100\,Hz bandwidth: $f_s \geq 2$\,kHz.
+
+\section{Data File Management}
+Continuous acquisition at high sample rates generates large files. At 100\,kS/s with 16-bit resolution (2 bytes per sample): 200\,kB/s = 12\,MB/min = 720\,MB/hr. Plan storage accordingly. Use binary file formats (not text/CSV) for large datasets. LabVIEW's TDMS format provides efficient binary storage with metadata.
+\begin{advancedbox}{Z-Transform}
+The z-transform is the discrete-time counterpart of the Laplace transform. This section is included for reference; you do not need to design filters using the z-transform directly for MEGN~300.
+\end{advancedbox}
+\section{The Z-Transform and Digital System Analysis}
+Just as the Laplace transform ($s$-domain) is the analysis tool for continuous systems, the \textbf{z-transform} is the tool for discrete (sampled) systems. A discrete-time signal $x[n]$ has z-transform:
+\begin{equation}
+X(z) = \sum_{n=0}^{\infty} x[n] \, z^{-n}
+\end{equation}
+A digital filter's transfer function $H(z) = Y(z)/X(z)$ describes its frequency response when evaluated on the unit circle ($z = e^{j\omega T_s}$). Poles inside the unit circle ($|z| < 1$) produce stable, decaying responses; poles outside produce unstable, growing responses. This is the discrete-system equivalent of the left/right half-plane rule in the $s$-domain.
+
+For MEGN~300, you do not need to design filters using the z-transform directly, but understanding that LabVIEW's digital filter VIs are implementing z-domain transfer functions helps you interpret their behavior and debug unexpected results.
+
+\section{Quantization Effects in Digital Systems}
+After sampling, the continuous-amplitude signal is quantized to $2^n$ discrete levels. This introduces two distinct effects:
+
+\textbf{Quantization noise}: the difference between the true sample value and the nearest quantization level. For a properly dithered signal, this behaves as additive white noise with RMS value $\text{LSB}/\sqrt{12}$ and flat PSD up to $f_s/2$. The signal-to-quantization-noise ratio (SQNR) is $6.02n + 1.76$\,dB.
+
+\textbf{Quantization distortion}: for small signals (amplitude comparable to a few LSBs), the quantization is no longer approximately linear. The ``staircase'' nature of the transfer function creates harmonic distortion. Dithering (adding noise of amplitude $\sim$1\,LSB before quantization) linearizes the process at the cost of a slightly higher noise floor.
+
+\section{Practical Anti-Aliasing: A Complete Design Example}
+Design an anti-aliasing system for measuring vibration from 0 to 500\,Hz:
+
+\textbf{Step 1}: signal bandwidth $f_{\max} = 500$\,Hz. Choose $f_s = 2560$\,S/s (standard vibration analysis: $2.56 \times f_{\max}$, which gives 56\% oversampling above Nyquist minimum).
+
+\textbf{Step 2}: Nyquist frequency $f_N = f_s/2 = 1280$\,Hz. The anti-alias filter must attenuate all content above 1280\,Hz below the ADC noise floor.
+
+\textbf{Step 3}: for a 16-bit ADC (96\,dB dynamic range), require $\geq$96\,dB attenuation at $f_N$. A 4th-order Butterworth at $f_c = 640$\,Hz provides $-80$\,dB/decade rolloff. At $f_N = 1280$\,Hz ($= 2 \times f_c$): attenuation $= 4 \times 20\log_{10}(1280/640) = 4 \times 6 = 24$\,dB. Insufficient.
+
+\textbf{Step 4}: increase to 8th-order (two cascaded 4th-order stages): $-160$\,dB/decade. At $f_N$: $8 \times 6 = 48$\,dB. Still insufficient for 16-bit, but adequate for 8-bit. For 16-bit, either increase the sample rate (more oversampling) or use a higher-order filter.
+
+\textbf{Step 5}: alternatively, oversample at $f_s = 10{,}240$\,S/s ($20\times f_{\max}$). Now $f_N = 5120$\,Hz. A 4th-order Butterworth at $f_c = 640$\,Hz provides $-80\log_{10}(5120/640) = -80 \times 0.903 = 72$\,dB at $f_N$. Combined with subsequent digital filtering and decimation: adequate for 14-bit.
+
+This example illustrates the fundamental tradeoff: sharper anti-alias filters allow lower sample rates, while higher sample rates allow simpler anti-alias filters.
+
+\begin{advancedbox}{Multirate Signal Processing}
+The following section on decimation and interpolation is beyond the scope of most MEGN~300 projects. It is included for reference when interfacing sensors at different sample rates.
+\end{advancedbox}
+\section{Multirate Signal Processing}
+Many practical systems use multirate processing: acquire at a high sample rate (to simplify anti-aliasing), then decimate digitally to the rate needed for analysis or control.
+
+\textbf{Decimation by M}: (1) apply a digital LP filter with cutoff at $f_s/(2M)$ to prevent aliasing; (2) discard $M-1$ out of every $M$ samples. The output rate is $f_s/M$. Example: acquire at 10\,kS/s, decimate by 10 to 1\,kS/s. The digital anti-alias filter at 500\,Hz can be very sharp (100th-order FIR) because computation is cheap.
+
+\textbf{Multistage decimation}: for large decimation ratios, cascade multiple smaller stages. Decimating by 100 as $10 \times 10$ requires fewer total filter taps than a single $100\times$ decimation. Each stage's filter only needs to handle its own Nyquist constraint.
+
+\section{Sigma-Delta Conversion in Detail}
+The sigma-delta ADC deserves deeper treatment because it is the dominant technology for precision measurement.
+
+The sigma-delta modulator oversamples the input at rate $K \times f_s$ (where $K = 64$--$256$ is the oversampling ratio and $f_s$ is the output rate). A 1-bit quantizer in a feedback loop with an integrator ``shapes'' the quantization noise, pushing most of it to high frequencies. A subsequent digital decimation filter (sinc$^3$ or sinc$^4$) removes this high-frequency noise and reduces the data rate to $f_s$.
+
+The result: from a simple 1-bit converter, you achieve 24-bit resolution in the output band. The tradeoff is latency: the decimation filter introduces a delay of several hundred output sample periods. For the ThermoRig at 10\,S/s output rate: latency $\approx 0.3$\,s. This is acceptable for temperature measurement but would be too slow for a fast control loop.
+\section{Complete Anti-Aliasing Design: A Worked Example}
+Design a measurement system for capturing vibration signatures of a small DC motor (0--1\,kHz bandwidth) using an NI USB-6001 (14-bit, max 20\,kS/s).
+
+\textbf{Step 1: Sample rate.} For $f_{\max} = 1$\,kHz: $f_s = 2.56 \times 1000 = 2560$\,S/s minimum. Choose $f_s = 5120$\,S/s (power of 2 $\times$ 10, convenient for FFT with $N = 5120$). Nyquist: $f_N = 2560$\,Hz.
+
+\textbf{Step 2: Anti-alias filter.} Need $\geq 6.02 \times 14 = 84$\,dB attenuation at $f_N = 2560$\,Hz. Choose $f_c = 1280$\,Hz (octave above $f_{\max}$). Required order $n$ for Butterworth: $n \geq 84/(20\log_{10}(2560/1280)) = 84/6.02 = 14$. An 8th-order Butterworth (four cascaded Sallen-Key stages) provides $8 \times 6 = 48$\,dB at $f_N$, insufficient.
+
+\textbf{Step 3: Increase oversampling.} Instead, sample at $f_s = 20{,}480$\,S/s ($20\times f_{\max}$). Now $f_N = 10{,}240$\,Hz. A 4th-order Butterworth at $f_c = 1280$\,Hz provides $4 \times 20\log_{10}(10240/1280) = 4 \times 18.1 = 72$\,dB at $f_N$. Marginally adequate for 14-bit. Add a 6th-order ($3\times$ Sallen-Key) for 108\,dB: comfortable margin.
+
+\textbf{Step 4: Digital decimation.} After acquisition at 20\,kS/s, apply a digital LP at 1280\,Hz (sharp FIR, 200 taps) and decimate by 4 to 5\,kS/s output. This gives 1\,Hz frequency resolution with $N = 5000$ points.
+
+This example illustrates the oversampling + digital decimation strategy that is standard in modern instrumentation: use a high sample rate to simplify the analog anti-alias filter, then do the sharp filtering digitally where precision is free.
+\section{Choosing the Right Sample Rate: A Decision Framework}
+The sample rate $f_s$ is one of the most important design decisions in a measurement system. Too low: aliasing corrupts data. Too high: generates excessive data volume, increases computational load, and may exceed DAQ bandwidth when using many channels. The right choice depends on the application:
+
+\textbf{DC and slowly varying measurements} (temperature, static pressure, weight): $f_s = 10$--$100$\,S/s. The signal bandwidth is $< 1$\,Hz, so even $10\times$ oversampling requires only 10\,S/s. Higher rates are useful only for oversampling-based resolution enhancement.
+
+\textbf{Low-frequency dynamic measurements} (building vibration, ocean waves, biological signals): $f_s = 100$--$1000$\,S/s. Signal bandwidth up to 50\,Hz.
+
+\textbf{General vibration and acoustics}: $f_s = 2{,}560$--$51{,}200$\,S/s. Signal bandwidth 100\,Hz to 20\,kHz. The standard vibration analysis rate is $2.56 \times f_{\max}$ (providing adequate oversampling for Hanning-windowed FFT).
+
+\textbf{High-speed transients} (impact, shock, ultrasonic): $f_s = 100$\,kS/s to 100\,MS/s. Signal bandwidth 10\,kHz to 50\,MHz. Requires high-speed DAQ hardware (oscilloscopes or dedicated high-speed digitizers).
+
+\section{Data Volume and Storage Calculations}
+At $f_s = 100$\,kS/s with 16-bit resolution: data rate $= 200$\,kB/s $= 12$\,MB/min $= 720$\,MB/hr. For a 24-hour monitoring session: 17.3\,GB. For 8 channels simultaneously: 138\,GB. Plan storage and file format accordingly:
+
+\textbf{Binary formats} (TDMS, HDF5, raw binary): compact, fast to write, preserves full precision. TDMS (NI's Technical Data Management Streaming) is native to LabVIEW and includes metadata headers.
+
+\textbf{Text formats} (CSV, tab-delimited): human-readable but 3--10$\times$ larger than binary (each 16-bit sample uses 2 bytes in binary but 5--6 characters in text). Writing speed is also slower due to number-to-text conversion. Use for small datasets or interoperability with Excel.
+
+\textbf{Compression}: lossless compression (ZIP, gzip) typically reduces measurement data by 30--50\%. Lossy compression (reducing precision from 16-bit to 12-bit) saves 25\% but discards information permanently.
+
+\section{Discrete Convolution}
+Convolution is the fundamental operation of digital filtering. The output of an FIR filter is the discrete convolution of the input signal $x[n]$ with the filter's impulse response $h[n]$:
+\begin{equation}
+y[n] = \sum_{k=0}^{M-1} h[k] \cdot x[n-k] = (x * h)[n]
+\end{equation}
+In the frequency domain, convolution becomes multiplication: $Y(f) = X(f) \cdot H(f)$. This duality is the foundation of all frequency-domain signal processing: multiplying the signal spectrum by the filter's frequency response is equivalent to convolving the signal with the filter's impulse response in the time domain.
+
+LabVIEW implements convolution via the ``Convolution'' VI in the Signal Processing palette, or implicitly when you use any filter VI (which convolves the input with the filter coefficients).
+
+\section{The Sampling Theorem: Proof by Intuition}
+Why must $f_s > 2f_{\max}$? Consider a sine wave at frequency $f$. To uniquely identify this sine wave, you need to determine three parameters: frequency, amplitude, and phase. Each parameter requires at least one constraint, and each sample provides one constraint. Therefore, you need at least two samples per cycle ($f_s > 2f$) to determine a single sinusoid. With fewer than two samples per cycle, you cannot distinguish the sinusoid from a lower-frequency alias.
+
+At exactly $f_s = 2f$ (sampling at the Nyquist rate): the samples fall at the same phase of each cycle. If they fall at the zero crossings, the measured amplitude is zero regardless of the true amplitude. This is why the inequality is strict: $f_s > 2f_{\max}$, not $f_s \geq 2f_{\max}$.
+
+\section{Practical Aliasing Scenarios in MEGN 300}
+\textbf{Scenario 1: Switching noise.} A DC-DC converter on the power supply board operates at 500\,kHz. The thermocouple wiring picks up 5\,mV of this noise. Sampled at 1\,kS/s: the 500\,kHz noise aliases to $|500{,}000 - 500 \times 1000| = 0$\,Hz (DC), appearing as a constant offset. Worse: it aliases to DC \emph{only when the switching frequency is an exact multiple of the sample rate}. If the switching frequency drifts slightly (to 500.1\,kHz): the alias appears at 100\,Hz, creating an unexplained oscillation in the data.
+
+\textbf{Scenario 2: Motor commutation.} A brushed DC motor commutates at $N_{\text{segments}} \times f_{\text{rotation}}$. For a 3-segment commutator at 10{,}000\,RPM: $f_{\text{comm}} = 3 \times 166.7 = 500$\,Hz. If the vibration sensor is sampled at 800\,S/s: the 500\,Hz vibration aliases to $|500 - 800| = 300$\,Hz, appearing as a false vibration that does not correspond to any physical phenomenon.
+
+\textbf{Scenario 3: Fluorescent lighting.} Fluorescent lights flicker at twice the mains frequency (120\,Hz in the US). A photodiode measuring ambient light sampled at 100\,S/s: the 120\,Hz flicker aliases to $|120 - 100| = 20$\,Hz, appearing as a slow oscillation in the light level.
+
+In all three scenarios, the solution is the same: an analog anti-alias filter before the ADC, with cutoff below $f_s/2$.
+\section{Digital Filtering in LabVIEW: Implementation Patterns}
+Three common implementation patterns for digital filtering in LabVIEW real-time applications:
+
+\textbf{Pattern 1: Block processing.} Acquire a block of $N$ samples, apply the filter to the entire block, process the result. Simple but introduces latency of $N/f_s$ seconds. Suitable for offline analysis and non-real-time monitoring.
+
+\textbf{Pattern 2: Sample-by-sample with shift registers.} In a While Loop, read one sample per iteration. Use shift registers to store the filter state (past inputs and outputs). Apply the filter equation to produce one output sample. This provides minimum latency (one sample period) and is the pattern for real-time control loops. The shift register count equals the filter order.
+
+\textbf{Pattern 3: Streaming with overlap.} Acquire blocks of $N$ samples with overlap. Apply the filter to each block, then stitch the results using overlap-add or overlap-save. This is the most efficient for long FIR filters because it uses FFT-based convolution (which is $O(N\log N)$ instead of $O(NM)$ for direct convolution). LabVIEW's ``Convolution'' VI uses this approach internally.
+
+\section{Resampling: Practical Considerations}
+When combining data from two sources sampled at different rates (e.g., a vibration signal at 10\,kS/s and a tachometer at 1\,kS/s), resampling aligns the time bases:
+
+\textbf{Upsampling} (interpolation): insert zeros between samples, then low-pass filter to smooth. In LabVIEW: the ``Resample Waveforms'' VI. Quality depends on the interpolation filter; use cubic or sinc interpolation for measurement-quality results. Linear interpolation introduces high-frequency distortion.
+
+\textbf{Downsampling} (decimation): low-pass filter to prevent aliasing, then discard samples. The anti-alias filter cutoff must be at the new Nyquist frequency ($f_{s,\text{new}}/2$), not the original.
+
+\textbf{Rational resampling}: for non-integer rate ratios (e.g., converting from 44.1\,kS/s to 48\,kS/s, ratio $= 160/147$): first upsample by 160, then downsample by 147 (or use a polyphase filter that combines both operations efficiently).
+
+\section{Spectral Analysis of Noise}
+The noise floor of a measurement system is best characterized by its Power Spectral Density (PSD). To measure the system PSD:
+
+(1) Short the input (zero signal). (2) Acquire a long record ($T \geq 10$\,s for thermal noise characterization). (3) Compute the PSD using Welch's method (averaged, overlapped FFTs). (4) Plot in units of V$^2$/Hz or V/$\sqrt{\text{Hz}}$ vs.\ frequency.
+
+The PSD reveals the noise character: \textbf{white noise} (flat PSD) indicates thermal noise or quantization noise dominating. \textbf{1/f noise} (PSD rising at low frequencies) indicates flicker noise in semiconductors. \textbf{Discrete peaks} indicate EMI at specific frequencies.
+
+The total RMS noise in a measurement with bandwidth $B$ is:
+\begin{equation}
+V_{n,\text{RMS}} = \sqrt{\int_0^B \text{PSD}(f)\,df}
+\end{equation}
+For white noise with PSD $= S_0$: $V_{n,\text{RMS}} = \sqrt{S_0 \cdot B}$. Halving $B$ reduces noise by $\sqrt{2}$ (3\,dB).
+\begin{advancedbox}{Z-Transform for Digital Control}
+This section connects the z-transform to digital PID implementation. It is advanced reference material not required for MEGN~300 exams.
+\end{advancedbox}
+\section{The Z-Transform: Bridge from Continuous to Digital}
+The Laplace transform ($s$-domain) describes continuous-time systems. The \textbf{z-transform} is its discrete-time counterpart. Understanding the $s$-to-$z$ mapping is essential for analyzing digital control loops (Chapter~16) and digital filters (Chapter~12).
+
+\subsection{Definition}
+For a discrete-time signal $x[n]$: $X(z) = \sum_{n=0}^{\infty} x[n] z^{-n}$. The variable $z = e^{sT_s}$ relates the $z$-domain to the $s$-domain, where $T_s = 1/f_s$ is the sample period.
+
+\subsection{Key Mapping: Poles and Stability}
+In the $s$-domain, stability requires all poles in the left half-plane ($\text{Re}(s) < 0$). The mapping $z = e^{sT_s}$ transforms the left half-plane into the interior of the unit circle ($|z| < 1$). Therefore, in the $z$-domain, stability requires all poles inside the unit circle.
+
+The imaginary axis ($\text{Re}(s) = 0$) maps to the unit circle ($|z| = 1$). Frequencies map as: $\omega = 0$ (DC) maps to $z = 1$. The Nyquist frequency $\omega = \pi/T_s$ maps to $z = -1$. Frequencies between 0 and Nyquist trace the upper half of the unit circle.
+
+\subsection{Bilinear Transform}
+The most common method for converting an analog filter or controller design to digital form: $s = \frac{2}{T_s} \frac{1 - z^{-1}}{1 + z^{-1}}$. This maps the entire left half-plane to the interior of the unit circle (preserving stability) with a nonlinear frequency warping: $\omega_{\text{digital}} = (2/T_s)\tan(\omega_{\text{analog}} T_s/2)$. The warping is negligible for $\omega_{\text{analog}} \ll \pi/T_s$ but becomes significant near Nyquist. Pre-warp the analog cutoff frequency before applying the bilinear transform to ensure the digital filter has the correct cutoff.
+
+\subsection{Why This Matters for Control}
+A PI controller designed in the $s$-domain as $G_c(s) = K_p + K_i/s$ must be converted to the $z$-domain for digital implementation. The simplest method (backward Euler): $1/s \to T_s/(1 - z^{-1})$, giving $G_c(z) = K_p + K_i T_s / (1 - z^{-1})$. This is exactly the discrete PID summation used in Chapter~16. The bilinear transform gives a slightly different (and more accurate) discretization: $1/s \to (T_s/2)(1 + z^{-1})/(1 - z^{-1})$, called the Tustin method. For slow loops ($f_s \gg 10 \times f_{\text{bandwidth}}$), the methods are equivalent. For fast loops ($f_s < 20 \times f_{\text{bandwidth}}$), the Tustin method better preserves the analog design's stability margins.
+
+\begin{tipbox}[When to Worry About the $s$-to-$z$ Mapping]
+For MEGN~300 thermal control systems ($f_{\text{bandwidth}} < 0.1$\,Hz, $f_s \geq 10$\,Hz): the ratio $f_s/f_{\text{bandwidth}} > 100$. At this ratio, all discretization methods (Euler, Tustin, exact ZOH) give identical results. The $s$-to-$z$ mapping becomes important when this ratio drops below 20, which occurs in fast mechanical and electrical control systems but not in typical instrumentation lab projects.
+\end{tipbox}
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A 500\,Hz signal is sampled at 800\,S/s. What frequency appears in the digital data? Is this the true signal or an alias?
+\item Design an anti-aliasing filter for a DAQ system sampling at 10\,kS/s. The signal of interest spans 0--2\,kHz. Specify the filter type, cutoff frequency, and minimum order if the filter must attenuate frequencies above 5\,kHz by at least 40\,dB.
+\item A 12-bit ADC with a 10\,V range has a measured SINAD of 68\,dB. Calculate the ENOB. How many bits of resolution are ``lost'' to noise and distortion?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item $f_s/2 = 400$\,Hz. Since 500 $>$ 400, it aliases. $f_{\text{alias}} = |500 - 1 \times 800| = 300$\,Hz. A false 300\,Hz signal appears in the data; the true 500\,Hz signal is lost.
+\item Anti-alias cutoff: set at 4\,kHz (to pass the 0--2\,kHz signal band with margin and begin rolling off before Nyquist at 5\,kHz). For 40\,dB attenuation in the range 5--10\,kHz: a 4th-order Butterworth ($-80$\,dB/decade) provides 40\,dB attenuation at 1.25 decades above cutoff... actually at 5\,kHz ($5/4 = 1.25\times$ cutoff): attenuation $= 20 \times 4 \times \log_{10}(1.25) = 7.7$\,dB (not enough). A better approach: set cutoff at 3\,kHz. At 5\,kHz: $5/3 = 1.67\times$, 4th-order attenuation $= 80 \times \log_{10}(1.67) = 17.8$\,dB (still not enough for $-40$\,dB). Need higher order or lower cutoff. An 8th-order Butterworth at 3.5\,kHz gives $-160 \times \log_{10}(5/3.5) = -24.8$\,dB at 5\,kHz; still short. Practical solution: use a 4th-order Butterworth at 2.5\,kHz, which gives $-80 \times \log_{10}(5/2.5) = -24$\,dB at 5\,kHz. With oversampling (sample at 50\,kS/s, digitally filter, then decimate to 10\,kS/s), the analog filter requirements relax dramatically. This is the standard approach in modern DAQ systems.
+\item ENOB $= (68 - 1.76)/6.02 = 11.0$ bits. The ADC loses 1.0 bit of effective resolution to noise and distortion.
+\end{enumerate}
+
+
+% ================================================================

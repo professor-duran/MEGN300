@@ -1,0 +1,297 @@
+% Chapter 19: Closed-Loop Control
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Closed-Loop Control}
+\label{ch:closedloop}\index{control!closed-loop}\index{feedback}\index{stability}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={Time (s)}, ylabel={Output $y(t)$},
+    xmin=0, xmax=8, ymin=0, ymax=1.6,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\scriptsize\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (8,1)};
+\addlegendentry{Setpoint $r$}
+\addplot[domain=0:8, samples=300, thick, MinesBlue]
+    {1 - exp(-1.5*x)*(cos(deg(3*x)) + 0.5*sin(deg(3*x)))};
+\addlegendentry{Underdamped ($\zeta = 0.3$)}
+\addplot[domain=0:8, samples=300, thick, AccentTeal]
+    {1 - (1 + 2*x)*exp(-2*x)};
+\addlegendentry{Critically damped ($\zeta = 1.0$)}
+\addplot[domain=0:8, samples=300, thick, WarnOrange]
+    {1 - 1.333*exp(-0.75*x) + 0.333*exp(-3*x)};
+\addlegendentry{Overdamped ($\zeta = 2.0$)}
+\draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, red!60!black, thick] (0.65,1.0) -- (0.65,1.45);
+\node[font=\tiny\sffamily, red!60!black, anchor=west] at (axis cs:0.75,1.25) {Overshoot};
+\end{axis}
+\end{tikzpicture}
+\caption{Closed-loop step response for different damping ratios. Underdamped ($\zeta < 1$) responds quickly but overshoots; critically damped ($\zeta = 1$) is the fastest without overshoot; overdamped ($\zeta > 1$) is slow but conservative.}
+\label{fig:step_damping}
+\end{figure}
+
+\section{Feedback Control}
+Closed-loop control measures the output (the \textbf{process variable}, PV), compares it to the desired value (the \textbf{setpoint}, SP), and adjusts the actuator based on the \textbf{error} ($e = \text{SP} - \text{PV}$). This feedback loop enables the system to self-correct.
+
+\section{Block Diagram}
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=0.9cm, align=center, font=\small\sffamily},
+    sum/.style={draw=MinesBlue, thick, circle, minimum size=0.5cm, fill=LightBG, font=\sffamily},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+]
+\node[sum] (sj) at (0,0) {$\Sigma$};
+\node[font=\tiny\sffamily] at (-0.2,0.2) {$+$};
+\node[font=\tiny\sffamily] at (0,-0.3) {$-$};
+\node[block] (ctrl) at (2.5,0) {Controller};
+\node[sum] (dsum) at (5.5,0) {$\Sigma$};
+\node[block] (plant) at (8,0) {Plant};
+\node[block] (sens) at (5,-2.0) {Sensor};
+\draw[arr] (-2,0) -- (sj) node[midway, above, font=\small\sffamily] {SP};
+\draw[arr] (sj) -- (ctrl) node[midway, above, font=\scriptsize\sffamily] {$e$};
+\draw[arr] (ctrl) -- (dsum) node[midway, above, font=\scriptsize\sffamily] {$u$};
+\draw[arr] (dsum) -- (plant);
+\draw[arr] (plant) -- (10,0) node[midway, above, font=\small\sffamily] {PV};
+\draw[MinesBlue, thick] (9.5,0) -- (9.5,-2.0) -- (sens);
+\draw[arr] (sens) -| (sj);
+\draw[-{Stealth[length=2mm]}, WarnOrange, thick] (5.5,1.2) -- (5.5,0.35);
+\node[font=\scriptsize\sffamily, WarnOrange] at (5.5,1.5) {Disturbance $d$};
+\end{tikzpicture}
+\caption{Standard feedback control loop. The summing junction computes error $e = \text{SP} - \text{PV}$. Disturbances enter at the plant but the feedback loop detects and corrects their effect.}
+\label{fig:feedback_loop}
+\end{figure}
+
+The summing junction computes $e = \text{SP} - \text{PV}$. The controller processes $e$ and outputs a control signal $u$. The actuator converts $u$ into physical action. The plant responds. The sensor measures the result and feeds it back.
+
+\section{Advantages Over Open-Loop}
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Disturbance rejection}: the controller compensates for unmeasured disturbances (load changes, supply voltage variations, environmental shifts).
+\item \textbf{Reduced sensitivity to plant uncertainty}: the system works even if the plant model is imperfect.
+\item \textbf{Improved accuracy}: steady-state error can be driven to zero (with integral action).
+\end{itemize}
+
+\section{Stability}
+A feedback system can become \textbf{unstable} if the loop gain is too high or the phase shift around the loop reaches $-180$\ang{} at a frequency where the gain is still $>$1. An unstable system oscillates with growing amplitude. Stability analysis tools: Bode plots (gain and phase margins), root locus, and Nyquist criterion. For MEGN~300, the key takeaway is: excessive controller gain causes instability (oscillation).
+
+\begin{tipbox}[The Stability Rule of Thumb]
+If your controller output oscillates, the gain is too high. Reduce proportional gain first, then check if the oscillation stops. If the system responds sluggishly but does not oscillate, the gain may be too low.
+\end{tipbox}
+
+
+\section{Transfer Functions}
+The transfer function $G(s)$ of a system relates its output to its input in the Laplace domain:
+\begin{equation}
+G(s) = \frac{Y(s)}{X(s)}
+\end{equation}
+For the standard closed-loop with forward path $G(s)$ and feedback sensor $H(s)$, the closed-loop transfer function is:
+\begin{equation}
+T(s) = \frac{G(s)}{1 + G(s)H(s)}
+\end{equation}
+The denominator $1 + G(s)H(s) = 0$ defines the \textbf{characteristic equation}; its roots determine stability. If any root has a positive real part, the system is unstable.
+
+\section{Steady-State Error}
+For a step input, the steady-state error depends on the \textbf{system type} (number of integrators in the open-loop transfer function):
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Type 0} (no integrator, P-only): finite steady-state error $e_{ss} = 1/(1 + K_p)$ where $K_p$ is the DC loop gain.
+\item \textbf{Type 1} (one integrator, PI or I controller): zero steady-state error for step inputs. This is why integral action eliminates offset.
+\item \textbf{Type 2} (two integrators): zero steady-state error for step and ramp inputs.
+\end{itemize}
+
+\begin{keyconceptbox}[Requirements Mapping: Control Performance to Shall-Statements]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item ``Zero steady-state error'' $\to$ CTRL-REQ: The controller shall include integral action (PI or PID). Verify: step test showing error converges to within $\pm$[tolerance] of setpoint.
+\item ``Rise time $<$2\,s, overshoot $<$10\%'' $\to$ CTRL-REQ: Step response shall reach 90\% of setpoint within 2\,s with peak overshoot $\leq$10\%. Verified by step test with data logging.
+\item ``Gain margin $\geq$6\,dB, phase margin $\geq$45\ang{}'' $\to$ CTRL-REQ: Verified by Bode plot analysis of the open-loop transfer function.
+\end{itemize}
+\end{keyconceptbox}
+
+
+\section{The Feedback Principle}
+Closed-loop control measures the actual output (process variable, PV) and compares it to the desired output (setpoint, SP). The difference is the error: $e(t) = \text{SP} - \text{PV}$. The controller uses this error to compute a control action $u(t)$ that drives the error toward zero. This is the fundamental mechanism of all feedback control: measure, compare, correct.
+
+\section{Closed-Loop Block Diagram Components}
+\textbf{Setpoint (SP)}: the desired output value, specified by the user or a higher-level controller.
+
+\textbf{Summing junction}: computes $e = \text{SP} - \text{PV}$.
+
+\textbf{Controller}: processes the error $e$ to compute the control output $u$. May be as simple as a proportional gain or as sophisticated as a PID algorithm with anti-windup and derivative filtering.
+
+\textbf{Actuator}: converts the control signal into physical action. Examples: heater (electrical power $\to$ heat), motor (electrical power $\to$ torque), valve (signal $\to$ flow rate).
+
+\textbf{Plant}: the physical system being controlled (room temperature dynamics, motor speed dynamics, fluid level dynamics).
+
+\textbf{Sensor}: measures the output of the plant and converts it to a signal for comparison with the setpoint. The sensor's accuracy, bandwidth, and noise directly limit the achievable control performance.
+
+\textbf{Disturbance}: any uncontrolled influence that affects the plant output (door opening, load change, supply voltage fluctuation). Feedback detects the effect of the disturbance on the output and corrects for it.
+
+\section{Transfer Functions and System Type}
+A transfer function $G(s)$ describes the input-output relationship in the Laplace domain. The \textbf{open-loop transfer function} $L(s) = G_c(s) \cdot G_p(s)$ (controller times plant) determines the closed-loop behavior. The \textbf{system type} (number of pure integrators in $L(s)$) determines the steady-state error for different input types:
+
+\textbf{Type 0} (no integrators): finite steady-state error for step inputs. $e_{ss} = 1/(1 + K_p)$ where $K_p = \lim_{s\to 0} L(s)$ is the position error constant. P-only control of a first-order plant is Type 0.
+
+\textbf{Type 1} (one integrator): zero steady-state error for step inputs, finite for ramp inputs. PI control adds the required integrator.
+
+\textbf{Type 2} (two integrators): zero steady-state error for step and ramp inputs. Rarely needed in instrumentation.
+
+\section{Stability}
+A closed-loop system is stable if and only if all poles of the closed-loop transfer function have negative real parts (lie in the left half of the $s$-plane). In practice, stability is assessed using gain margin (how much the gain can increase before instability) and phase margin (how much additional phase lag can be tolerated). For robust performance, aim for gain margin $> 6$\,dB and phase margin $> 45^\circ$.
+
+\section{Closed-Loop Advantages}
+\textbf{Disturbance rejection}: feedback detects and corrects the effect of disturbances. A door opening in a heated room causes a temperature drop that the controller detects and compensates by increasing heater power.
+
+\textbf{Reduced sensitivity}: the closed-loop gain $T(s) = L(s)/(1+L(s))$ is much less sensitive to plant parameter variations than the open-loop gain. If the plant gain doubles, the closed-loop gain changes by a much smaller fraction.
+
+\textbf{Integral action eliminates offset}: adding an integrator in the controller (the ``I'' in PID) drives the steady-state error to zero for step inputs, regardless of the plant's DC gain.
+
+
+\section{Sensitivity and Complementary Sensitivity}
+The closed-loop transfer function from setpoint to output is the \textbf{complementary sensitivity function} $T(s) = L(s)/(1+L(s))$ where $L(s) = G_c(s)G_p(s)$ is the open-loop transfer function. The \textbf{sensitivity function} $S(s) = 1/(1+L(s))$ describes how disturbances affect the output. Note that $S + T = 1$: you cannot simultaneously reduce sensitivity to disturbances at all frequencies. This is the fundamental limitation of feedback control.
+
+At low frequencies where $|L| \gg 1$: $T \approx 1$ (output tracks setpoint), $S \approx 1/L \ll 1$ (disturbances are strongly rejected). At high frequencies where $|L| \ll 1$: $T \approx L \ll 1$ (output does not track fast setpoint changes), $S \approx 1$ (disturbances pass through unattenuated).
+
+\section{Stability Margins in Detail}
+\textbf{Gain margin}: the factor by which the loop gain can increase before the system becomes unstable. Measured at the frequency where the phase is $-180^\circ$. Minimum recommended: 6\,dB (gain can double before instability).
+
+\textbf{Phase margin}: the additional phase lag the system can tolerate before instability. Measured at the gain crossover frequency (where $|L| = 1$). Minimum recommended: $45^\circ$. More phase margin gives less overshoot and more robust behavior.
+
+In MEGN 300, you assess stability empirically: if the control loop oscillates, reduce $K_p$. If it oscillates with growing amplitude, you are at or beyond the stability boundary. Back off gain by at least 50\%.
+
+\section{The Effect of Sensor Dynamics}
+The sensor is inside the feedback loop. Its dynamic response (bandwidth, time constant) directly affects stability. A slow sensor adds phase lag, reducing the phase margin. For stable control, the sensor bandwidth should be at least $5\times$--$10\times$ the closed-loop bandwidth. If the sensor is too slow, the maximum achievable control bandwidth is limited by the sensor, not the controller or actuator.
+
+\section{Disturbance Rejection Quantified}
+For a step disturbance $d$ entering at the plant, the steady-state output deviation is:
+\begin{equation}
+\Delta y_{ss} = \frac{d}{1 + K_p K_{\text{plant}}} \quad \text{(P-only control)}
+\end{equation}
+With integral action (PI or PID), $\Delta y_{ss} = 0$ for step disturbances, because the integrator drives the error to zero regardless of the disturbance magnitude. This is the primary motivation for adding integral action.
+\section{The Feedback Equation}
+The closed-loop transfer function from setpoint $R(s)$ to output $Y(s)$:
+\begin{equation}
+T(s) = \frac{G_c(s)G_p(s)}{1 + G_c(s)G_p(s)H(s)}
+\end{equation}
+where $G_c$ is the controller, $G_p$ is the plant, and $H$ is the sensor/feedback transfer function. For an ideal sensor ($H = 1$): $T(s) = L(s)/(1+L(s))$ where $L(s) = G_c G_p$ is the loop transfer function.
+
+At frequencies where $|L| \gg 1$ (low frequencies, typically): $T \approx 1/H \approx 1$ (output tracks setpoint regardless of plant dynamics). At frequencies where $|L| \ll 1$ (high frequencies): $T \approx L$ (no tracking; the bandwidth limit). The \textbf{crossover frequency} (where $|L| = 1$) defines the closed-loop bandwidth.
+
+\section{Steady-State Error Analysis}
+The steady-state error for a step input of magnitude $R_0$:
+\begin{equation}
+e_{ss} = \lim_{s \to 0} \frac{s \cdot R_0/s}{1 + L(s)} = \frac{R_0}{1 + K_p}
+\end{equation}
+where $K_p = \lim_{s \to 0} L(s)$ is the \textbf{position error constant}. For P-only control of a plant with DC gain $K_{\text{plant}}$: $K_p = K_p^{\text{ctrl}} \times K_{\text{plant}}$, and $e_{ss} = R_0/(1 + K_p^{\text{ctrl}} K_{\text{plant}})$.
+
+Example: ThermoRig with $K_p^{\text{ctrl}} = 10$ and $K_{\text{plant}} = 1$\,\degC{}/\% power: $K_p = 10$, $e_{ss} = R_0/11 = 9.1\%$ of setpoint change. For a 50\,\degC{} setpoint (from 25\,\degC{} ambient): $e_{ss} = 25/11 = 2.3$\,\degC{}. The controller achieves 47.7\,\degC{} instead of 50\,\degC{}.
+
+Adding integral action ($K_i > 0$) makes the system Type~1: $K_p \to \infty$, $e_{ss} \to 0$. This is the primary motivation for the ``I'' in PID.
+
+\section{Stability Analysis Methods}
+\subsection{Bode Plot Method}
+Plot the magnitude and phase of $L(j\omega)$ vs.\ frequency. The system is stable if the gain margin (gain below 0\,dB at the $-180^\circ$ phase frequency) and phase margin (phase above $-180^\circ$ at the 0\,dB gain frequency) are both positive.
+
+For the ThermoRig PI controller: $L(s) = (10 + 0.5/s) \times 1/(1+30s)$ (P$=10$, I$=0.5$, plant time constant $= 30$\,s). The Bode plot shows crossover at $\sim$0.05\,Hz with $\sim$50$^\circ$ phase margin. This is adequate ($>$45$^\circ$). Increasing $K_p$ to 20 reduces the phase margin to $\sim$30$^\circ$, making the response oscillatory.
+
+\subsection{Root Locus (Conceptual)}
+As the proportional gain $K_p$ increases from 0 to infinity, the closed-loop poles trace paths in the complex plane. When poles cross the imaginary axis, the system becomes unstable. Root locus shows the gain at which instability occurs (the ``ultimate gain'' $K_u$) and the frequency of oscillation ($f_u$). This is the theoretical basis for the Ziegler-Nichols tuning method.
+
+\section{Performance Specifications}
+\textbf{Rise time} ($t_r$): time for the output to go from 10\% to 90\% of the step change. Faster is better, but is limited by actuator power and stability.
+
+\textbf{Overshoot} ($\%OS$): peak value above the setpoint, as a percentage of the step change. Typical target: $<$10\%. Zero overshoot requires overdamped response (slow settling).
+
+\textbf{Settling time} ($t_s$): time for the output to remain within a specified band (typically $\pm$2\% or $\pm$5\%) of the final value. For a second-order system: $t_s \approx 4/(\zeta \omega_n)$.
+
+\textbf{Steady-state error} ($e_{ss}$): final deviation from setpoint. Zero with integral action for step inputs.
+
+These four specifications are mutually constrained: reducing rise time increases overshoot (for a given plant and controller structure). Achieving zero steady-state error (integral action) increases overshoot and settling time. The controller gains represent a tradeoff among these competing objectives.
+
+\section{Practical Closed-Loop Design Steps}
+(1) Characterize the plant: apply a step input in open loop and measure the output response. Fit a first or second-order model. For the ThermoRig: $G_p(s) \approx K/(1+\tau s) = 1/(1+30s)$ (first-order with $\tau = 30$\,s).
+
+(2) Choose a controller structure: P, PI, or PID. For systems requiring zero steady-state error: PI minimum. For systems with significant overshoot: add D.
+
+(3) Tune the controller: Z-N method for initial gains, then manual refinement based on step response observation.
+
+(4) Verify stability and performance: check phase margin ($>$45$^\circ$), overshoot ($<$10\%), settling time (within specification), and steady-state error (zero for step inputs with integral action).
+
+(5) Test robustness: change the plant conditions (different ambient temperature, different load, different supply voltage) and verify the controller still performs acceptably.
+\section{Closed-Loop Bandwidth and Speed of Response}
+The closed-loop bandwidth $f_{BW}$ determines how fast the system can track changing setpoints and reject disturbances. For a first-order closed-loop system: $f_{BW} = f_{-3\text{dB}} = (1+K_p K_{\text{plant}}) / (2\pi\tau)$, where $\tau$ is the plant time constant. Higher gain $K_p$ increases bandwidth (faster response), but also reduces stability margins.
+
+For the ThermoRig with $K_p = 10$, $K_{\text{plant}} = 1$, $\tau = 30$\,s: $f_{BW} = 11/(2\pi \times 30) = 0.058$\,Hz, corresponding to a closed-loop time constant of $30/11 = 2.7$\,s (much faster than the open-loop 30\,s). With $K_p = 50$: $f_{BW} = 0.27$\,Hz, closed-loop time constant $= 0.59$\,s. But the phase margin at this gain may be insufficient.
+
+\section{The Sensitivity Tradeoff}
+The sensitivity function $S(s) = 1/(1 + L(s))$ and the complementary sensitivity function $T(s) = L(s)/(1+L(s))$ satisfy $S + T = 1$ at every frequency. This means: at frequencies where the system tracks the setpoint well ($|T| \approx 1$), it also rejects disturbances well ($|S| \approx 0$). At frequencies where tracking is poor ($|T| \approx 0$), disturbances pass through unattenuated ($|S| \approx 1$).
+
+The crossover frequency (where $|L| = 1$) separates these two regimes. Below crossover: good tracking and disturbance rejection. Above crossover: no tracking, no disturbance rejection. This is why increasing bandwidth (moving the crossover to higher frequencies) improves performance, subject to the stability constraint.
+
+\section{Effect of Time Delay (Dead Time)}
+Dead time $L$ in the plant ($G_p(s) = K e^{-Ls}/(1+\tau s)$) introduces phase lag $\phi = -\omega L$ radians at frequency $\omega$, without affecting magnitude. This phase lag directly reduces the phase margin: $\Delta PM = -360 \times f_{BW} \times L$ degrees. For the ThermoRig with $L = 3$\,s and $f_{BW} = 0.058$\,Hz: $\Delta PM = -360 \times 0.058 \times 3 = -63$\degC{}. This is very significant; the dead time alone uses most of the available phase budget.
+
+Dead time is the enemy of feedback control. It limits the achievable bandwidth and the maximum usable gain. Systems with large $L/\tau$ ratios (dead time comparable to the time constant) are inherently difficult to control. The Smith predictor is an advanced control technique that compensates for dead time by including a model of the plant (including its delay) inside the controller.
+
+\section{Integral Action and Reset Windup}
+When integral action is added ($K_i > 0$), the steady-state error for step inputs becomes zero. However, integral action has two drawbacks:
+
+(1) \textbf{Reduced stability}: the integrator adds $-90$\degC{} of phase lag at all frequencies, reducing the phase margin. If the original P-only system had 60\degC{} phase margin, adding integral action might reduce it to 30\degC{} or less, producing oscillatory behavior. The solution: reduce $K_i$ (longer integral time $T_i$) to push the integral action to lower frequencies where its phase contribution at the crossover frequency is minimized.
+
+(2) \textbf{Integral windup}: when the actuator saturates, the integral continues to accumulate, causing massive overshoot when the error changes sign. This is addressed in Chapter~16.
+\section{Root Locus: Physical Interpretation}
+The root locus is a graphical tool showing how the closed-loop pole locations change as the proportional gain $K_p$ varies from 0 to infinity. Each pole traces a path (locus) in the complex plane. The pole locations determine the dynamic behavior:
+
+\textbf{Real-axis poles}: produce exponential modes. A pole at $s = -a$ produces a mode $e^{-at}$ with time constant $\tau = 1/a$. More negative $=$ faster decay.
+
+\textbf{Complex conjugate poles}: produce oscillatory modes. Poles at $s = -\sigma \pm j\omega_d$ produce $e^{-\sigma t}\sin(\omega_d t + \phi)$. The real part $\sigma$ determines the decay rate; the imaginary part $\omega_d$ determines the oscillation frequency.
+
+\textbf{Imaginary axis poles}: produce sustained oscillation (marginally stable). This is the ultimate gain $K_u$: the gain at which poles reach the imaginary axis. Beyond this gain: poles enter the right half-plane and the system is unstable.
+
+For the ThermoRig FOPDT model $G_p(s) = 1.1 e^{-3s}/(1+30s)$ with PI controller $G_c(s) = K_p(1 + 1/(T_i s))$: as $K_p$ increases, the dominant poles move from the real axis (overdamped at low gain) toward the imaginary axis (oscillatory at high gain), crossing at $K_u \approx 35$. The Ziegler-Nichols tuning sets $K_p = 0.45 K_u = 15.75$, which places the poles roughly halfway between the real axis and the imaginary axis, giving a damped oscillatory response with $\sim$25\% overshoot.
+
+\section{Frequency-Domain Design: Lead and Lag Compensation}
+Beyond PID, classical control design uses \textbf{lead compensators} (to add phase and increase bandwidth) and \textbf{lag compensators} (to increase low-frequency gain for steady-state accuracy without affecting stability).
+
+\textbf{Lead compensator}: $G_{\text{lead}}(s) = K_c \cdot (s + z)/(s + p)$ where $p > z$ (pole at higher frequency than zero). Adds positive phase near the geometric mean of $z$ and $p$. Use when you need more phase margin at the crossover frequency.
+
+\textbf{Lag compensator}: $G_{\text{lag}}(s) = K_c \cdot (s + z)/(s + p)$ where $z > p$ (zero at higher frequency than pole). Adds gain at low frequencies (improving steady-state accuracy) without significantly affecting the crossover frequency or phase margin.
+
+In MEGN~300, the PI controller is a lag compensator (the integrator adds infinite gain at DC), and the PD controller is a lead compensator (the derivative adds phase at the crossover frequency). The PID combines both.
+
+\section{Closed-Loop Response to Ramp Inputs}
+Many control applications require tracking a ramping setpoint (heating at a constant rate, constant-speed motion). The steady-state tracking error for a ramp input $r(t) = Rt$ depends on the system type:
+
+Type 0 (P-only): ramp error grows without bound. P-only cannot track a ramp.
+
+Type 1 (PI): finite ramp error $e_{ss} = R/K_v$ where $K_v = \lim_{s \to 0} sL(s)$ is the velocity error constant. Higher $K_v$ (higher integral gain) reduces the ramp tracking error.
+
+Type 2 (PID with double integrator): zero ramp error. However, double integrators are difficult to stabilize and are rarely needed in thermal or mechanical systems.
+
+For the ThermoRig ramping at 1\,\degC{}/s with PI control ($K_v = K_p K_i K_{\text{plant}} = 10 \times 0.5 \times 1.1 = 5.5$\,s$^{-1}$): $e_{ss} = 1.0/5.5 = 0.18$\,\degC{}. The temperature always lags the ramp by 0.18\,\degC{}. Increasing $K_i$ reduces this lag but increases overshoot at the end of the ramp.
+
+\section{Implementation Considerations}
+\textbf{Sampling rate selection}: the control loop update rate should be $\geq 10\times$ the closed-loop bandwidth. For the ThermoRig ($f_{BW} \approx 0.05$\,Hz): $f_s \geq 0.5$\,Hz ($T_s \leq 2$\,s). We use $T_s = 100$\,ms ($f_s = 10$\,Hz) for margin. For motor speed control ($f_{BW} = 100$\,Hz): $f_s \geq 1$\,kHz.
+
+\textbf{Computational delay}: the time between reading the sensor and writing the actuator output. In LabVIEW on a desktop PC: 1--10\,ms (adequate for thermal and slow mechanical systems). On a real-time controller (CompactRIO, myRIO): $< 100\,\mu$s. On a microcontroller (ESP32): $< 1$\,ms. Computational delay adds to the dead time and reduces phase margin.
+
+\textbf{Actuator saturation}: every actuator has limits (heater: 0--100\%, motor: $-V_{\text{max}}$ to $+V_{\text{max}}$). The controller's output must be clamped to the actuator range. Saturation means the controller temporarily loses authority: it commands more than the actuator can deliver. During saturation, the feedback loop is effectively broken, and integral windup can occur (addressed in the PID chapter).
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item Draw the block diagram for a closed-loop temperature control system. Label: setpoint, error, controller, heater (actuator), room (plant), and temperature sensor. Identify a specific disturbance and show where it enters the loop.
+\item Explain why a thermostat (on/off controller) is a closed-loop system, and identify what limits its accuracy.
+\item Your closed-loop motor speed controller oscillates at 5\,Hz. What is the most likely cause, and what is the first adjustment you should make?
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item Block diagram: SP (desired temp) $\to$ summing junction $\to$ PID controller $\to$ relay/SSR (actuator) $\to$ room (plant) $\to$ PV (room temperature) $\to$ temperature sensor (e.g., thermistor) $\to$ feedback to summing junction. Disturbance: someone opens a window (heat loss), which enters between the plant and the output.
+\item A thermostat measures the room temperature (feedback), compares it to the setpoint, and switches the heater on or off. It is closed-loop because the output (temperature) is measured and used to determine the control action. Accuracy is limited by: (1) the dead band (hysteresis) between the on and off thresholds, (2) the sensor's accuracy and placement, and (3) the thermal lag between the heater and the sensor location.
+\item The oscillation indicates the loop gain exceeds the stability margin at 5\,Hz. First adjustment: reduce the proportional gain ($K_p$) by 50\% and observe if the oscillation amplitude decreases. If it stops, the gain was too high. If it persists, check for measurement delay (sensor lag, DAQ sampling latency) that adds phase shift to the loop.
+\end{enumerate}
+
+
+% ================================================================

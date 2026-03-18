@@ -1,0 +1,372 @@
+% Chapter 3: Dynamic Measurements
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Dynamic Measurements}
+\label{ch:dynamic}\index{time constant}\index{dynamic response!first-order}\index{bandwidth}\index{rise time}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6.5cm,
+    xlabel={Time ($t/\tau$)}, ylabel={Normalized Response $y/y_\infty$},
+    xmin=0, xmax=6, ymin=0, ymax=1.15,
+    grid=major, grid style={MinesSilver!40}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\small\sffamily, at={(0.98,0.5)}, anchor=east},
+]
+\addplot[domain=0:6, samples=200, thick, MinesBlue] {1 - exp(-x)};
+\addlegendentry{$y(t) = y_\infty(1 - e^{-t/\tau})$}
+\addplot[dashed, WarnOrange, thin] coordinates {(0,0.632) (1,0.632)};
+\addplot[dashed, WarnOrange, thin] coordinates {(1,0) (1,0.632)};
+\addplot[dashed, AccentTeal, thin] coordinates {(0,0.993) (5,0.993)};
+\addplot[dashed, AccentTeal, thin] coordinates {(5,0) (5,0.993)};
+\addplot[only marks, mark=*, mark size=2.5pt, WarnOrange] coordinates {(1,0.632)};
+\addplot[only marks, mark=*, mark size=2.5pt, AccentTeal] coordinates {(5,0.993)};
+\node[font=\scriptsize\sffamily, WarnOrange, anchor=west] at (axis cs:1.15,0.632) {63.2\% at $t = \tau$};
+\node[font=\scriptsize\sffamily, AccentTeal, anchor=west] at (axis cs:5.1,0.95) {99.3\% at $t = 5\tau$};
+\addplot[dashed, MinesSilver, thin] coordinates {(0,1) (6,1)};
+\node[font=\scriptsize\sffamily, MinesSilver, anchor=west] at (axis cs:5.5,1.04) {$y_\infty$};
+\end{axis}
+\end{tikzpicture}
+\caption{First-order step response showing the time constant ($\tau$) at 63.2\% and the Rule of Five ($5\tau$) settling criterion at 99.3\%. Wait at least $5\tau$ before recording a steady-state measurement.}
+\label{fig:step_response}
+\end{figure}
+
+\section{Why Dynamic Response Matters}
+Static calibration tells you the sensor's input-output relationship when the measurand is constant. But in real systems, measurands change with time: a pressure pulse, a temperature transient, a vibrating structure. A sensor's \textbf{dynamic response} determines how faithfully it tracks a time-varying input. A sensor that responds too slowly will attenuate rapid changes and introduce phase delay.
+
+\section{System Order and Models}
+
+\subsection{Zero-Order Systems}
+Output is directly proportional to input at all times: $y(t) = K \cdot x(t)$. The output tracks the input instantaneously with no delay or distortion. Pure zero-order sensors are idealizations, but a wire-wound potentiometer measuring slow displacement is approximately zero-order.
+
+\subsection{First-Order Systems}
+Described by:
+\begin{equation}
+\tau \frac{dy}{dt} + y = K \cdot x(t)
+\end{equation}
+where $\tau$ is the \textbf{time constant} and $K$ is the static sensitivity. First-order systems are characterized by a single energy storage element (e.g., thermal mass of a temperature probe).
+
+\textbf{Step response}: $y(t) = K \cdot x_0 (1 - e^{-t/\tau})$. After one time constant ($t = \tau$), the output reaches 63.2\% of its final value. After $5\tau$, the output is within 0.7\% of final (effectively settled).
+
+\textbf{Frequency response}: the magnitude ratio and phase are:
+\begin{align}
+M(\omega) &= \frac{K}{\sqrt{1 + (\omega\tau)^2}} \\
+\phi(\omega) &= -\arctan(\omega\tau)
+\end{align}
+The $-3$\,dB bandwidth (where $M$ drops to $K/\sqrt{2}$) occurs at $\omega = 1/\tau$, or $f_{-3\text{dB}} = 1/(2\pi\tau)$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    name=step, width=6.5cm, height=5cm,
+    xlabel={$t/\tau$}, ylabel={$y/y_\infty$},
+    xmin=0, xmax=6, ymin=0, ymax=1.1,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Step Response},
+]
+\addplot[domain=0:6, samples=200, thick, MinesBlue] {1 - exp(-x)};
+\addplot[dashed, WarnOrange, thin] coordinates {(0,0.632) (1,0.632) (1,0)};
+\addplot[only marks, mark=*, mark size=2pt, WarnOrange] coordinates {(1,0.632)};
+\node[font=\tiny\sffamily, WarnOrange] at (axis cs:2.2,0.55) {$\tau$: 63.2\%};
+\addplot[dashed, MinesSilver, thin] coordinates {(0,1) (6,1)};
+\end{axis}
+\begin{axis}[
+    at={(step.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={$f/f_{-3\text{dB}}$}, ylabel={Magnitude (dB)},
+    xmode=log, xmin=0.01, xmax=100, ymin=-40, ymax=5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Bode Magnitude},
+]
+\addplot[domain=0.01:100, samples=200, thick, MinesBlue] {-10*log10(1+x^2)};
+\addplot[dashed, WarnOrange, thin] coordinates {(0.01,-3) (1,-3) (1,-40)};
+\addplot[only marks, mark=*, mark size=2pt, WarnOrange] coordinates {(1,-3)};
+\node[font=\tiny\sffamily, WarnOrange] at (axis cs:3,-6) {$-3$\,dB};
+\addplot[dashed, MinesSilver, thin] coordinates {(10,-10) (100,-30)};
+\node[font=\tiny\sffamily, MinesSilver, rotate=-22] at (axis cs:30,-22) {$-20$\,dB/dec};
+\end{axis}
+\end{tikzpicture}
+\caption{First-order system: step response (left) and Bode magnitude (right). The time constant $\tau$ determines both settling time ($5\tau$ to 99\%) and bandwidth ($f_{-3\text{dB}} = 1/2\pi\tau$).}
+\label{fig:first_order}
+\end{figure}
+
+\begin{examplebox}[ThermoRig: Time Constant of a Thermocouple]
+A Type K thermocouple (0.5\,mm bead) plunged into boiling water responds with $\tau \approx 0.2$\,s. This means it reaches 63.2\% of the temperature change in 0.2\,s and settles to within 1\% in $5\tau = 1.0$\,s.
+
+For measuring a temperature that oscillates at 1\,Hz: $\omega = 2\pi$, $\omega\tau = 1.26$, $M = K/\sqrt{1 + 1.59} = 0.62K$. The sensor attenuates the oscillation to 62\% of its true amplitude and introduces a $-51.6$\ang{} phase lag. The measurement significantly underreports the true oscillation.
+
+\textbf{Lesson}: to faithfully measure a 1\,Hz temperature oscillation, you need $\tau \ll 1/(2\pi \times 1) = 0.16$\,s. A finer thermocouple (0.1\,mm bead, $\tau \approx 0.01$\,s) would be adequate.
+\end{examplebox}
+
+\subsection{Second-Order Systems}
+Described by:
+\begin{equation}
+\frac{1}{\omega_n^2}\frac{d^2 y}{dt^2} + \frac{2\zeta}{\omega_n}\frac{dy}{dt} + y = K \cdot x(t)
+\end{equation}
+where $\omega_n$ is the \textbf{undamped natural frequency} and $\zeta$ is the \textbf{damping ratio}. Typical second-order sensors: accelerometers, pressure transducers with diaphragms, and force sensors with spring elements.
+
+Three damping regimes: \textbf{underdamped} ($\zeta < 1$): oscillatory response with overshoot; \textbf{critically damped} ($\zeta = 1$): fastest non-oscillatory response; \textbf{overdamped} ($\zeta > 1$): slow, no oscillation. Most practical sensors target $\zeta \approx 0.6$--$0.7$ for fast response with minimal overshoot ($<$5\%).
+
+\textbf{Frequency response} magnitude:
+\begin{equation}
+M(\omega) = \frac{K}{\sqrt{[1 - (\omega/\omega_n)^2]^2 + [2\zeta\omega/\omega_n]^2}}
+\end{equation}
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={$\omega_n t$}, ylabel={$y/y_\infty$},
+    xmin=0, xmax=15, ymin=0, ymax=1.8,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\scriptsize\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (15,1)};
+% zeta=0.1 (very underdamped)
+\addplot[domain=0:15, samples=400, thick, red!70!black]
+    {1 - exp(-0.1*x)/sqrt(1-0.01)*sin(deg(sqrt(1-0.01)*x) + deg(acos(0.1)))};
+\addlegendentry{$\zeta = 0.1$}
+% zeta=0.3
+\addplot[domain=0:15, samples=400, thick, WarnOrange]
+    {1 - exp(-0.3*x)/sqrt(1-0.09)*sin(deg(sqrt(1-0.09)*x) + deg(acos(0.3)))};
+\addlegendentry{$\zeta = 0.3$}
+% zeta=0.7 (optimal)
+\addplot[domain=0:15, samples=400, thick, AccentTeal, line width=1.5pt]
+    {1 - exp(-0.7*x)/sqrt(1-0.49)*sin(deg(sqrt(1-0.49)*x) + deg(acos(0.7)))};
+\addlegendentry{$\zeta = 0.7$ (optimal)}
+% zeta=1.0 (critically damped)
+\addplot[domain=0:15, samples=300, thick, MinesBlue]
+    {1 - (1 + x)*exp(-x)};
+\addlegendentry{$\zeta = 1.0$ (critical)}
+% zeta=2.0 (overdamped)
+\addplot[domain=0:15, samples=300, thick, MinesSilver!70!black]
+    {1 - 1.333*exp(-0.382*x) + 0.333*exp(-2.618*x)};
+\addlegendentry{$\zeta = 2.0$}
+\end{axis}
+\end{tikzpicture}
+\caption{Second-order system step response for different damping ratios. The optimal range for most sensors is $\zeta = 0.6$--$0.7$ (thick teal), giving fast response with minimal overshoot ($\sim$5\%).}
+\label{fig:second_order}
+\end{figure}
+
+The sensor faithfully measures frequencies up to about $0.2\omega_n$ (flat within $\pm$5\% for $\zeta = 0.65$). Above $\omega_n$, the output rolls off at $-40$\,dB/decade.
+
+\begin{tipbox}[The Rule of Five]
+For a first-order sensor, allow $5\tau$ settling time for each measurement point. For a second-order sensor, use the signal frequency to less than $\omega_n / 5$ to stay in the flat region. Both rules give $<$1\% amplitude error.
+\end{tipbox}
+
+\section{Measuring Dynamic Characteristics}
+
+\subsection{Step Test}
+Apply a sudden step change in the measurand and record the sensor output vs.\ time. For a first-order sensor, plot $\ln(1 - y/y_{\infty})$ vs.\ $t$; the slope is $-1/\tau$. For a second-order sensor, measure the overshoot percentage ($M_p$) and peak time ($t_p$) to extract $\zeta$ and $\omega_n$:
+\begin{equation}
+\zeta = \frac{-\ln(M_p/100)}{\sqrt{\pi^2 + [\ln(M_p/100)]^2}}, \qquad \omega_n = \frac{\pi}{t_p \sqrt{1 - \zeta^2}}
+\end{equation}
+
+\subsection{Frequency Response Test}
+Apply sinusoidal inputs at increasing frequencies and measure the output amplitude ratio and phase shift at each frequency. Plot the Bode diagram (magnitude in dB and phase in degrees vs.\ log frequency). This method is more thorough but requires a signal generator capable of producing sinusoidal variations in the measurand.
+
+
+\section{Bandwidth and Rise Time}
+Two related metrics describe how fast a sensor can respond:
+
+\textbf{Bandwidth} ($f_{-3\text{dB}}$): the frequency at which the amplitude response drops to $-3$\,dB (70.7\% of the DC sensitivity). For a first-order system: $f_{-3\text{dB}} = 1/(2\pi\tau)$. For a second-order system: $f_{-3\text{dB}} \approx \omega_n / (2\pi)$ (exact value depends on $\zeta$).
+
+\textbf{Rise time} ($t_r$): the time for the step response to go from 10\% to 90\% of the final value. For a first-order system: $t_r = 2.2\tau$. The approximate relationship between bandwidth and rise time:
+\begin{equation}
+f_{-3\text{dB}} \times t_r \approx 0.35
+\end{equation}
+This is a useful design rule: if you need to resolve events with a 1\,ms rise time, your sensor bandwidth must be $\geq$350\,Hz.
+
+\section{Selecting a Sensor for Dynamic Measurements}
+\begin{enumerate}[leftmargin=1.5em]
+\item Identify the highest frequency of interest in the measurand ($f_{\max}$).
+\item Select a sensor with $f_{-3\text{dB}} \geq 5 f_{\max}$ (to stay in the flat amplitude region with $<$1\% error).
+\item Set the sampling rate $f_s \geq 10 f_{\max}$ (per Chapter~9) to capture the waveform shape.
+\item Place an anti-aliasing filter at $f_c = 0.4 f_s$ before the ADC.
+\end{enumerate}
+
+\begin{keyconceptbox}[Requirements Mapping: Dynamic Response to Shall-Statements]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item ``Measure vibration up to 500\,Hz'' $\to$ SENS-REQ: Sensor bandwidth $\geq$2500\,Hz ($5\times$). DAQ-REQ: Sampling rate $\geq$5000\,S/s ($10\times$).
+\item ``Resolve pressure transients with 0.5\,ms rise time'' $\to$ SENS-REQ: Sensor bandwidth $\geq$700\,Hz ($0.35/0.0005$). SENS-REQ: Sensor natural frequency $\geq$3500\,Hz ($5\times$ bandwidth).
+\end{itemize}
+\end{keyconceptbox}
+
+
+\section{Why Dynamic Response Matters}
+In static measurements, we wait for settling. In dynamic measurements, the measurand changes continuously and the sensor must track those changes. If the sensor cannot keep up, it attenuates and phase-shifts the signal, producing incorrect results.
+
+\section{Zero-Order Systems}
+Output instantaneously proportional to input: $y(t) = K \cdot x(t)$. A potentiometric sensor approximates this at low frequencies. No real sensor is truly zero-order; parasitic effects always introduce dynamics.
+
+\section{First-Order Step Response in Depth}
+For step input of magnitude $A$ at $t = 0$: $y(t) = KA(1 - e^{-t/\tau})$. At $\tau$: 63.2\%. At $2\tau$: 86.5\%. At $3\tau$: 95.0\%. At $5\tau$: 99.3\% (``settled''). If $\tau = 0.5$\,s, settling takes 2.5\,s.
+
+\subsection{Frequency Response}
+Magnitude: $|H| = 1/\sqrt{1+(\omega\tau)^2}$. Phase: $\phi = -\arctan(\omega\tau)$. At $f_{-3\text{dB}} = 1/(2\pi\tau)$: amplitude is 70.7\% (29\% error), phase is $-45^\circ$. For $<$5\% amplitude error: stay below $f_{-3\text{dB}}/3$. For $<$1\%: below $f_{-3\text{dB}}/7$.
+
+\subsection{Measuring the Time Constant}
+Apply step input (plunge thermocouple into hot water). Record output vs.\ time. Find time at 63.2\% of step change. That time is $\tau$. Alternatively: plot $\ln(1 - y/y_\infty)$ vs.\ $t$; slope is $-1/\tau$.
+
+\begin{examplebox}[ThermoRig: Measuring Thermocouple Time Constant]
+Plunge Type K TC from 23\,\degC{} air into 80\,\degC{} stirred water bath. At 100\,S/s, output reaches 63.2\% of 57\,\degC{} step (i.e., 59.0\,\degC{}) at $t = 0.42$\,s. Therefore $\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz. For signals up to 0.05\,Hz (convective heat transfer): amplitude error $<$1\%. For rapid thermal transients: too slow.
+\end{examplebox}
+
+\section{Second-Order Systems in Depth}
+Governing equation: $(1/\omega_n^2)\ddot{y} + (2\zeta/\omega_n)\dot{y} + y = Kx(t)$.
+
+\textbf{Underdamped ($\zeta < 1$)}: oscillates with decaying amplitude. Damped frequency $\omega_d = \omega_n\sqrt{1-\zeta^2}$. Overshoot: $\%OS = 100 \cdot e^{-\pi\zeta/\sqrt{1-\zeta^2}}$.
+
+\textbf{Critically damped ($\zeta = 1$)}: fastest non-oscillatory approach.
+
+\textbf{Overdamped ($\zeta > 1$)}: no oscillation but slower than critical.
+
+\subsection{Frequency Response}
+$|H| = 1/\sqrt{[1-(f/f_n)^2]^2 + [2\zeta(f/f_n)]^2}$. Usable flat band: $\sim 0.2 f_n$ for $\zeta = 0.65$, $\sim 0.4 f_n$ for $\zeta = 0.7$. This is why accelerometer datasheets specify a ``useful range'' that is a fraction of resonant frequency.
+
+\subsection{The Bandwidth--Rise Time Tradeoff}
+$B \times t_r \approx 0.35$ where $B$ is bandwidth (Hz) and $t_r$ is 10--90\% rise time (s). Faster sensor = wider bandwidth = more noise captured. Cannot independently improve both.
+
+\begin{tipbox}[First vs.\ Second-Order Model Selection]
+Smooth exponential step response with no overshoot $\to$ first-order. Overshoot and ringing $\to$ second-order. Thermal sensors are typically first-order. Mechanical sensors (accelerometers, pressure transducers) are second-order.
+\end{tipbox}
+
+\section{Practical Implications}
+Rule 1: sensor bandwidth must exceed signal bandwidth by $5\times$ minimum ($10\times$ preferred). Rule 2: for transients, sensor rise time must be much shorter than event duration. Rule 3: in control systems, sensor phase lag directly affects stability margins.
+
+
+\section{Time Domain vs.\ Frequency Domain Characterization}
+Sensor dynamic behavior can be characterized in either domain. The step response (time domain) is intuitive: apply a sudden change and observe how the sensor responds. The frequency response (frequency domain) is more powerful for system design: it directly shows which frequencies the sensor can measure and which it attenuates.
+
+The two representations are mathematically equivalent (connected by the Laplace transform), but each reveals different insights. Use the step response to evaluate settling time, overshoot, and rise time. Use the frequency response to evaluate bandwidth, resonance, and phase shift.
+
+\section{Experimental Frequency Response Measurement}
+To measure a sensor's frequency response experimentally: (1) Apply a sinusoidal input at frequency $f$. (2) Measure the input amplitude $A_{\text{in}}$ and output amplitude $A_{\text{out}}$. (3) Compute the gain: $|H(f)| = A_{\text{out}}/A_{\text{in}}$. (4) Measure the time delay $\Delta t$ between input and output peaks. (5) Compute the phase: $\phi = -360 \times f \times \Delta t$ degrees. (6) Repeat at 10--20 frequencies from $0.1 f_{-3\text{dB}}$ to $10 f_{-3\text{dB}}$, logarithmically spaced. (7) Plot the Bode diagram (gain in dB vs.\ log frequency; phase in degrees vs.\ log frequency).
+
+For temperature sensors, generating a sinusoidal temperature input is difficult. Instead, use the step response method and extract the time constant. For mechanical sensors (accelerometers, pressure transducers), a shaker table provides calibrated sinusoidal acceleration at precise frequencies.
+
+\section{Transfer Functions}
+A transfer function $G(s) = Y(s)/X(s)$ describes the input-output relationship in the Laplace domain ($s = j\omega$).
+
+First-order: $G(s) = K/(1 + \tau s)$. One pole at $s = -1/\tau$.
+
+Second-order: $G(s) = K\omega_n^2/(s^2 + 2\zeta\omega_n s + \omega_n^2)$. Two poles at $s = -\zeta\omega_n \pm \omega_n\sqrt{\zeta^2 - 1}$.
+
+The pole locations determine the dynamic behavior completely. Poles on the negative real axis produce exponential decay (first-order, overdamped). Complex conjugate poles produce oscillatory decay (underdamped). Poles on the imaginary axis produce sustained oscillation (critically stable). Poles on the positive real axis produce unstable (growing) response.
+
+\section{Cascaded System Response}
+When multiple dynamic elements are in series (sensor $\to$ amplifier $\to$ filter), the overall transfer function is the product of individual transfer functions: $G_{\text{total}}(s) = G_1(s) \cdot G_2(s) \cdot G_3(s)$. In the frequency domain, magnitudes multiply (or add in dB) and phases add.
+
+Example: a thermocouple ($\tau = 0.5$\,s, $f_{-3\text{dB}} = 0.32$\,Hz) followed by a 2nd-order Butterworth filter at 10\,Hz. At 0.1\,Hz: thermocouple gain is $-0.4$\,dB, filter gain is $-0.0$\,dB; total is $-0.4$\,dB (acceptable). At 1\,Hz: thermocouple is $-10$\,dB (the sensor, not the filter, limits performance). The system bandwidth is determined by the slowest element.
+
+\begin{examplebox}[ThermoRig: Cascaded Dynamic Response]
+The ThermoRig signal chain dynamic response: thermocouple ($\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz) $\to$ INA128 ($f_{-3\text{dB}} \approx 1.6$\,kHz at $G = 611$, negligible lag at signal frequencies) $\to$ Sallen-Key LP ($f_c = 40$\,Hz, 2nd order, negligible lag below 4\,Hz). The overall system bandwidth is limited entirely by the thermocouple at 0.38\,Hz. The amplifier and filter contribute less than 0.01\,dB of attenuation and less than 0.1$^\circ$ of phase shift at frequencies below 1\,Hz. This is typical: in thermal measurement systems, the sensor dynamics dominate.
+\end{examplebox}
+
+\section{Sensor Dynamic Compensation}
+If the sensor's dynamic response is too slow for the measurement, mathematical compensation can partially recover the attenuated high-frequency content. For a first-order sensor with known $\tau$:
+\begin{equation}
+x_{\text{true}}(t) \approx y(t) + \tau \frac{dy}{dt}
+\end{equation}
+where $y(t)$ is the measured output and $x_{\text{true}}(t)$ is the estimated true input. In the frequency domain, this is an inverse filter: multiply the measured spectrum by $1 + j\omega\tau$ (the inverse of the sensor's transfer function).
+
+Caution: dynamic compensation amplifies high-frequency noise (the derivative term). It is only practical when the sensor's bandwidth is within a factor of 2--5 of the signal bandwidth, and when the SNR at high frequencies is adequate. Beyond this, the noise amplification overwhelms the recovered signal.
+
+\section{Aliasing from Sensor Dynamics}
+A sensor acts as a low-pass filter. If the sensor bandwidth is less than $f_s/2$, it provides inherent anti-alias filtering. However, this is not deliberate and should not be relied upon. The sensor's rolloff may not be steep enough (first-order: only $-20$\,dB/decade), and the exact bandwidth may vary with operating conditions (temperature, mounting). Always include a dedicated anti-alias filter in the signal chain.
+\section{Measuring Sensor Time Constants: Advanced Methods}
+\subsection{Plunge Test Details}
+For thermal sensors, the plunge test is the gold standard. Critical details: (1)~the fluid must be well-stirred to eliminate thermal boundary layers (use a magnetic stirrer or continuous manual agitation), (2)~the fluid temperature must be uniform and known (use a calibrated reference thermometer), (3)~the initial sensor temperature must be stable (allow 5 minutes of equilibration before plunging), (4)~the data acquisition rate must be fast enough to capture the transient ($f_s \geq 10/\tau$; for $\tau = 0.5$\,s: $f_s \geq 20$\,S/s), (5)~compute $\tau$ using the 63.2\% method \emph{and} the log-linear fit method, and compare. If they agree within 5\%, the first-order model is valid.
+
+\subsection{Sinusoidal Testing}
+For sensors where a sinusoidal input is practical (vibration shakers for accelerometers, modulated light sources for photodetectors), sweep the input frequency from $0.1 f_{-3\text{dB}}$ to $10 f_{-3\text{dB}}$ in 20+ steps. At each frequency, measure the gain $|H| = A_{\text{out}}/A_{\text{in}}$ and the phase lag. The Bode plot provides the complete dynamic characterization, including the order of the system and any resonance behavior.
+
+\section{Higher-Order System Dynamics}
+Some sensors exhibit dynamics that are neither purely first-order nor second-order. A thermocouple welded to a heavy metal block may show a fast initial response (the junction itself, $\tau_1 \approx 0.1$\,s) followed by a slow drift to final value (the block equilibrating, $\tau_2 \approx 30$\,s). This is a two-time-constant system:
+\begin{equation}
+G(s) = \frac{K}{(1 + \tau_1 s)(1 + \tau_2 s)}
+\end{equation}
+The step response shows a fast initial rise followed by a slow creep. The dominant (larger) time constant determines the settling time; the faster time constant determines the initial response rate. In the frequency domain, there are two breakpoints on the Bode plot.
+
+\section{Sensor Bandwidth and Control System Interaction}
+In a feedback control system, the sensor is part of the loop. Its dynamic response affects stability. A sensor with time constant $\tau_s$ introduces phase lag $\phi = -\arctan(\omega \tau_s)$ at the crossover frequency. If this lag reduces the total phase margin below 45\degC{}, the system becomes oscillatory or unstable.
+
+Rule of thumb: the sensor bandwidth must be at least $5\times$ the closed-loop bandwidth. For a control system with 0.1\,Hz bandwidth (10\,s settling time): sensor $f_{-3\text{dB}} \geq 0.5$\,Hz ($\tau \leq 0.32$\,s). The ThermoRig thermocouple ($\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz) is marginally adequate; a faster thermocouple or an exposed-junction design would provide more stability margin.
+\section{Amplitude Ratio and Phase Measurement}
+When characterizing sensor dynamics experimentally, two quantities must be measured at each test frequency: the amplitude ratio $M(\omega) = |Y|/(K|X|)$ and the phase angle $\phi(\omega)$.
+
+For amplitude ratio: apply a sinusoidal input of known amplitude $A_{\text{in}}$ at frequency $f$. Measure the output amplitude $A_{\text{out}}$ after the transient has decayed (wait at least $5\tau$ or 10 cycles, whichever is longer). The amplitude ratio is $M = A_{\text{out}}/(K \cdot A_{\text{in}})$ where $K$ is the static sensitivity.
+
+For phase angle: measure the time delay $\Delta t$ between the input and output waveforms (zero-crossing to zero-crossing, or peak to peak). The phase angle in degrees is $\phi = -360 \cdot f \cdot \Delta t$. For a first-order system, $\phi$ is always negative (output lags input) and ranges from 0\,\degC{} at DC to $-90$\,\degC{} at infinite frequency. For a second-order system, $\phi$ ranges from 0\,\degC{} to $-180$\,\degC{}, passing through $-90$\,\degC{} at the natural frequency.
+
+\section{Practical Impact of Sensor Dynamics: Worked Examples}
+\textbf{Example 1: Temperature measurement during soldering.} A solder joint reaches peak temperature in approximately 2\,s. A thermocouple with $\tau = 0.5$\,s reads only 86\% of the peak temperature at $t = 2$\,s (missing $\sim$40\,\degC{} if the peak is 280\,\degC{}). A thermocouple with $\tau = 0.05$\,s (exposed junction, 0.25\,mm wire) reads 99.95\% of the peak. For process control where the peak temperature must not exceed 290\,\degC{}, the slow thermocouple could allow a 40\,\degC{} overshoot without detection.
+
+\textbf{Example 2: Pressure measurement in a hydraulic actuator.} The pressure oscillates at 50\,Hz due to pump ripple. A pressure transducer with $f_n = 500$\,Hz ($\zeta = 0.7$) has an amplitude ratio of $M = 1/\sqrt{(1-0.01)^2 + (0.14)^2} = 1.005$ at 50\,Hz, practically perfect. A cheaper transducer with $f_n = 100$\,Hz ($\zeta = 0.4$) has $M = 1/\sqrt{(1-0.25)^2 + (0.4)^2} = 1.21$ at 50\,Hz, overstating the pressure by 21\%. At 80\,Hz, the resonance amplification makes the reading meaningless.
+
+\textbf{Example 3: Vibration measurement on a rotating shaft.} An accelerometer with $f_n = 25$\,kHz ($\zeta = 0.7$) has a flat response ($\pm$5\%) up to approximately $0.2 \times 25000 = 5000$\,Hz. If the shaft rotates at 3600\,RPM (60\,Hz), harmonics up to the 80th (4800\,Hz) are measured accurately. A cheaper accelerometer with $f_n = 5$\,kHz is flat only to 1000\,Hz, measuring only the first 16 harmonics.
+
+\section{White Noise Testing for System Identification}
+Instead of sweeping individual frequencies, apply broadband white noise as the input and compute the frequency response function using cross-spectral analysis (Chapter~8). This characterizes the entire frequency response in a single measurement. The coherence function $\gamma^2(f)$ at each frequency indicates the quality of the measurement: $\gamma^2 > 0.95$ means the estimate is reliable; $\gamma^2 < 0.5$ means the SNR at that frequency is too low.
+
+For thermal systems where white noise temperature input is impractical, use a Pseudo-Random Binary Sequence (PRBS): a square wave that switches between two temperatures at random intervals. The PRBS has a flat spectrum up to a frequency determined by the minimum switching interval, effectively exciting all frequencies simultaneously.
+\section{System Identification from Experimental Data}
+Determining the dynamic model (transfer function) of a sensor or plant from measured data is called \textbf{system identification}. For MEGN~300 applications, two simple methods suffice:
+
+\subsection{Step Response Method}
+Apply a step input and record the output. For a first-order system: (1) measure the final steady-state value $y_{ss}$, (2) measure the time to reach $0.632 y_{ss}$ to get $\tau$, (3) the transfer function is $G(s) = y_{ss}/(1 + \tau s)$. For a second-order system: (1) measure the peak overshoot $\%OS$ to determine $\zeta$: $\zeta = -\ln(\%OS/100)/\sqrt{\pi^2 + \ln^2(\%OS/100)}$, (2) measure the peak time $t_p$ to determine $\omega_d$: $\omega_d = \pi/t_p$, (3) compute $\omega_n = \omega_d/\sqrt{1-\zeta^2}$, (4) the transfer function is $G(s) = K\omega_n^2/(s^2 + 2\zeta\omega_n s + \omega_n^2)$.
+
+\subsection{Frequency Response Method}
+Sweep a sinusoidal input across a range of frequencies. At each frequency, measure the gain $|H| = A_{\text{out}}/A_{\text{in}}$ and the phase $\phi$. Plot the Bode diagram. For a first-order system: the $-3$\,dB frequency gives $\tau = 1/(2\pi f_{-3\text{dB}})$. For a second-order system: the resonant peak frequency and height give $\omega_n$ and $\zeta$.
+
+The frequency response method is more accurate than the step response method for second-order systems because it provides data at many frequencies, allowing curve fitting to reduce the effect of noise. However, it requires a sinusoidal input source, which is easy for electrical and mechanical systems but difficult for thermal systems.
+
+\section{Dynamic Range of Sensor Systems}
+The dynamic range of a sensor is the ratio between its maximum measurable input and its minimum resolvable input, both determined by dynamic characteristics:
+
+\textbf{Upper limit}: determined by the sensor's linear range. Beyond this, the output saturates or becomes nonlinear. For an accelerometer with $\pm$50\,g range: the maximum input is 50\,g.
+
+\textbf{Lower limit}: determined by the noise floor. For the same accelerometer with a noise floor of 100\,$\mu$g/$\sqrt{\text{Hz}}$ and a 1\,kHz bandwidth: the minimum resolvable acceleration is $100 \times \sqrt{1000} = 3.16$\,mg $\approx 3$\,mg.
+
+\textbf{Dynamic range}: $20\log_{10}(50/0.003) = 84$\,dB ($\sim$14 bits equivalent). The DAQ must have at least this dynamic range to utilize the sensor's full capability. A 12-bit ADC (72\,dB) would limit the usable range; a 16-bit ADC (96\,dB) provides headroom.
+
+\section{Anti-Resonance and Its Effects}
+Some measurement systems exhibit \textbf{anti-resonance}: a frequency at which the sensor output drops to near zero, even though the input is non-zero. Anti-resonance occurs when two parallel signal paths with different phase produce destructive interference. In vibration measurement, a mounting structure with internal resonances can create anti-resonances in the accelerometer's frequency response, producing ``blind spots'' where vibration at specific frequencies is invisible. The cure: verify the complete frequency response of the installed sensor (not just the sensor alone) and avoid measurements at anti-resonance frequencies.
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A temperature sensor has $\tau = 3.0$\,s. How long must you wait after a step change for the reading to be within 1\% of the true value?
+\item A first-order pressure sensor ($\tau = 0.5$\,ms) measures a pressure signal oscillating at 500\,Hz. Calculate the amplitude attenuation (as a percentage of true amplitude) and the phase lag in degrees.
+\item An accelerometer step response shows 15\% overshoot and a peak time of 2.0\,ms. Calculate $\zeta$ and $\omega_n$.
+\item Your system must measure a vibration signal containing frequencies up to 200\,Hz with less than 5\% amplitude error. What minimum natural frequency must your accelerometer have if $\zeta = 0.65$?
+\item Explain why wrapping a thermocouple in thermal paste improves its dynamic response when measuring surface temperature, even though the paste itself has low thermal conductivity.
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item Within 1\% means $e^{-t/\tau} < 0.01$, so $t > -\tau \ln(0.01) = 3.0 \times 4.605 = 13.8$\,s (i.e., $4.6\tau$; often rounded to $5\tau = 15$\,s).
+\item $\omega = 2\pi \times 500 = 3142$\,rad/s. $\omega\tau = 3142 \times 0.0005 = 1.571$. $M = 1/\sqrt{1 + 1.571^2} = 1/\sqrt{3.468} = 0.537$. Amplitude = 53.7\% of true (attenuated by 46.3\%). Phase $= -\arctan(1.571) = -57.5$\ang{}.
+\item $\zeta = -\ln(0.15)/\sqrt{\pi^2 + [\ln(0.15)]^2} = 1.897/\sqrt{9.870 + 3.599} = 1.897/3.669 = 0.517$. $\omega_n = \pi/(0.002 \times \sqrt{1 - 0.267}) = \pi/(0.002 \times 0.856) = 1835$\,rad/s = 292\,Hz.
+\item For $\zeta = 0.65$, the flat region extends to $\approx 0.2\omega_n$ for $<$5\% error. So $0.2\omega_n \geq 2\pi \times 200$, giving $\omega_n \geq 6283$\,rad/s $= 1000$\,Hz. The accelerometer's natural frequency must be at least 1000\,Hz.
+\item Thermal paste fills the microscopic air gaps between the thermocouple bead and the surface. Air has very low thermal conductivity ($\sim$0.025\,W/m$\cdot$K), so air gaps create a large thermal resistance that increases the effective time constant. The paste ($\sim$1--5\,W/m$\cdot$K) dramatically reduces this contact resistance, lowering $\tau$ and improving dynamic response, even though the paste itself is not a great conductor compared to metal.
+\end{enumerate}
+
+
+% ================================================================
+
+\begin{masterycheckbox}{Dynamic Measurements}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Measure $\tau$ from step response data using both the 63.2\% method and log-linear regression.
+\item Calculate the $-3$\,dB bandwidth from $\tau$ and apply the bandwidth-rise time product ($f_{-3\text{dB}} \times t_r \approx 0.35$).
+\item Determine amplitude attenuation and phase lag of a first-order sensor at a given signal frequency.
+\item Evaluate whether a sensor's dynamic response is adequate (the $5\times$ rule: $f_{\text{sensor}} \geq 5 f_{\text{signal}}$).
+\item Explain the difference between overdamped, critically damped, and underdamped second-order responses.
+\end{enumerate}
+\end{masterycheckbox}
+

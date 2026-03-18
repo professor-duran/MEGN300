@@ -1,0 +1,454 @@
+% Chapter 20: PID Control
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{PID Control}
+\label{ch:pid}\index{PID control}\index{Ziegler-Nichols}\index{integral windup}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                  minimum width=2.0cm, minimum height=0.9cm, align=center, font=\small\sffamily},
+    sum/.style={draw=MinesBlue, thick, circle, minimum size=0.5cm, fill=LightBG, font=\sffamily},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+]
+\node[sum] (sum) at (0,0) {$\Sigma$};
+\node[block, fill=AccentTeal!10] (kp) at (3.0, 1.0) {$K_p \cdot e$};
+\node[block, fill=AccentTeal!10] (ki) at (3.0, 0.0) {$K_i \!\int\! e\,dt$};
+\node[block, fill=AccentTeal!10] (kd) at (3.0,-1.0) {$K_d \frac{de}{dt}$};
+\node[sum] (sum2) at (5.5,0) {$\Sigma$};
+\node[block] (plant) at (8.0,0) {Plant $G(s)$};
+\node[block, minimum width=1.5cm] (sensor) at (5.5,-2.5) {Sensor $H(s)$};
+\draw[arr] (-2.0,0) -- (sum) node[midway, above, font=\small\sffamily] {$r(t)$};
+\draw[arr] (sum) -- (1.2,0) node[midway, above, font=\scriptsize\sffamily] {$e(t)$};
+\draw[MinesBlue, thick] (1.2,0) -- (1.2,1.0); \draw[MinesBlue, thick] (1.2,0) -- (1.2,-1.0);
+\draw[arr] (1.2,1.0) -- (kp); \draw[arr] (1.2,0) -- (ki); \draw[arr] (1.2,-1.0) -- (kd);
+\draw[arr] (kp) -| (sum2); \draw[arr] (ki) -- (sum2); \draw[arr] (kd) -| (sum2);
+\draw[arr] (sum2) -- (plant) node[midway, above, font=\scriptsize\sffamily] {$u(t)$};
+\draw[arr] (plant) -- (10.0,0) node[near end, above, font=\small\sffamily] {$y(t)$};
+\draw[MinesBlue, thick] (9.5,0) -- (9.5,-2.5) -- (sensor);
+\draw[arr] (sensor) -| (sum);
+\end{tikzpicture}
+\caption{PID controller block diagram. The error $e(t) = r(t) - y_{\text{measured}}(t)$ drives three parallel paths: proportional (speed), integral (accuracy), derivative (damping). The sensor feedback path introduces its own dynamics and noise.}
+\label{fig:pid_block}
+\end{figure}
+
+\section{The PID Controller}
+The Proportional-Integral-Derivative controller is the most widely used feedback controller in industry. The control output is:
+\begin{equation}
+u(t) = K_p \, e(t) + K_i \int_0^t e(\tau)\, d\tau + K_d \frac{de(t)}{dt}
+\end{equation}
+where $e(t) = \text{SP} - \text{PV}$ is the error.
+
+\section{The Three Terms}
+
+\subsection{Proportional (P)}
+$u_P = K_p \cdot e(t)$. Output is directly proportional to the current error. Higher $K_p$ gives faster response but more overshoot. \textbf{P-only control always has steady-state error} (called ``offset'') because the controller needs a nonzero error to produce a nonzero output.
+
+\subsection{Integral (I)}
+$u_I = K_i \int e(\tau)\, d\tau$. Output is proportional to the accumulated error over time. The integral term \textbf{eliminates steady-state error}: as long as any error exists, the integral grows, increasing the output until the error reaches zero. Too much integral action causes overshoot and oscillation (slow, wind-up driven).
+
+\subsection{Derivative (D)}
+$u_D = K_d \cdot de/dt$. Output is proportional to the rate of change of error. The derivative term provides \textbf{damping}: it opposes rapid changes, reducing overshoot and improving stability. Sensitive to noise (differentiating a noisy signal amplifies the noise); usually low-pass filtered in practice.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6cm,
+    xlabel={Time (s)}, ylabel={Process Variable},
+    xmin=0, xmax=10, ymin=0, ymax=1.5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\sffamily}, tick label style={font=\small\sffamily},
+    legend style={font=\small\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (10,1)};
+\addlegendentry{Setpoint}
+% P-only: reaches ~0.8 with offset
+\addplot[domain=0:10, samples=200, thick, WarnOrange]
+    {0.8*(1 - exp(-1.5*x))};
+\addlegendentry{P-only (offset)}
+% PI: overshoots then settles to 1.0
+\addplot[domain=0:10, samples=300, thick, AccentTeal]
+    {1 - exp(-0.8*x)*(cos(deg(1.5*x)) + 0.53*sin(deg(1.5*x)))};
+\addlegendentry{PI (overshoots)}
+% PID: fast, minimal overshoot
+\addplot[domain=0:10, samples=300, thick, MinesBlue, line width=1.5pt]
+    {1 - exp(-2*x)*(cos(deg(2*x)) + sin(deg(2*x)))};
+\addlegendentry{PID (optimal)}
+% Offset annotation
+\draw[{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, WarnOrange] (9,0.8) -- (9,1.0);
+\node[font=\tiny\sffamily, WarnOrange, anchor=west] at (axis cs:9.1,0.9) {offset};
+\end{axis}
+\end{tikzpicture}
+\caption{Step response comparison: P-only has steady-state offset, PI eliminates offset but overshoots, PID provides fast settling with minimal overshoot. Tune P first, then I, then D.}
+\label{fig:pid_steps}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    term/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                 minimum width=4.2cm, minimum height=3.5cm, align=left, font=\scriptsize\sffamily,
+                 inner sep=6pt, text width=3.8cm},
+]
+\node[term] (P) at (0,0) {
+\textbf{\large\color{MinesBlue}P} -- Proportional\\[3pt]
+$u_P = K_p \cdot e(t)$\\[3pt]
+\textcolor{AccentTeal}{Effect:} Fast response\\
+\textcolor{WarnOrange}{Risk:} Steady-state offset\\
+\textcolor{MinesSilver}{Tune:} Increase until\\~20\% overshoot
+};
+\node[term] (I) at (5,0) {
+\textbf{\large\color{MinesBlue}I} -- Integral\\[3pt]
+$u_I = K_i \!\int\! e(t)\,dt$\\[3pt]
+\textcolor{AccentTeal}{Effect:} Zero offset\\
+\textcolor{WarnOrange}{Risk:} Windup, overshoot\\
+\textcolor{MinesSilver}{Tune:} Increase until\\offset vanishes
+};
+\node[term] (D) at (10,0) {
+\textbf{\large\color{MinesBlue}D} -- Derivative\\[3pt]
+$u_D = K_d \cdot \frac{de}{dt}$\\[3pt]
+\textcolor{AccentTeal}{Effect:} Damping\\
+\textcolor{WarnOrange}{Risk:} Noise amplification\\
+\textcolor{MinesSilver}{Tune:} Increase to reduce\\overshoot; filter if noisy
+};
+% Tuning sequence arrows
+\draw[-{Stealth[length=3mm]}, thick, MinesBlue!50] (P.east) -- (I.west) node[midway, above, font=\tiny\sffamily\bfseries] {Step 2};
+\draw[-{Stealth[length=3mm]}, thick, MinesBlue!50] (I.east) -- (D.west) node[midway, above, font=\tiny\sffamily\bfseries] {Step 3};
+\node[font=\tiny\sffamily\bfseries, MinesBlue!50] at (-1.2,1.8) {Step 1};
+\draw[-{Stealth[length=2mm]}, MinesBlue!50, thick] (-1.2,1.5) -- (-0.5,1.2);
+\end{tikzpicture}
+\caption{The three PID controller terms: their formulas, effects, risks, and the recommended manual tuning sequence (P first, then I, then D).}
+\label{fig:pid}
+\end{figure}
+
+\begin{examplebox}[ThermoRig: PID Temperature Control]
+The ThermoRig controls a 100\,W cartridge heater to maintain a metal block at a setpoint temperature. The sensor is a Type~K thermocouple read by the NI~DAQ at 10\,S/s.
+
+\textbf{P-only} ($K_p = 5$\,\%/\degC{}): the heater reaches 95\% of setpoint but stabilizes with a 2.5\,\degC{} offset below target.
+
+\textbf{PI} ($K_p = 5$, $K_i = 0.5$\,\%/(\degC{}$\cdot$s)): the offset is eliminated; the system reaches setpoint in 45\,s with 8\% overshoot.
+
+\textbf{PID} ($K_p = 5$, $K_i = 0.5$, $K_d = 2$\,\%$\cdot$s/\degC{}): overshoot reduced to 2\%, settling time 30\,s. The derivative term damps the approach to setpoint.
+\end{examplebox}
+
+
+\section{From PID Output to Physical Actuator}
+The PID controller computes a control variable $u(t)$ as a percentage (0--100\%). This abstract number must be converted into a physical actuation signal:
+
+\textbf{For a DC motor} (speed control): $u$ maps to PWM duty cycle. At $u = 50\%$, the MOSFET switches the motor supply at 50\% duty, delivering half the average voltage. The PWM frequency (1--25\,kHz) is fast enough that the motor's inertia smooths the pulsed current.
+
+\textbf{For an AC heater} (temperature control via SSR): $u$ maps to time-proportional control. Over a fixed period (e.g., 1\,s), the SSR is ON for $u/100 \times 1$\,s and OFF for the remainder. At $u = 75\%$, the heater is ON for 0.75\,s and OFF for 0.25\,s each cycle. The thermal mass of the system smooths this into quasi-continuous heating.
+
+\textbf{For a valve} (flow/pressure control): $u$ maps to valve position via a servo actuator or stepper motor driving the valve stem.
+
+In LabVIEW, wire the PID output (0--100) to a ``Rescale'' function that converts to the appropriate DAQ output: a 0--3.3\,V analog voltage for a proportional driver, or a digital output with timing logic for time-proportional SSR control.
+
+\begin{keyconceptbox}[Requirements Mapping: Control Output to Shall-Statements]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item ``PID loop rate $\geq$10\,Hz'' $\to$ SW-REQ: LabVIEW While Loop period shall be $\leq$100\,ms, verified by timing measurement.
+\item ``Heater PWM resolution $\leq$1\%'' $\to$ HW-REQ: Time-proportional period shall be $\geq$1\,s (giving 100 discrete steps at 10\,ms resolution).
+\item ``Motor speed controllable 0--100\%'' $\to$ HW-REQ: PWM duty cycle shall span 0--100\% with $\geq$8-bit resolution (256 steps).
+\end{itemize}
+\end{keyconceptbox}
+
+\section{Tuning Methods}
+
+\subsection{Ziegler-Nichols (Closed-Loop)}
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Set $K_i = 0$ and $K_d = 0$ (P-only control).
+\item Increase $K_p$ until the system oscillates at a constant amplitude. Record this \textbf{ultimate gain} $K_u$ and the \textbf{ultimate period} $T_u$.
+\item Apply the Ziegler-Nichols tuning rules:
+\end{enumerate}
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{0.7\textwidth}{l c c c}
+\toprule
+\textbf{Controller} & $K_p$ & $T_i$ & $T_d$ \\
+\midrule
+P & $0.50 \, K_u$ & -- & -- \\
+PI & $0.45 \, K_u$ & $T_u / 1.2$ & -- \\
+PID & $0.60 \, K_u$ & $T_u / 2.0$ & $T_u / 8.0$ \\
+\bottomrule
+\end{tabularx}
+\caption{Ziegler-Nichols closed-loop tuning rules. $K_i = K_p / T_i$, $K_d = K_p \cdot T_d$.}
+\end{table}
+
+\subsection{Manual Tuning}
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Start with P-only. Increase $K_p$ until the response is reasonably fast with acceptable overshoot (typically 10--25\%).
+\item Add integral. Start $K_i$ small; increase until the steady-state error is eliminated. If overshoot increases significantly, reduce $K_i$.
+\item Add derivative. Start $K_d$ small; increase to reduce overshoot and oscillation. If the output becomes jerky or noisy, $K_d$ is too high.
+\end{enumerate}
+
+\section{Integral Windup}
+When the actuator saturates (e.g., heater at 100\% duty, valve fully open), the error persists and the integral term continues to grow. When the error finally reverses, the large integral value causes excessive overshoot before the integral ``unwinds.'' \textbf{Anti-windup}: stop integrating when the actuator is saturated, or clamp the integral term to a maximum value.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    name=noaw, width=6.5cm, height=5cm,
+    xlabel={Time (s)}, ylabel={Output},
+    xmin=0, xmax=10, ymin=0, ymax=2.0,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{WarnOrange} Without Anti-Windup},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (10,1)};
+% Massive overshoot from windup
+\addplot[domain=0:10, samples=300, thick, WarnOrange]
+    {x < 2 ? 0 : min(1.8, 1 + 0.8*exp(-0.5*(x-4))*sin(deg(2*(x-4))))};
+\draw[{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, red!70!black, thick]
+    (axis cs:4,1) -- (axis cs:4,1.75);
+\node[font=\tiny\sffamily, red!70!black, anchor=west] at (axis cs:4.2,1.4) {80\% OS};
+\end{axis}
+\begin{axis}[
+    at={(noaw.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={Time (s)}, ylabel={Output},
+    xmin=0, xmax=10, ymin=0, ymax=2.0,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily\color{AccentTeal} With Anti-Windup},
+]
+\addplot[dashed, MinesSilver, thick] coordinates {(0,1) (10,1)};
+% Minimal overshoot
+\addplot[domain=0:10, samples=300, thick, AccentTeal]
+    {x < 2 ? 0 : 1 - exp(-1.5*(x-2))*(cos(deg(2.5*(x-2))) + 0.6*sin(deg(2.5*(x-2))))};
+\draw[{Stealth[length=1.5mm]}-{Stealth[length=1.5mm]}, AccentTeal, thick]
+    (axis cs:3.2,1) -- (axis cs:3.2,1.12);
+\node[font=\tiny\sffamily, AccentTeal, anchor=west] at (axis cs:3.4,1.08) {12\% OS};
+\end{axis}
+\end{tikzpicture}
+\caption{Integral windup: without anti-windup (left), the integral accumulates during saturation, causing 80\%+ overshoot. With anti-windup clamping (right), the integral is frozen during saturation, limiting overshoot to $\sim$12\%. Always enable anti-windup.}
+\label{fig:windup}
+\end{figure}
+
+\section{Digital PID Implementation}
+In discrete time (sampling period $T_s$):
+\begin{align}
+u[n] &= K_p \, e[n] + K_i \, T_s \sum_{k=0}^{n} e[k] + K_d \, \frac{e[n] - e[n-1]}{T_s}
+\end{align}
+This is the \textbf{positional form}. The \textbf{velocity form} computes the change in output ($\Delta u$) instead of the absolute value, which naturally prevents integral windup:
+\begin{equation}
+\Delta u[n] = K_p (e[n] - e[n-1]) + K_i T_s \, e[n] + K_d \frac{e[n] - 2e[n-1] + e[n-2]}{T_s}
+\end{equation}
+
+\begin{keyconceptbox}[Requirements Mapping: PID to Shall-Statements]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item ``Maintain temperature at setpoint $\pm$0.5\,\degC{}'' $\to$ CTRL-REQ: PID controller shall achieve steady-state error $\leq$0.5\,\degC{} within 60\,s of a step change.
+\item ``No overshoot $>$5\%'' $\to$ CTRL-REQ: Step response overshoot shall be $\leq$5\% of the step magnitude.
+\item ``Control loop executes at $\geq$10\,Hz'' $\to$ SW-REQ: PID computation and DAQ cycle shall complete within 100\,ms.
+\end{itemize}
+\end{keyconceptbox}
+
+
+\section{Practical PID Considerations}
+
+\subsection{Derivative Filter}
+The pure derivative term $K_d \cdot de/dt$ amplifies high-frequency noise. In practice, the derivative is always filtered:
+\begin{equation}
+u_D(s) = \frac{K_d s}{1 + \frac{s}{N \omega_c}} \quad \text{where } N = 2\text{--}20
+\end{equation}
+This limits the derivative gain at high frequencies. In discrete form: use a first-order low-pass on the error difference before multiplying by $K_d$. LabVIEW's PID VI includes this filter automatically.
+
+\subsection{Setpoint Weighting}
+When the setpoint changes suddenly (step change), the proportional and derivative terms produce a large instantaneous output (``derivative kick''). Setpoint weighting reduces this: apply P and D only to the process variable (not the error), while I acts on the full error. This gives smooth response to setpoint changes while maintaining full disturbance rejection.
+
+\subsection{Bumpless Transfer}
+When switching between manual and automatic control modes, a poorly implemented PID can produce a large output jump. Bumpless transfer initializes the integral term so that the automatic output matches the manual output at the moment of transfer.
+
+\subsection{Cascade Control}
+For systems with multiple time constants (e.g., a heater heating a metal block that heats a fluid), cascade control uses two nested loops: an inner (fast) loop controls the heater temperature, and an outer (slow) loop controls the fluid temperature. The outer loop's output becomes the inner loop's setpoint. This rejects disturbances faster by addressing them at the inner loop before they propagate to the outer variable.
+
+\begin{examplebox}[ThermoRig: Complete PID Implementation in LabVIEW]
+The ThermoRig PID loop runs at 10\,Hz ($T_s = 0.1$\,s). The NI DAQ reads the thermocouple (averaged over 10 readings per cycle for noise reduction). The PID VI computes the output (0--100\% duty cycle). The output drives the SSR via a digital output toggled at 1\,Hz time-proportional rate.
+
+Tuning: Ziegler-Nichols yielded $K_u = 15$, $T_u = 8$\,s. Z-N PID: $K_p = 9.0$, $K_i = 2.25$/s, $K_d = 2.25$\,s. After manual refinement (reducing overshoot): $K_p = 6.0$, $K_i = 1.5$/s, $K_d = 3.0$\,s. Anti-windup enabled with integral clamp at $\pm$50\%. Result: setpoint reached in 35\,s, overshoot 3\%, steady-state error $<$0.2\,\degC{}.
+\end{examplebox}
+
+
+\section{PID Controller Theory}
+The PID (Proportional-Integral-Derivative) controller computes the control output as:
+\begin{equation}
+u(t) = K_p \, e(t) + K_i \int_0^t e(\tau)\,d\tau + K_d \frac{de(t)}{dt}
+\end{equation}
+where $e(t) = \text{SP} - \text{PV}$ is the error. Each term contributes a distinct behavior:
+
+\subsection{Proportional (P) Term}
+$u_P = K_p \cdot e$: output proportional to current error. Higher $K_p$ gives faster response but more overshoot and less stability margin. P-only control always has a non-zero steady-state error (offset) for step inputs in Type~0 systems:
+\begin{equation}
+e_{ss} = \frac{1}{1 + K_p K_{\text{plant}}}
+\end{equation}
+For $K_p = 10$ and $K_{\text{plant}} = 1$: $e_{ss} = 1/11 \approx 9.1\%$ of the step size. Higher $K_p$ reduces but never eliminates the offset.
+
+\subsection{Integral (I) Term}
+$u_I = K_i \int e\,dt$: output proportional to the accumulated error over time. The integral action eliminates steady-state offset by continuously increasing the output as long as any error persists. However, it introduces phase lag (reduces stability) and can cause \textbf{integral windup} when the actuator saturates.
+
+\subsection{Derivative (D) Term}
+$u_D = K_d \cdot de/dt$: output proportional to the rate of change of error. It provides predictive action, reducing overshoot and improving stability by ``braking'' when the error is decreasing rapidly. However, it amplifies high-frequency noise. In practice, the derivative is computed from the PV (not the error) to avoid setpoint step spikes, and a low-pass filter is applied to the derivative signal.
+
+\section{Tuning Methods}
+\subsection{Ziegler-Nichols Closed-Loop Method}
+(1) Set $K_i = 0$ and $K_d = 0$ (P-only). (2) Increase $K_p$ until the system oscillates at constant amplitude. Record this $K_p$ as $K_u$ (ultimate gain) and the oscillation period as $T_u$ (ultimate period). (3) Calculate gains from the Z-N table:
+
+P-only: $K_p = 0.5 K_u$. PI: $K_p = 0.45 K_u$, $T_i = T_u/1.2$. PID: $K_p = 0.6 K_u$, $T_i = T_u/2$, $T_d = T_u/8$.
+
+Z-N tuning produces aggressive response with significant overshoot ($\sim$25\%). Use it as a starting point and manually reduce $K_p$ and increase $T_i$ for less aggressive behavior.
+
+\subsection{Manual Tuning}
+(1) Set $K_i = 0$, $K_d = 0$. Increase $K_p$ until the response is fast with acceptable overshoot ($<$10\%). (2) Gradually increase $K_i$ to eliminate the steady-state offset. Too much $K_i$ causes slow oscillation. (3) Add $K_d$ to reduce overshoot and improve settling. Too much $K_d$ causes high-frequency jitter (noise amplification).
+
+\section{Anti-Windup}
+When the actuator saturates (e.g., heater at 100\% power), the integral term continues to accumulate error, growing very large. When the error finally changes sign, the massive accumulated integral drives the output far past the setpoint, causing enormous overshoot. This is \textbf{integral windup}.
+
+The clamping anti-windup strategy: when the output hits the actuator limit, stop accumulating the integral. Resume integration only when the output comes back within the actuator's range. The pseudocode in Section~16.4 implements this.
+
+\section{Discrete PID Implementation}
+In LabVIEW (or any digital controller), the continuous PID equation is discretized:
+\begin{equation}
+u[n] = K_p \, e[n] + K_i \, T_s \sum_{k=0}^{n} e[k] + \frac{K_d}{T_s}\left(e[n] - e[n-1]\right)
+\end{equation}
+where $T_s$ is the sample period. The integral is a running sum (stored in a shift register). The derivative is a first difference (also using a shift register for $e[n-1]$). Anti-windup: if the output exceeds actuator limits, do not update the integral sum.
+
+\begin{examplebox}[ThermoRig: PID Tuning for Temperature Control]
+The ThermoRig heater drives a 200\,W ceramic element through an SSR. Using Z-N method: with PI control only, we increase $K_p$ until sustained oscillation at $K_u = 35$, $T_u = 18$\,s. Z-N PI: $K_p = 15.75$, $T_i = 15$\,s ($K_i = K_p/T_i = 1.05$). This produces 22\% overshoot. Manual refinement: reduce $K_p$ to 10, increase $T_i$ to 20\,s ($K_i = 0.5$), add $K_d = 5$ with a derivative filter at 10\,Hz. Result: 4\% overshoot, 45\,s settling to $\pm$0.5\,\degC{} of the 80\,\degC{} setpoint. Anti-windup clamping active during large setpoint changes.
+\end{examplebox}
+
+\section{Practical PID Tips}
+\textbf{Derivative on PV, not error}: compute $K_d \cdot d(\text{PV})/dt$ instead of $K_d \cdot de/dt$. This avoids the derivative spike that occurs when the setpoint changes step-wise.
+
+\textbf{Derivative filter}: a first-order LP filter on the derivative term with cutoff at $5$--$10\times$ the closed-loop bandwidth. Without it, sensor noise is amplified by the derivative gain.
+
+\textbf{Sampling rate}: the PID loop rate must be at least $10\times$ the closed-loop bandwidth. For a system with 5\,s settling time (bandwidth $\sim$0.2\,Hz), the loop should update at $\geq$2\,Hz ($T_s \leq 0.5$\,s). Faster is better; 10--100\,Hz is typical for thermal systems.
+
+\textbf{Bumpless transfer}: when switching from manual to automatic mode, initialize the integral term to the current manual output to avoid an output jump.
+
+
+\section{PID Gain Units and Conversion}
+Different PID implementations use different parameterizations. The \textbf{parallel (independent)} form: $u = K_p e + K_i \int e\,dt + K_d de/dt$, with units $K_p$\,[output/error], $K_i$\,[output/(error$\cdot$s)], $K_d$\,[output$\cdot$s/error].
+
+The \textbf{standard (ISA)} form: $u = K_c\left(e + \frac{1}{T_i}\int e\,dt + T_d \frac{de}{dt}\right)$, where $K_c = K_p$ is the controller gain, $T_i = K_p/K_i$ is the integral time (seconds), and $T_d = K_d/K_p$ is the derivative time (seconds). Many industrial controllers and LabVIEW's PID VI use the ISA form.
+
+Conversion: $K_i = K_c/T_i$ and $K_d = K_c \times T_d$. When reading Z-N tuning tables or textbook examples, verify which form is used before entering the gains.
+
+\section{Cascade Control}
+For systems with multiple time constants (e.g., a heater inside an insulated chamber: fast heater response, slow chamber response), a single PID loop may not provide adequate performance. \textbf{Cascade control} uses two nested loops: an inner (fast) loop controls the heater temperature, and an outer (slow) loop controls the chamber temperature by setting the setpoint for the inner loop. The inner loop rejects disturbances (supply voltage changes) before they propagate to the outer loop, dramatically improving the overall response.
+
+\section{Feed-Forward Combined with PID}
+The PID controller corrects for errors after they occur (reactive). A feed-forward term can anticipate known disturbances and act before the error appears (proactive). For the ThermoRig: measuring the door-open event with a switch and immediately increasing heater power by a predetermined amount (feed-forward), while the PID handles the residual error (feedback). The combined system responds faster to disturbances than either approach alone.
+\section{PID Autotuning}
+Manual PID tuning requires expertise and time. \textbf{Autotuning} algorithms automate the process:
+
+\textbf{Relay feedback method} (Astrom-Hagglund): replace the controller with a relay (bang-bang controller). The system oscillates at the ultimate frequency with the relay amplitude determining the ultimate gain. From $K_u$ and $T_u$, compute PID gains using Z-N rules. LabVIEW's PID Autotuning VI implements this method.
+
+\textbf{Step response method}: apply a step in the controller output (open-loop) and measure the plant's response. Fit a FOPDT model ($K_p$, $\tau$, $L$) and compute gains using the 
+\begin{tipbox}[Z-N Values Are Starting Points, Not Final Gains]
+The Ziegler-Nichols tuning rules produce aggressive gains optimized for fast disturbance rejection with approximately 25\% overshoot. In practice, these gains often produce excessive oscillation, especially in systems with dead time. After applying Z-N values: (1) reduce $K_p$ by 30--50\% for smoother response, (2) increase $T_i$ (reduce $K_i$) by 50--100\% to reduce integral overshoot, (3) reduce $T_d$ ($K_d$) by 50\% if derivative noise is excessive. Treat Z-N as a ``ballpark'' that gets you close, then refine by observing the step response.
+\end{tipbox}
+
+Cohen-Coon or IMC (Internal Model Control) tuning rules, which produce less aggressive tuning than Z-N.
+
+\textbf{IMC tuning rules}: for a FOPDT plant with gain $K$, time constant $\tau$, and dead time $L$: $K_p = \tau/(K \lambda)$, $T_i = \tau$, $T_d = L/2$, where $\lambda$ is the desired closed-loop time constant (user-specified tradeoff between speed and robustness). Setting $\lambda = L$ gives aggressive tuning; $\lambda = 3L$ gives conservative tuning.
+\section{Control Latency and Its Effect on Stability}
+\subsection{What Is Control Latency?}
+Control latency is the total time delay between a change in the process variable and the corresponding change in the actuator output. It includes:
+
+\textbf{Sensor delay}: the sensor's dynamic response time (first-order time constant $\tau_s$, Chapter~3). For a thermocouple: $\tau_s = 0.1$--$1$\,s. For an accelerometer: $\tau_s = 0.01$\,ms (negligible for most applications).
+
+\textbf{Acquisition delay}: the time to digitize the signal ($1/f_s$ for one sample, plus any multiplexer settling time). At $f_s = 100$\,S/s: $T_{\text{acq}} = 10$\,ms.
+
+\textbf{Computation delay}: the time for the MCU to execute the filter, calibration, and PID calculations. On an ESP32 at 240\,MHz: typically $0.01$--$1$\,ms for a PID loop with filtering, negligible. On a LabVIEW VI on a desktop PC: $1$--$10$\,ms due to OS scheduling jitter.
+
+\textbf{Output delay}: the time for the DAC or PWM output to reach the actuator. For PWM: up to one PWM period ($1/f_{\text{PWM}}$). For a DAC: typically $< 0.1$\,ms.
+
+\textbf{Actuator delay}: the time for the actuator to respond physically. An SSR turns on within 1\,ms (zero-cross type: up to 8.3\,ms in a 60\,Hz system). A motor takes 10--100\,ms to change speed (electrical time constant $L/R$ plus mechanical time constant $J/B$).
+
+The total control latency is the sum: $\tau_{\text{total}} = \tau_s + T_{\text{acq}} + T_{\text{comp}} + T_{\text{out}} + \tau_{\text{act}}$.
+
+\subsection{Phase Lag from Latency}
+Every second of delay adds phase lag to the feedback loop. At frequency $f$:
+\begin{equation}
+\phi_{\text{delay}} = -360 \times f \times \tau_{\text{total}} \quad \text{(degrees)}
+\end{equation}
+
+This phase lag directly reduces the phase margin. If the original system (without delay) has a phase margin of 60\,\degC{} at crossover frequency $f_c$, and the total latency introduces $\phi_{\text{delay}} = 25$\,\degC{} at $f_c$, the effective phase margin drops to $60 - 25 = 35$\,\degC{}. If $\phi_{\text{delay}} > 60$\,\degC{}: the phase margin becomes negative and the system oscillates.
+
+\subsection{Worked Example: ThermoRig}
+ThermoRig latency budget: thermocouple ($\tau_s = 0.42$\,s, but this is modeled as plant dynamics, not pure delay), SSR zero-cross ($\tau_{\text{SSR}} = 4$\,ms average), LabVIEW loop ($T_{\text{comp}} = 5$\,ms), sample period ($T_s = 100$\,ms, contributes $T_s/2 = 50$\,ms of effective delay from the zero-order hold). Total pure delay: $\tau_{\text{delay}} \approx 50 + 5 + 4 = 59$\,ms $\approx 0.06$\,s.
+
+At the crossover frequency ($f_c \approx 0.05$\,Hz): $\phi_{\text{delay}} = 360 \times 0.05 \times 0.06 = 1.1$\,\degC{}. Negligible for this slow system.
+
+For a hypothetical motor speed controller at $f_c = 50$\,Hz with $\tau_{\text{delay}} = 2$\,ms: $\phi_{\text{delay}} = 360 \times 50 \times 0.002 = 36$\,\degC{}. This is significant and must be accounted for in the controller design.
+
+\subsection{Reducing Latency}
+(1) \textbf{Increase the sample rate}: the zero-order hold contributes $T_s/2$ of effective delay. Doubling $f_s$ halves this contribution.
+
+(2) \textbf{Use deterministic timing}: LabVIEW on Windows has 1--10\,ms jitter due to OS scheduling. LabVIEW Real-Time (on CompactRIO or myRIO) has $< 0.1$\,ms jitter. An ESP32 running bare-metal or FreeRTOS has $< 0.01$\,ms jitter.
+
+(3) \textbf{Minimize computation}: use fixed-point arithmetic, pre-computed lookup tables, and optimized filter implementations. Avoid dynamic memory allocation, string operations, and file I/O inside the control loop.
+
+(4) \textbf{Use faster actuators}: if the SSR zero-cross delay ($\leq 8.3$\,ms) is significant, switch to a random-fire SSR ($< 0.1$\,ms delay, but generates more EMI) or a MOSFET-based DC switch ($< 0.001$\,ms).
+
+\begin{tipbox}[The Rule of 20]
+For stable, well-damped control: the sample rate should be at least 20$\times$ the closed-loop bandwidth. This ensures the total delay from sampling ($T_s/2$) contributes less than $360/(2 \times 20) = 9$\,\degC{} of phase lag, which is comfortably within most stability margins. For the ThermoRig ($f_c = 0.05$\,Hz): $f_s \geq 1$\,Hz. We use 10\,Hz, giving a factor of 200 (massive margin). For a 50\,Hz motor controller: $f_s \geq 1$\,kHz.
+\end{tipbox}
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A P-only controller with $K_p = 10$ controls a heater. The setpoint is 50\,\degC{} and the steady-state temperature reaches 47\,\degC{}. What is the steady-state error? Why does P-only control have this offset?
+\item You perform Ziegler-Nichols tuning and find $K_u = 8.0$ and $T_u = 2.0$\,s. Calculate the PID gains ($K_p$, $K_i$, $K_d$) using the Z-N table.
+\item Explain integral windup using a concrete example (e.g., a temperature controller with a setpoint step from 25 to 80\,\degC{}). What happens, and how does anti-windup prevent it?
+\item Your PID controller for motor speed works well at moderate speeds but becomes oscillatory at high speeds. What is changing, and how would you adapt the controller?
+\item Implement the discrete PID equation in pseudocode. Include anti-windup (clamp the integral term when the output saturates).
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item Steady-state error $= 50 - 47 = 3$\,\degC{}. P-only control requires $e > 0$ to produce $u > 0$. If $e = 0$, then $u = 0$ and the heater turns off; the temperature drops until $e$ grows enough to produce sufficient heater output. The system settles where the heat loss equals the heater output at that error level. Only integral action can drive $e \to 0$.
+\item $K_p = 0.60 \times 8.0 = 4.8$. $T_i = 2.0/2.0 = 1.0$\,s, so $K_i = K_p/T_i = 4.8$. $T_d = 2.0/8.0 = 0.25$\,s, so $K_d = K_p \times T_d = 1.2$.
+\item At the step from 25 to 80\,\degC{}, the error is large (55\,\degC{}) and the heater output saturates at 100\%. The integral term keeps accumulating this large error (because $e > 0$ continuously). When the temperature approaches 80\,\degC{}, the integral has grown enormously. Even after the error crosses zero, the large positive integral forces the output to stay high, causing the temperature to overshoot well past 80\,\degC{}. It takes a long time for the negative error to ``unwind'' the integral. Anti-windup: when the output saturates, freeze the integral accumulator (stop adding to it). When the output leaves saturation, resume integration. This limits the overshoot to the amount caused by system dynamics alone.
+\item At high speeds, the plant dynamics change: the motor has less torque margin, the load-speed relationship becomes more nonlinear, and the mechanical time constant may shift. Gains tuned for moderate speeds may provide too much gain at high speeds. Solutions: (1) gain scheduling (use different PID gains at different speed ranges), (2) reduce $K_p$ and $K_d$ at high speeds, or (3) use a feedforward term that accounts for the known speed-torque relationship.
+\item \begin{verbatim}
+integral = 0; prev_error = 0
+loop:
+  error = setpoint - measured
+  integral = integral + error * Ts
+  # Anti-windup: clamp integral
+  if integral > I_MAX: integral = I_MAX
+  if integral < I_MIN: integral = I_MIN
+  derivative = (error - prev_error) / Ts
+  output = Kp*error + Ki*integral + Kd*derivative
+  # Clamp output to actuator range
+  if output > OUT_MAX: output = OUT_MAX
+  if output < OUT_MIN: output = OUT_MIN
+  prev_error = error
+  apply(output)
+  wait(Ts)
+\end{verbatim}
+\end{enumerate}
+
+
+% ================================================================
+% BACK MATTER
+% ================================================================
+
+\backmatter
+
+
+
+\begin{masterycheckbox}{PID Control}
+To demonstrate mastery of this module, you must be able to:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Explain what each PID term does and predict the effect of increasing each gain.
+\item Tune a PID controller using Ziegler-Nichols and refine manually.
+\item Implement anti-windup clamping and explain why it is necessary.
+\item Diagnose common PID problems from time-domain response plots.
+\item Configure and tune the LabVIEW PID VI, including the derivative filter $N$.
+\end{enumerate}
+\end{masterycheckbox}
+
+\begin{tipbox}[Required Reading: Why Instrumentation Projects Fail]
+Before your first Design Challenge, read the ``Why Instrumentation Projects Fail'' appendix (page~\pageref{ch:projects_fail}). It consolidates the ten most common failure modes from six years of MEGN~300 projects.
+\end{tipbox}
+

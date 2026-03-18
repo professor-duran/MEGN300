@@ -1,0 +1,364 @@
+% Chapter 9: Fourier Series
+% Auto-generated from megn300_master_reference.tex
+
+\chapter{Fourier Series and Complex Signal Construction}
+\label{ch:fourier}\index{Fourier series}\index{harmonics}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    spec/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=2pt,
+                 minimum width=3.5cm, minimum height=2.4cm, align=left, font=\scriptsize\sffamily,
+                 inner sep=5pt, text width=3.1cm},
+]
+\node[spec] (sq) at (0,0) {
+\textbf{\color{MinesBlue}Square Wave}\\[2pt]
+Odd harmonics only:\\
+$1, 3, 5, 7, \ldots$\\
+Amplitude: $\propto 1/n$\\
+Roll-off: $-20$\,dB/dec
+};
+\node[spec] (tri) at (4.3,0) {
+\textbf{\color{MinesBlue}Triangle Wave}\\[2pt]
+Odd harmonics only:\\
+$1, 3, 5, 7, \ldots$\\
+Amplitude: $\propto 1/n^2$\\
+Roll-off: $-40$\,dB/dec
+};
+\node[spec] (saw) at (8.6,0) {
+\textbf{\color{MinesBlue}Sawtooth Wave}\\[2pt]
+All harmonics:\\
+$1, 2, 3, 4, \ldots$\\
+Amplitude: $\propto 1/n$\\
+Roll-off: $-20$\,dB/dec
+};
+\node[spec, draw=WarnOrange] (imp) at (12.9,0) {
+\textbf{\color{WarnOrange}Impulse (Dirac)}\\[2pt]
+All harmonics:\\
+$1, 2, 3, 4, \ldots$\\
+Amplitude: constant\\
+Flat spectrum
+};
+% Iconic waveform sketches above
+\begin{scope}[shift={(0,2.0)}, scale=0.4]
+\draw[MinesBlue, thick] (0,0) -- (0,1) -- (1,1) -- (1,-1) -- (2,-1) -- (2,1) -- (3,1) -- (3,-1) -- (4,-1);
+\end{scope}
+\begin{scope}[shift={(4.3,2.0)}, scale=0.4]
+\draw[MinesBlue, thick] (0,0) -- (1,1) -- (2,0) -- (3,-1) -- (4,0);
+\end{scope}
+\begin{scope}[shift={(8.6,2.0)}, scale=0.4]
+\draw[MinesBlue, thick] (0,-1) -- (2,1) -- (2,-1) -- (4,1);
+\end{scope}
+\begin{scope}[shift={(12.9,2.0)}, scale=0.4]
+\draw[WarnOrange, thick] (0,0) -- (1,0) -- (1,0) -- (1,1.5);
+\draw[WarnOrange, thick] (1,0) -- (2,0) -- (3,0) -- (3,1.5);
+\draw[WarnOrange, thick] (3,0) -- (4,0);
+\end{scope}
+\end{tikzpicture}
+\caption{Fourier spectra of common periodic waveforms. Square and triangle waves contain only odd harmonics; sawtooth contains all harmonics. The roll-off rate determines how many harmonics carry significant energy, which in turn determines the bandwidth required to faithfully measure the signal.}
+\label{fig:common_spectra}
+\end{figure}
+
+\section{The Fourier Principle}
+Any periodic signal $x(t)$ with period $T$ can be represented as a sum of sinusoids at the fundamental frequency $f_0 = 1/T$ and its integer harmonics:
+\begin{equation}
+x(t) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \left[ a_n \cos(2\pi n f_0 t) + b_n \sin(2\pi n f_0 t) \right]
+\end{equation}
+where the Fourier coefficients are:
+\begin{align}
+a_n &= \frac{2}{T} \int_0^T x(t) \cos(2\pi n f_0 t)\, dt \\
+b_n &= \frac{2}{T} \int_0^T x(t) \sin(2\pi n f_0 t)\, dt
+\end{align}
+$a_0/2$ is the DC offset (average value). Each $(a_n, b_n)$ pair defines the amplitude and phase of the $n$-th harmonic.
+
+\section{Common Waveform Decompositions}
+\textbf{Square wave} (amplitude $A$, period $T$):
+\begin{equation}
+x(t) = \frac{4A}{\pi} \sum_{n=1,3,5,\ldots}^{\infty} \frac{1}{n} \sin(2\pi n f_0 t)
+\end{equation}
+Contains only odd harmonics. The amplitude of each harmonic decreases as $1/n$.
+
+\textbf{Triangle wave}: contains only odd harmonics, with amplitudes decreasing as $1/n^2$.
+
+\textbf{Sawtooth wave}: contains all harmonics (odd and even), with amplitudes decreasing as $1/n$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    name=harm, width=6.5cm, height=5cm,
+    xlabel={$t$ (cycles)}, ylabel={Amplitude},
+    xmin=0, xmax=2, ymin=-1.5, ymax=1.5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Individual Harmonics},
+    legend style={font=\tiny\sffamily, at={(0.98,0.98)}, anchor=north east},
+]
+\addplot[domain=0:2, samples=300, thick, MinesBlue] {(4/pi)*sin(deg(2*pi*x))};
+\addlegendentry{Fundamental}
+\addplot[domain=0:2, samples=300, thick, AccentTeal] {(4/pi)*(1/3)*sin(deg(2*pi*3*x))};
+\addlegendentry{3rd harmonic}
+\addplot[domain=0:2, samples=300, thick, WarnOrange] {(4/pi)*(1/5)*sin(deg(2*pi*5*x))};
+\addlegendentry{5th harmonic}
+\end{axis}
+\begin{axis}[
+    at={(harm.east)}, anchor=west, xshift=1.5cm,
+    width=6.5cm, height=5cm,
+    xlabel={$t$ (cycles)}, ylabel={Amplitude},
+    xmin=0, xmax=2, ymin=-1.5, ymax=1.5,
+    grid=major, grid style={MinesSilver!30}, axis lines=left,
+    every axis label/.style={font=\scriptsize\sffamily}, tick label style={font=\tiny\sffamily},
+    title={\small\sffamily Sum Approaches Square Wave},
+    legend style={font=\tiny\sffamily, at={(0.98,0.02)}, anchor=south east},
+]
+% 1 term
+\addplot[domain=0:2, samples=300, MinesSilver, thin] {(4/pi)*sin(deg(2*pi*x))};
+\addlegendentry{1 term}
+% 3 terms
+\addplot[domain=0:2, samples=300, AccentTeal, thin]
+    {(4/pi)*(sin(deg(2*pi*x)) + (1/3)*sin(deg(2*pi*3*x)) + (1/5)*sin(deg(2*pi*5*x)))};
+\addlegendentry{3 terms}
+% 9 terms
+\addplot[domain=0:2, samples=500, thick, MinesBlue]
+    {(4/pi)*(sin(deg(2*pi*x)) + (1/3)*sin(deg(6*pi*x)) + (1/5)*sin(deg(10*pi*x))
+    + (1/7)*sin(deg(14*pi*x)) + (1/9)*sin(deg(18*pi*x)) + (1/11)*sin(deg(22*pi*x))
+    + (1/13)*sin(deg(26*pi*x)) + (1/15)*sin(deg(30*pi*x)) + (1/17)*sin(deg(34*pi*x)))};
+\addlegendentry{9 terms}
+\end{axis}
+\end{tikzpicture}
+\caption{Fourier decomposition of a square wave. Left: individual odd harmonics. Right: as more terms are summed, the result approaches the square wave. Low-pass filtering removes high harmonics, rounding the edges.}
+\label{fig:fourier}
+\end{figure}
+
+\begin{tipbox}[Why Fourier Series Matters for Instrumentation]
+Every real signal is a superposition of sinusoids. If your measurement system attenuates or phase-shifts any frequency component differently from others, the reconstructed signal is distorted. Understanding Fourier decomposition lets you predict how your sensor's frequency response (Chapter~3) and your filters (Chapters~10--11) will affect the measured signal.
+\end{tipbox}
+
+
+\section{Why Frequency Matters in Instrumentation}
+Every sensor, amplifier, filter, and ADC has a frequency-dependent response. To understand, predict, and design these behaviors, we need to describe signals in terms of frequency content. The Fourier series provides this: any periodic signal decomposes into sinusoids at harmonics of the fundamental frequency.
+
+\section{Mathematical Foundation}
+A periodic signal $x(t)$ with period $T$ and fundamental $f_0 = 1/T$:
+\begin{equation}
+x(t) = \frac{a_0}{2} + \sum_{n=1}^{\infty}\left[a_n\cos(2\pi n f_0 t) + b_n\sin(2\pi n f_0 t)\right]
+\end{equation}
+where $a_n = (2/T)\int_0^T x(t)\cos(2\pi n f_0 t)\,dt$ and $b_n = (2/T)\int_0^T x(t)\sin(2\pi n f_0 t)\,dt$. The amplitude of the $n$th harmonic is $c_n = \sqrt{a_n^2 + b_n^2}$.
+
+\section{Common Waveforms}
+\textbf{Square wave}: $x(t) = (4A/\pi)[\sin(\omega_0 t) + \sin(3\omega_0 t)/3 + \sin(5\omega_0 t)/5 + \cdots]$. Only odd harmonics, amplitudes $\propto 1/n$. Sharp edges require many harmonics.
+
+\textbf{Triangle wave}: odd harmonics, amplitudes $\propto 1/n^2$. Converges faster because transitions are smooth.
+
+\textbf{Sawtooth}: all harmonics, amplitudes $\propto 1/n$.
+
+\section{Physical Interpretation}
+A measurement system must pass all significant harmonics. A sensor measuring a 100\,Hz square wave must have bandwidth covering at least the 5th harmonic (500\,Hz) to avoid severe distortion. For faithful edge reproduction, the 11th harmonic (1100\,Hz) or higher is needed.
+
+\section{The Gibbs Phenomenon}
+Truncating the series near a discontinuity produces $\sim$9\% overshoot that narrows but never disappears with more terms. In instrumentation, this manifests as ``ringing'' when a filter truncates harmonics.
+
+\section{From Series to Transform}
+The Fourier series applies to periodic signals. The Fourier transform generalizes to non-periodic signals (transients, events) by letting the period approach infinity. The discrete version (DFT/FFT) is the computational tool used in digital systems (Chapter~8).
+
+\begin{tipbox}[Parseval's Theorem]
+Total signal energy is the same in time and frequency domains: $\sum|x[n]|^2 = (1/N)\sum|X[k]|^2$. A filter removing frequency components removes their energy. If noise is concentrated in a narrow band (e.g., 60\,Hz), a notch filter removes that energy without affecting the rest.
+\end{tipbox}
+
+
+\section{Complex Exponential Representation}
+Euler's formula $e^{j\theta} = \cos\theta + j\sin\theta$ allows sine and cosine to be combined into a single complex exponential. The Fourier series in complex form:
+\begin{equation}
+x(t) = \sum_{n=-\infty}^{\infty} c_n \, e^{j2\pi n f_0 t}
+\end{equation}
+where $c_n = (1/T)\int_0^T x(t)e^{-j2\pi n f_0 t}\,dt$. Negative frequencies are mathematical conveniences representing the complex conjugate of positive frequencies. For real signals, $c_{-n} = c_n^*$.
+
+\section{Convergence and the Dirichlet Conditions}
+The Fourier series converges for any signal satisfying the Dirichlet conditions: (1) finitely many discontinuities per period, (2) finitely many maxima and minima per period, (3) absolutely integrable over one period. All physical signals satisfy these conditions.
+
+\section{Practical Implications for Bandwidth Requirements}
+To pass a square wave through a measurement system with less than 10\% distortion (measured by total harmonic distortion, THD), you must pass harmonics through the 7th ($7f_0$). For less than 5\%: through the 11th. For less than 1\%: through the 25th or higher. This directly determines the sensor and filter bandwidth requirements.
+
+A 100\,Hz square wave with 5\% THD limit requires system bandwidth $\geq 1100$\,Hz. If your anti-alias filter cuts off at 500\,Hz, the 7th harmonic (700\,Hz) and above are removed, distorting the signal.
+
+\section{Spectral Analysis of Real Signals}
+Real instrumentation signals are never pure sinusoids. A motor vibration signal typically contains: the fundamental rotation frequency, harmonics from gear tooth meshing, bearing defect frequencies, and broadband noise from turbulence. Fourier analysis separates these into distinct spectral lines, enabling diagnosis. A peak at $f = N_{\text{teeth}} \times f_{\text{shaft}}$ identifies gear mesh; a peak at $0.4 \times f_{\text{shaft}}$ identifies a ball-bearing outer race defect.
+\section{Why Engineers Must Think in Frequency}
+Consider a vibrating beam. In the time domain, you see a complex, seemingly random oscillation. In the frequency domain, you see three sharp peaks: the first, second, and third natural frequencies at 15, 94, and 263\,Hz. Each peak corresponds to a mode shape. The frequency domain reveals the physics; the time domain obscures it.
+
+This principle applies universally in instrumentation: noise has a spectrum (concentrated at 60\,Hz and its harmonics), sensor bandwidth is defined in frequency, filter design is frequency-domain engineering, and control system stability is analyzed in frequency. Fourier analysis is the bridge between the physical time-domain world and the engineering frequency-domain tools.
+
+\section{Even and Odd Function Decomposition}
+Any signal can be decomposed into an even part $x_e(t) = [x(t) + x(-t)]/2$ and an odd part $x_o(t) = [x(t) - x(-t)]/2$. The even part has only cosine terms in the Fourier series ($b_n = 0$); the odd part has only sine terms ($a_n = 0$). This simplifies computation: if you know a signal is symmetric about $t = 0$ (even), you only need to compute cosine coefficients. If anti-symmetric (odd), only sine coefficients.
+
+\section{Power and Energy in the Frequency Domain}
+The average power of a periodic signal can be computed from its Fourier coefficients (Parseval's theorem):
+\begin{equation}
+P = \frac{a_0^2}{4} + \frac{1}{2}\sum_{n=1}^{\infty}(a_n^2 + b_n^2) = c_0^2 + \frac{1}{2}\sum_{n=1}^{\infty}c_n^2
+\end{equation}
+This means the total power is the sum of the power in each harmonic. A useful metric: the fraction of total power contained in the first $N$ harmonics indicates how many harmonics are ``significant.'' For a square wave, 90\% of the power is in the first 3 harmonics ($f_0$, $3f_0$, $5f_0$). For a triangle wave, 98\% is in the first 3. This quantifies the bandwidth needed to capture the signal.
+
+\section{Total Harmonic Distortion (THD)}
+THD quantifies how much a system distorts a pure sine wave:
+\begin{equation}
+\text{THD} = \frac{\sqrt{c_2^2 + c_3^2 + c_4^2 + \cdots}}{c_1} \times 100\%
+\end{equation}
+where $c_1$ is the fundamental amplitude and $c_n$ are the harmonic amplitudes. A DAQ with 0.01\% THD introduces negligible distortion. A sensor or amplifier with 1\% THD generates significant harmonics that may be confused with real signal content. In vibration analysis, THD of the excitation source must be verified before using it for frequency response measurement.
+
+\section{Modulation and Demodulation}
+\textbf{Amplitude modulation (AM)}: a low-frequency signal (e.g., strain gauge bridge output at 10\,Hz) modulates the amplitude of a high-frequency carrier (e.g., 5\,kHz excitation). The spectrum of the AM signal contains the carrier at 5\,kHz and sidebands at 4990\,Hz and 5010\,Hz. Demodulation recovers the original 10\,Hz signal. Advantage: the signal is shifted to a frequency range where 1/f noise and DC drift are negligible.
+
+\textbf{Frequency modulation (FM)}: the signal modulates the frequency of an oscillator. Used in voltage-to-frequency (VFC) converters for noise-immune data transmission over long cables. A 0--10\,V signal modulates a 10--100\,kHz oscillator. The receiver counts the frequency to recover the voltage.
+
+\section{Discrete Fourier Series and the Transition to DFT}
+When a computer processes sampled data, the continuous integrals of the Fourier series become discrete sums. For a periodic signal sampled at $N$ equally spaced points:
+\begin{equation}
+c_k = \frac{1}{N}\sum_{n=0}^{N-1} x[n]\,e^{-j2\pi kn/N}
+\end{equation}
+This is the Discrete Fourier Transform (DFT), covered in full in Chapter~8. The key insight: $N$ samples produce $N$ frequency coefficients, but only $N/2$ are unique (the other half are complex conjugates). The frequency spacing is $\Delta f = f_s/N$, and the maximum frequency is $f_s/2$.
+
+\section{Windowing Preview}
+The DFT assumes the $N$-point data block is one period of a periodic signal. If the signal is not exactly periodic in $N$ samples (which it almost never is in practice), the assumption is violated, and spectral leakage occurs. Chapter~8 discusses windowing functions that mitigate this problem. The Fourier series context here helps explain why: the discontinuity at the block boundary is a sharp transient, which the Fourier series represents as a superposition of many harmonics. The window eliminates the discontinuity.
+\section{Fourier Transform of Common Signals}
+While the Fourier series handles periodic signals, many instrumentation signals are non-periodic. The Fourier transform extends the analysis:
+
+\textbf{Impulse (Dirac delta)}: $\mathcal{F}\{\delta(t)\} = 1$ (flat spectrum, all frequencies equally present). An ideal impulse contains infinite bandwidth, which is why impact testing excites all resonances simultaneously.
+
+\textbf{Rectangular pulse}: $\mathcal{F}\{\text{rect}(t/T)\} = T \cdot \text{sinc}(fT)$. The spectrum is a sinc function with first null at $f = 1/T$. A narrower pulse has a wider spectrum (more bandwidth).
+
+\textbf{Exponential decay}: $\mathcal{F}\{e^{-t/\tau}u(t)\} = \tau/(1+j2\pi f\tau)$. This is the impulse response of a first-order system, confirming that the frequency response is $1/\sqrt{1+(\omega\tau)^2}$.
+
+\textbf{Gaussian pulse}: $\mathcal{F}\{e^{-t^2/(2\sigma^2)}\} = \sigma\sqrt{2\pi} \cdot e^{-2(\pi f\sigma)^2}$. A Gaussian in time has a Gaussian spectrum. The ``uncertainty principle'': the product of the time-domain width and frequency-domain width is constant. Narrower in time = wider in frequency. This is a fundamental constraint on simultaneous time and frequency resolution.
+
+\section{The Short-Time Fourier Transform (STFT) and Spectrograms}
+The standard FFT computes the frequency content over the entire signal duration. For signals whose frequency content changes with time (motor speed ramp-up, earthquake, speech), the \textbf{Short-Time Fourier Transform} divides the signal into overlapping segments, computes the FFT of each, and displays the result as a time-frequency map called a \textbf{spectrogram} (or waterfall plot).
+
+In LabVIEW, the ``STFT Spectrogram'' VI computes this. Parameters: segment length (determines frequency resolution), overlap (typically 75\%), and window function (Hanning). The spectrogram is invaluable for analyzing run-up/coast-down vibration tests, transient thermal events, and any measurement where the frequency content evolves over time.
+\section{Bandwidth and Harmonic Content: A Design Tool}
+The Fourier series provides a quantitative tool for determining the bandwidth needed to faithfully reproduce a given waveform. The key metric: how many harmonics must be preserved to keep the waveform distortion below a specified threshold?
+
+Define the harmonic energy fraction: $E_N / E_{\text{total}} = \sum_{n=1}^{N} c_n^2 / \sum_{n=1}^{\infty} c_n^2$.
+
+For a square wave: $E_1/E_{\text{total}} = 81\%$ (fundamental alone). $E_3/E_{\text{total}} = 90\%$ (through 3rd harmonic). $E_5/E_{\text{total}} = 93.4\%$. $E_{11}/E_{\text{total}} = 97\%$. So passing harmonics through the 11th captures 97\% of the energy. For a 100\,Hz square wave: the measurement system needs bandwidth of at least $11 \times 100 = 1100$\,Hz.
+
+For a triangle wave: $E_1 = 97\%$, $E_3 = 98.8\%$. The triangle wave is nearly sinusoidal; bandwidth of $3f_0$ captures 99\% of the energy. This is why triangle waves pass through narrow-bandwidth systems with minimal distortion, while square waves are heavily distorted.
+
+For a half-sine pulse (rectified sine): contains even harmonics. $E_2/E_{\text{total}} = 95\%$. Bandwidth of $2f_0$ is nearly sufficient.
+
+\section{Fourier Series in Sensor Design}
+Sensor designers use Fourier analysis to specify bandwidth requirements. Example: a load cell measuring the force from a stamping press. The force waveform is approximately trapezoidal: a fast rise (impact), a flat peak (hold), and a fast fall (release). The trapezoidal waveform has harmonics decaying as $1/(n^2)$ times a sinc envelope. The bandwidth needed depends on the rise time $t_r$: $BW \geq 0.35/t_r$. For $t_r = 1$\,ms: $BW \geq 350$\,Hz. For $t_r = 0.1$\,ms (high-speed press): $BW \geq 3.5$\,kHz.
+
+\section{Spectral Analysis in Troubleshooting}
+When a measurement produces unexpected results, computing the Fourier series (or FFT) of the output often reveals the cause:
+
+\textbf{Symptom}: temperature reading fluctuates $\pm$0.5\,\degC{} when the heater is off. \textbf{FFT}: sharp peak at 60\,Hz. \textbf{Diagnosis}: mains coupling. \textbf{Fix}: shielding + differential input.
+
+\textbf{Symptom}: strain gauge reading drifts slowly over 30 minutes. \textbf{FFT}: 1/f-shaped spectrum (power increasing at low frequencies). \textbf{Diagnosis}: thermal drift in the bridge or amplifier. \textbf{Fix}: temperature-compensated half-bridge, or zero-drift amplifier.
+
+\textbf{Symptom}: accelerometer output has a persistent component at exactly 2$\times$ shaft speed. \textbf{FFT}: peak at $2f_{\text{shaft}}$. \textbf{Diagnosis}: misalignment (classic signature). \textbf{Fix}: realign the coupling.
+
+\textbf{Symptom}: pressure sensor output has a ``haystack'' (broad hump) centered at 200\,Hz. \textbf{FFT}: broad peak from 150--250\,Hz. \textbf{Diagnosis}: turbulent flow noise. \textbf{Fix}: cannot eliminate (physical phenomenon); increase signal averaging to reduce its effect on mean pressure measurement.
+\section{Fourier Series Symmetry Properties}
+Understanding symmetry simplifies Fourier analysis and provides physical insight:
+
+\textbf{Even functions} ($x(t) = x(-t)$, symmetric about $t = 0$): contain only cosine terms ($b_n = 0$). Examples: cosine waves, rectified sine waves, any waveform that is a mirror image about $t = 0$.
+
+\textbf{Odd functions} ($x(-t) = -x(t)$, anti-symmetric): contain only sine terms ($a_n = 0$, $a_0 = 0$). Examples: sine waves, square waves centered at zero, sawtooth waves.
+
+\textbf{Half-wave symmetry} ($x(t + T/2) = -x(t)$): contains only odd harmonics ($a_n = b_n = 0$ for even $n$). The square wave, triangle wave, and any waveform where the second half-period is the negative of the first have this property.
+
+These symmetry properties explain why the square wave contains only odd harmonics (it has half-wave symmetry), while the sawtooth contains all harmonics (it does not have half-wave symmetry).
+
+\section{Convergence Rate and Bandwidth Implications}
+The rate at which Fourier coefficients decrease with harmonic number $n$ is directly related to the smoothness of the waveform:
+
+\textbf{Discontinuous waveform} (square wave): $c_n \propto 1/n$. Coefficients decay slowly. Many harmonics needed for faithful reproduction. Bandwidth requirement: $\sim 11f_0$ for 97\% energy capture.
+
+\textbf{Continuous but with discontinuous derivative} (triangle wave): $c_n \propto 1/n^2$. Faster decay. Bandwidth: $\sim 3f_0$ for 99\% energy.
+
+\textbf{Smooth waveform with continuous first derivative}: $c_n \propto 1/n^3$ or faster. Very few harmonics needed.
+
+\textbf{Sinusoid}: $c_1 = A/2$, all other $c_n = 0$. Zero bandwidth beyond $f_0$.
+
+The general rule: each additional order of continuity (smoothness) in the waveform adds a factor of $1/n$ to the coefficient decay rate. This is why digital signals (sharp edges, discontinuities) require much wider bandwidth than analog signals (smooth, continuous).
+
+\section{Fourier Analysis of Real Sensor Signals}
+\subsection{Vibration Signature Analysis}
+A rotating machine produces a vibration signal that is periodic at the rotation frequency $f_r$ but not sinusoidal. The Fourier series reveals the harmonic structure:
+
+$1 \times f_r$ (fundamental): unbalance. Amplitude indicates the severity of mass imbalance.
+
+$2 \times f_r$: misalignment (angular or parallel). Often the dominant component in poorly aligned machinery.
+
+$3 \times f_r$: looseness or rubbing. Indicates mechanical clearance problems.
+
+$N_{\text{teeth}} \times f_r$: gear mesh frequency. Sidebands spaced at $f_r$ around the mesh peak indicate gear wear.
+
+$N_{\text{blades}} \times f_r$: blade pass frequency in fans, pumps, and turbines.
+
+The Fourier series connects the physical defect to its spectral signature, enabling condition-based maintenance.
+
+\subsection{Electrical Power Quality}
+The AC mains voltage is nominally a 60\,Hz (or 50\,Hz) sinusoid. Nonlinear loads (computers, LED drivers, variable-frequency drives) draw current in pulses, distorting the voltage waveform. The Fourier series quantifies this distortion:
+
+Total Harmonic Distortion: $\text{THD} = \sqrt{c_2^2 + c_3^2 + \cdots}/c_1$. IEEE~519 limits THD to $< 5\%$ at the point of common coupling. A THD of 10\% indicates significant distortion that can cause overheating in transformers and interference in sensitive instrumentation.
+
+The 3rd harmonic (180\,Hz) is typically the largest for single-phase nonlinear loads. In three-phase systems, the 3rd harmonic currents from each phase add constructively in the neutral conductor, potentially overloading it. The 5th (300\,Hz) and 7th (420\,Hz) harmonics are dominant for three-phase variable-frequency drives.
+
+\section{Window Functions: Mathematical Basis}
+The DFT assumes periodicity: the $N$-point data block is treated as one period of an infinitely repeating signal. If the actual signal is not periodic within the window, the implicit discontinuity at the block boundaries creates spectral leakage.
+
+A window function $w[n]$ tapers the data to zero at both ends, eliminating the discontinuity. The price: the main lobe of each spectral line widens (reducing frequency resolution). The tradeoff between main lobe width and sidelobe level is characterized by:
+
+\textbf{Main lobe width} (in bins): determines the minimum separation between two frequencies that can be resolved. Rectangular: 2 bins. Hanning: 4 bins. Flat-top: 8 bins. Blackman-Harris: 8 bins.
+
+\textbf{Highest sidelobe level}: determines the dynamic range (ability to detect a small signal near a large one). Rectangular: $-13$\,dB. Hanning: $-31$\,dB. Flat-top: $-44$\,dB. Blackman-Harris: $-92$\,dB.
+
+\textbf{Amplitude accuracy}: the error in measuring the amplitude of a spectral line that falls between bins. Rectangular: $-3.9$\,dB worst case. Hanning: $-1.4$\,dB. Flat-top: $-0.01$\,dB.
+\section{Practical Frequency Analysis Workflow}
+A systematic approach to analyzing the frequency content of measured signals:
+
+\textbf{Step 1: Inspect the time-domain waveform.} Look for periodicity, transients, trends, and obvious anomalies. Estimate the dominant frequency visually (count cycles per unit time). Check for clipping (flat-topped peaks indicating ADC saturation).
+
+\textbf{Step 2: Remove the mean.} Subtract the DC component before computing the spectrum. A large DC component produces a tall spike at bin 0 that can mask nearby low-frequency content. In LabVIEW: subtract the mean of the array before wiring to the FFT function.
+
+\textbf{Step 3: Apply a window.} Select based on the application: Hanning for general analysis, Flat-top for amplitude measurement, Blackman-Harris for detecting small signals near large ones.
+
+\textbf{Step 4: Compute the FFT and display.} Plot the magnitude spectrum in dB (not linear): $\text{dB} = 20\log_{10}(|X[k]|)$. The dB scale reveals both large and small components simultaneously. A linear scale shows only the dominant peaks.
+
+\textbf{Step 5: Identify components.} Discrete peaks: identify the source (rotation speed, mains frequency, switching noise). Harmonics: verify they are integer multiples of a fundamental. Broadband noise: measure the PSD level in the flat regions.
+
+\textbf{Step 6: Validate.} Change the acquisition parameters (different $f_s$, different $N$) and verify that the identified components do not shift frequency (which would indicate aliasing). If a peak at 200\,Hz moves to 300\,Hz when you change $f_s$: it is an alias, not a real signal.
+
+\section{The Uncertainty Principle for Signals}
+The product of time resolution and frequency resolution has a fundamental lower bound:
+\begin{equation}
+\Delta t \cdot \Delta f \geq \frac{1}{4\pi} \approx 0.08
+\end{equation}
+In practice, the achievable product is $\Delta t \cdot \Delta f \approx 1$ for most window functions. This means: to resolve 1\,Hz frequency difference ($\Delta f = 1$\,Hz), you need at least 1 second of data ($\Delta t \geq 1$\,s). To resolve events lasting 1\,ms ($\Delta t = 0.001$\,s), the best achievable frequency resolution is $\Delta f \geq 1000$\,Hz.
+
+This tradeoff is not a limitation of the FFT algorithm; it is a fundamental property of signals. No analysis technique, no matter how sophisticated, can simultaneously achieve arbitrary time and frequency resolution.
+
+\begin{advancedbox}{Hilbert Transform and Envelope Analysis}
+The following section covers material beyond the core MEGN~300 curriculum. It is included for students whose projects require envelope or instantaneous frequency analysis. Skip this section on first reading.
+\end{advancedbox}
+\section{Hilbert Transform and Envelope Analysis}
+The \textbf{Hilbert transform} produces the analytic signal $z(t) = x(t) + j\hat{x}(t)$, where $\hat{x}(t)$ is the Hilbert transform of $x(t)$. The magnitude $|z(t)|$ is the \textbf{envelope} (instantaneous amplitude) and $\angle z(t)$ is the instantaneous phase. The time derivative of the instantaneous phase gives the instantaneous frequency.
+
+In vibration analysis, envelope analysis detects amplitude-modulated signals produced by bearing defects. The bearing defect produces a periodic impulse train (at the defect frequency) that amplitude-modulates the bearing's natural frequency (typically 2--5\,kHz). The envelope of the high-pass-filtered signal reveals the defect frequency, which is invisible in the raw spectrum (because it appears as sidebands, not a direct peak).
+\section{Practice Questions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A 100\,Hz square wave passes through a first-order low-pass filter with a 500\,Hz cutoff. What happens to the fundamental and the first four odd harmonics (100, 300, 500, 700, 900\,Hz)? Describe the distortion qualitatively.
+\item A signal has a fundamental at 50\,Hz and significant harmonic content at 150\,Hz and 250\,Hz. What is the minimum sampling rate to capture all three components without aliasing?
+\item Write the first three nonzero terms of the Fourier series for a triangle wave with amplitude 2\,V and frequency 1\,kHz.
+\end{enumerate}
+
+\subsection{Answers}
+\begin{enumerate}[leftmargin=1.5em]
+\item At 100\,Hz: $M = 1/\sqrt{1+(100/500)^2} = 0.981$ (nearly passed). At 300\,Hz: $M = 0.857$. At 500\,Hz: $M = 0.707$ ($-3$\,dB point). At 700\,Hz: $M = 0.581$. At 900\,Hz: $M = 0.486$. The higher harmonics that define the sharp edges of the square wave are progressively attenuated; the output will look like a rounded square wave with slower rise/fall times.
+\item Nyquist: $f_s > 2 \times f_{\max} = 2 \times 250 = 500$\,Hz minimum. In practice, use $f_s \geq 2.5 \times 250 = 625$\,Hz or higher.
+\item Triangle wave: $x(t) = \frac{8A}{\pi^2}\left[\sin(2\pi f_0 t) - \frac{1}{9}\sin(6\pi f_0 t) + \frac{1}{25}\sin(10\pi f_0 t) - \cdots\right]$. With $A = 2$\,V, $f_0 = 1000$\,Hz: $x(t) = \frac{16}{\pi^2}\left[\sin(2000\pi t) - \frac{1}{9}\sin(6000\pi t) + \frac{1}{25}\sin(10000\pi t)\right] \approx 1.621\sin(2000\pi t) - 0.180\sin(6000\pi t) + 0.065\sin(10000\pi t)$.
+\end{enumerate}
+
+
+% ================================================================
