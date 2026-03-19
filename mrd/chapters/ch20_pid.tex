@@ -369,7 +369,11 @@ Control latency is the total time delay between a change in the process variable
 
 \textbf{Actuator delay}: the time for the actuator to respond physically. An SSR turns on within 1\,ms (zero-cross type: up to 8.3\,ms in a 60\,Hz system). A motor takes 10--100\,ms to change speed (electrical time constant $L/R$ plus mechanical time constant $J/B$).
 
-The total control latency is the sum: $\tau_{\text{total}} = \tau_s + T_{\text{acq}} + T_{\text{comp}} + T_{\text{out}} + \tau_{\text{act}}$.
+The total control latency is the sum: 
+\[
+\tau_{\text{total}} = \tau_s + T_{\text{acq}} + T_{\text{comp}} + T_{\text{out}} + \tau_{\text{act}}
+\]
+.
 
 \subsection{Phase Lag from Latency}
 Every second of delay adds phase lag to the feedback loop. At frequency $f$:

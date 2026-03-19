@@ -355,7 +355,15 @@ Some measurement systems exhibit \textbf{anti-resonance}: a frequency at which t
 \begin{enumerate}[leftmargin=1.5em]
 \item Within 1\% means $e^{-t/\tau} < 0.01$, so $t > -\tau \ln(0.01) = 3.0 \times 4.605 = 13.8$\,s (i.e., $4.6\tau$; often rounded to $5\tau = 15$\,s).
 \item $\omega = 2\pi \times 500 = 3142$\,rad/s. $\omega\tau = 3142 \times 0.0005 = 1.571$. $M = 1/\sqrt{1 + 1.571^2} = 1/\sqrt{3.468} = 0.537$. Amplitude = 53.7\% of true (attenuated by 46.3\%). Phase $= -\arctan(1.571) = -57.5$\ang{}.
-\item $\zeta = -\ln(0.15)/\sqrt{\pi^2 + [\ln(0.15)]^2} = 1.897/\sqrt{9.870 + 3.599} = 1.897/3.669 = 0.517$. $\omega_n = \pi/(0.002 \times \sqrt{1 - 0.267}) = \pi/(0.002 \times 0.856) = 1835$\,rad/s = 292\,Hz.
+\item 
+\[
+\zeta = -\ln(0.15)/\sqrt{\pi^2 + [\ln(0.15)]^2} = 1.897/\sqrt{9.870 + 3.599} = 1.897/3.669 = 0.517
+\]
+. 
+\[
+\omega_n = \pi/(0.002 \times \sqrt{1 - 0.267}) = \pi/(0.002 \times 0.856) = 1835
+\]
+\,rad/s = 292\,Hz.
 \item For $\zeta = 0.65$, the flat region extends to $\approx 0.2\omega_n$ for $<$5\% error. So $0.2\omega_n \geq 2\pi \times 200$, giving $\omega_n \geq 6283$\,rad/s $= 1000$\,Hz. The accelerometer's natural frequency must be at least 1000\,Hz.
 \item Thermal paste fills the microscopic air gaps between the thermocouple bead and the surface. Air has very low thermal conductivity ($\sim$0.025\,W/m$\cdot$K), so air gaps create a large thermal resistance that increases the effective time constant. The paste ($\sim$1--5\,W/m$\cdot$K) dramatically reduces this contact resistance, lowering $\tau$ and improving dynamic response, even though the paste itself is not a great conductor compared to metal.
 \end{enumerate}

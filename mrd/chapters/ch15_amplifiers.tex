@@ -133,7 +133,11 @@ A complete signal conditioning chain for a resistive sensor:
 \end{enumerate}
 
 \begin{examplebox}[ThermoRig: Complete Signal Chain for Strain Measurement]
-A 350\,$\Omega$ strain gauge in a quarter-bridge (\textbf{ThermoRig Variant: Strain Measurement}; this example demonstrates the signal chain design process for a resistive sensor, complementing the thermocouple-based ThermoRig) with $V_{ex} = 5$\,V. At 1000\,$\mu\epsilon$: $\Delta V = V_{ex} \times GF \times \epsilon / 4 = 5 \times 2.1 \times 0.001 / 4 = 2.625$\,mV. Signal chain: INA128 at $G = 500$ ($V_{out} = 1.31$\,V), followed by a 2nd-order Butterworth LP at 500\,Hz, feeding a 16-bit ADC ($\pm$5\,V range). ADC resolution at sensor: $10/(65536 \times 500) = 0.305\,\mu$V $= 0.116\,\mu\epsilon$. Noise: INA128 noise ($8\,\text{nV}/\sqrt{\text{Hz}} \times \sqrt{500} = 179$\,nV input-referred) $\to$ referred to strain: $179\,\text{nV} / (5 \times 2.1 / 4) = 0.068\,\mu\epsilon$. Total: well within a $\pm$5\,$\mu\epsilon$ requirement.
+A 350\,$\Omega$ strain gauge in a quarter-bridge (\textbf{ThermoRig Variant: Strain Measurement}; this example demonstrates the signal chain design process for a resistive sensor, complementing the thermocouple-based ThermoRig) with $V_{ex} = 5$\,V. At 1000\,$\mu\epsilon$: 
+\[
+\Delta V = V_{ex} \times GF \times \epsilon / 4 = 5 \times 2.1 \times 0.001 / 4 = 2.625
+\]
+\,mV. Signal chain: INA128 at $G = 500$ ($V_{out} = 1.31$\,V), followed by a 2nd-order Butterworth LP at 500\,Hz, feeding a 16-bit ADC ($\pm$5\,V range). ADC resolution at sensor: $10/(65536 \times 500) = 0.305\,\mu$V $= 0.116\,\mu\epsilon$. Noise: INA128 noise ($8\,\text{nV}/\sqrt{\text{Hz}} \times \sqrt{500} = 179$\,nV input-referred) $\to$ referred to strain: $179\,\text{nV} / (5 \times 2.1 / 4) = 0.068\,\mu\epsilon$. Total: well within a $\pm$5\,$\mu\epsilon$ requirement.
 \end{examplebox}
 
 
@@ -207,7 +211,11 @@ A systematic approach to designing the complete signal conditioning chain:
 
 \textbf{Step 1: Define the input and output.} Input: sensor output range (e.g., $-10$ to $+40$\,mV for a thermocouple at 0--200\,\degC{}). Output: ADC input range (e.g., 0--5\,V).
 
-\textbf{Step 2: Calculate required gain.} $G = V_{\text{ADC,range}} / V_{\text{sensor,range}} = 5000\,\text{mV}/50\,\text{mV} = 100$.
+\textbf{Step 2: Calculate required gain.} 
+\[
+G = V_{\text{ADC,range}} / V_{\text{sensor,range}} = 5000\,\text{mV}/50\,\text{mV} = 100
+\]
+.
 
 \textbf{Step 3: Add offset to shift the signal.} The sensor output includes negative values ($-10$\,mV at 0\,\degC{}). After $100\times$ gain: $-1$\,V (cannot be measured by a 0--5\,V ADC). Add an offset of $+1$\,V after amplification, or bias the INA's REF pin to $+1$\,V.
 
@@ -350,7 +358,11 @@ The maximum rate at which the output voltage can change. For a TL072: 13\,V/$\mu
 \subsection{Answers}
 \begin{enumerate}[leftmargin=1.5em]
 \item $G = 1 + R_f/R_g = 50$, so $R_f/R_g = 49$. Choose $R_g = 1.00$\,k$\Omega$, $R_f = 49.9$\,k$\Omega$ (both standard 1\% values). Actual gain $= 1 + 49.9/1.00 = 50.9$. For tighter accuracy, use $R_g = 2.00$\,k$\Omega$ and $R_f = 97.6$\,k$\Omega$ ($G = 49.8$), or use a precision resistor network.
-\item Required CMRR $= 20\log_{10}(V_{CM} / V_{\text{max breakthrough}}) = 20\log_{10}(2/0.010) = 20\log_{10}(200) = 46$\,dB minimum. In practice, use $\geq$ 80\,dB to provide comfortable margin.
+\item Required CMRR 
+\[
+= 20\log_{10}(V_{CM} / V_{\text{max breakthrough}}) = 20\log_{10}(2/0.010) = 20\log_{10}(200) = 46
+\]
+\,dB minimum. In practice, use $\geq$ 80\,dB to provide comfortable margin.
 \item (1) An INA has very high and balanced input impedance on both inputs ($>$10\,G$\Omega$), while a single-op-amp differential amplifier's input impedance depends on the resistor values and is often unequal. This matters for thermocouples, which are high-impedance sources sensitive to loading. (2) An INA's gain is set by a single resistor ($R_G$), providing precise and easily adjustable gain, while a differential amplifier requires four matched resistors where any mismatch degrades CMRR.
 \end{enumerate}
 

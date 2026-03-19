@@ -158,7 +158,11 @@ Radiation is heat transfer by electromagnetic waves. It requires no medium and i
 where $\epsilon$ is the emissivity (0--1; $\epsilon = 1$ for a perfect blackbody, $\epsilon \approx 0.9$ for painted surfaces, $\epsilon \approx 0.05$ for polished metal), $\sigma = 5.67 \times 10^{-8}$\,W/m$^2\cdot$K$^4$ is the Stefan-Boltzmann constant, and temperatures are in Kelvin.
 
 \subsection{When Radiation Matters}
-At low temperatures ($<$100\,\degC{}), radiation is typically small compared to convection. At 80\,\degC{} ($= 353$\,K) with surroundings at 20\,\degC{} ($= 293$\,K), $\epsilon = 0.9$, $A = 0.0025$\,m$^2$: $\dot{Q}_{\text{rad}} = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (353^4 - 293^4) = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (1.55 \times 10^{10} - 7.37 \times 10^{9}) = 1.0$\,W. Compared to convective loss of $\dot{Q}_{\text{conv}} = 10 \times 0.0025 \times 60 = 1.5$\,W, radiation contributes about 40\% of the total heat loss. At higher temperatures or in vacuum, radiation dominates.
+At low temperatures ($<$100\,\degC{}), radiation is typically small compared to convection. At 80\,\degC{} ($= 353$\,K) with surroundings at 20\,\degC{} ($= 293$\,K), $\epsilon = 0.9$, $A = 0.0025$\,m$^2$: 
+\[
+\dot{Q}_{\text{rad}} = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (353^4 - 293^4) = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (1.55 \times 10^{10} - 7.37 \times 10^{9}) = 1.0
+\]
+\,W. Compared to convective loss of $\dot{Q}_{\text{conv}} = 10 \times 0.0025 \times 60 = 1.5$\,W, radiation contributes about 40\% of the total heat loss. At higher temperatures or in vacuum, radiation dominates.
 
 \section{Energy Balance}
 The energy balance is the most powerful tool in heat transfer analysis. For any system:
@@ -191,7 +195,11 @@ T(t) = T_\infty + (T_i - T_\infty)e^{-t/\tau}, \qquad \tau = \frac{mC_p}{hA_s} =
 This is a first-order response with time constant $\tau$. This equation directly connects heat transfer to the dynamic measurement theory of Chapter~3: the sensor's thermal time constant is $\tau = mC_p/(hA_s)$.
 
 \begin{examplebox}[ThermoRig: Thermocouple Time Constant from Heat Transfer]
-A Type~K thermocouple bead (diameter $d = 1$\,mm, $\rho = 8600$\,kg/m$^3$, $C_p = 500$\,J/kg$\cdot$K) in stirred water ($h = 500$\,W/m$^2\cdot$K). Volume $V = \pi d^3/6 = 5.24 \times 10^{-10}$\,m$^3$. Surface area $A_s = \pi d^2 = 3.14 \times 10^{-6}$\,m$^2$. Mass $m = \rho V = 4.5 \times 10^{-6}$\,kg. Time constant: $\tau = 4.5 \times 10^{-6} \times 500 / (500 \times 3.14 \times 10^{-6}) = 1.43$\,s. In still air ($h = 10$): $\tau = 71.7$\,s. This explains why thermocouples respond much faster in liquids than in air: the convective resistance dominates and is 50$\times$ lower in stirred water.
+A Type~K thermocouple bead (diameter $d = 1$\,mm, $\rho = 8600$\,kg/m$^3$, $C_p = 500$\,J/kg$\cdot$K) in stirred water ($h = 500$\,W/m$^2\cdot$K). Volume $V = \pi d^3/6 = 5.24 \times 10^{-10}$\,m$^3$. Surface area $A_s = \pi d^2 = 3.14 \times 10^{-6}$\,m$^2$. Mass $m = \rho V = 4.5 \times 10^{-6}$\,kg. Time constant: 
+\[
+\tau = 4.5 \times 10^{-6} \times 500 / (500 \times 3.14 \times 10^{-6}) = 1.43
+\]
+\,s. In still air ($h = 10$): $\tau = 71.7$\,s. This explains why thermocouples respond much faster in liquids than in air: the convective resistance dominates and is 50$\times$ lower in stirred water.
 \end{examplebox}
 
 \section{Heat Transfer and Sensor Placement}
@@ -206,7 +214,11 @@ Where you place the sensor determines what you measure. Temperature is not unifo
 \section{Thermal Design for Control Systems}
 When designing the ThermoRig PID control system, heat transfer analysis answers critical design questions:
 
-\textbf{Heater power sizing}: at the maximum setpoint ($T_{\text{max}} = 200$\,\degC{}) with worst-case ambient ($T_{\text{amb}} = 15$\,\degC{}), the total heat loss is $\dot{Q}_{\text{loss}} = (h_{\text{conv}} + h_{\text{rad}}) \times A \times (200 - 15)$. Size the heater for at least $1.5 \times \dot{Q}_{\text{loss, max}}$ to ensure the controller has authority to reach the setpoint with margin.
+\textbf{Heater power sizing}: at the maximum setpoint ($T_{\text{max}} = 200$\,\degC{}) with worst-case ambient ($T_{\text{amb}} = 15$\,\degC{}), the total heat loss is 
+\[
+\dot{Q}_{\text{loss}} = (h_{\text{conv}} + h_{\text{rad}}) \times A \times (200 - 15)
+\]
+. Size the heater for at least $1.5 \times \dot{Q}_{\text{loss, max}}$ to ensure the controller has authority to reach the setpoint with margin.
 
 \textbf{Insulation design}: adding insulation reduces $\dot{Q}_{\text{loss}}$, reducing the required heater power and making control easier (smaller disturbance sensitivity). However, insulation also increases the thermal time constant $\tau = mC_p/(h_{\text{eff}}A)$, making the system slower to respond.
 
@@ -274,7 +286,11 @@ For a 100\,mm plate at $\Delta T = 50$\,\degC{}: $h \approx 1.42 \times (50/0.1)
 \begin{equation}
 h \approx 0.037 \frac{k_{\text{air}}}{L} \text{Re}^{0.8} \text{Pr}^{0.33}
 \end{equation}
-For air at 2\,m/s over a 100\,mm plate: $\text{Re} = 1.2 \times 2 \times 0.1 / (1.8 \times 10^{-5}) = 13{,}333$ (laminar). Use the laminar correlation instead: $h \approx 0.664 \times (0.026/0.1) \times 13333^{0.5} \times 0.71^{0.33} = 0.172 \times 115.5 \times 0.89 = 17.7$\,W/m$^2\cdot$K.
+For air at 2\,m/s over a 100\,mm plate: $\text{Re} = 1.2 \times 2 \times 0.1 / (1.8 \times 10^{-5}) = 13{,}333$ (laminar). Use the laminar correlation instead: 
+\[
+h \approx 0.664 \times (0.026/0.1) \times 13333^{0.5} \times 0.71^{0.33} = 0.172 \times 115.5 \times 0.89 = 17.7
+\]
+\,W/m$^2\cdot$K.
 
 \section{Transient Heating and Cooling Curves}
 The lumped capacitance model produces exponential heating/cooling curves that directly determine measurement system behavior:
@@ -307,8 +323,16 @@ The multi-node model reveals internal temperature gradients. The heater surface 
 \subsection{Answers}
 \begin{enumerate}[leftmargin=1.5em]
 \item $\dot{Q} = 50 \times 0.01 \times (120-80)/0.005 = 4000$\,W. The thin steel plate conducts very effectively.
-\item Energy balance: $100 = 10 \times 0.005 \times (T_{ss} - 22) + \epsilon\sigma \times 0.005 \times (T_{ss}^4 - 295^4)$. Neglecting radiation as first approximation: $100 = 0.05(T_{ss} - 22)$, $T_{ss} = 2022$\,\degC{}. This is clearly too high, the steady state would be limited by the heater surface area and the onset of higher convection at elevated temperatures. In practice, the specimen reaches the heater's surface temperature limit ($\sim$200\,\degC{} for ceramic heaters) and the energy balance includes radiation and increased natural convection ($h$ increases with $\Delta T$). A more realistic $h = 15$\,W/m$^2\cdot$K with radiation ($h_{\text{rad}} \approx 5$ at moderate temperatures): $100 = (15+5) \times 0.005 \times (T_{ss} - 22)$, $T_{ss} = 1022$\,\degC{}. The problem illustrates that 100\,W is far more power than needed for a small specimen in air.
-\item $L_c = V/A_s = (5.24 \times 10^{-10})/(3.14 \times 10^{-6}) = 1.67 \times 10^{-4}$\,m. In water ($h = 500$): $\text{Bi} = 500 \times 1.67 \times 10^{-4}/22 = 0.0038 \ll 0.1$. Lumped capacitance is valid ($k_{\text{chromel}} \approx 22$\,W/m$\cdot$K).
+\item Energy balance: 
+\[
+100 = 10 \times 0.005 \times (T_{ss} - 22) + \epsilon\sigma \times 0.005 \times (T_{ss}^4 - 295^4)
+\]
+. Neglecting radiation as first approximation: $100 = 0.05(T_{ss} - 22)$, $T_{ss} = 2022$\,\degC{}. This is clearly too high, the steady state would be limited by the heater surface area and the onset of higher convection at elevated temperatures. In practice, the specimen reaches the heater's surface temperature limit ($\sim$200\,\degC{} for ceramic heaters) and the energy balance includes radiation and increased natural convection ($h$ increases with $\Delta T$). A more realistic $h = 15$\,W/m$^2\cdot$K with radiation ($h_{\text{rad}} \approx 5$ at moderate temperatures): $100 = (15+5) \times 0.005 \times (T_{ss} - 22)$, $T_{ss} = 1022$\,\degC{}. The problem illustrates that 100\,W is far more power than needed for a small specimen in air.
+\item 
+\[
+L_c = V/A_s = (5.24 \times 10^{-10})/(3.14 \times 10^{-6}) = 1.67 \times 10^{-4}
+\]
+\,m. In water ($h = 500$): $\text{Bi} = 500 \times 1.67 \times 10^{-4}/22 = 0.0038 \ll 0.1$. Lumped capacitance is valid ($k_{\text{chromel}} \approx 22$\,W/m$\cdot$K).
 \item $V = (0.02)^3 = 8 \times 10^{-6}$\,m$^3$. $A_s = 6 \times (0.02)^2 = 2.4 \times 10^{-3}$\,m$^2$. $m = 8960 \times 8 \times 10^{-6} = 0.0717$\,kg. $\tau = 0.0717 \times 385/(100 \times 2.4 \times 10^{-3}) = 115$\,s. Time to 1\,\degC{} of ambient: $T(t) = 25 + 75e^{-t/115} = 26$\,\degC{} when $75e^{-t/115} = 1$, $t = 115\ln(75) = 115 \times 4.32 = 497$\,s $\approx 8.3$\,min.
 \item The time constant $\tau = mC_p/(hA_s)$ is inversely proportional to $h$. Only $h$ changes: from $\sim$10\,W/m$^2\cdot$K in still air to $\sim$500\,W/m$^2\cdot$K in stirred water (50$\times$ increase). All other parameters ($m$, $C_p$, $A_s$) are properties of the thermocouple and do not change with the medium.
 \end{enumerate}

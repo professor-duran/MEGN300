@@ -250,9 +250,17 @@ In MEGN~300: always report both the $p$-value (statistical significance) and the
 
 \subsection{Answers}
 \begin{enumerate}[leftmargin=1.5em]
-\item SE $= 0.15/\sqrt{20} = 0.0335\,\Omega$. $t_{0.975,19} = 2.093$. CI: $99.87 \pm 2.093 \times 0.0335 = 99.87 \pm 0.07\,\Omega = [99.80, 99.94]\,\Omega$. Since $100.0\,\Omega$ is outside the CI, the measured mean is statistically significantly different from 100\,$\Omega$ at the 95\% level, suggesting a systematic offset of $-0.13\,\Omega$ (0.13\%).
+\item SE $= 0.15/\sqrt{20} = 0.0335\,\Omega$. $t_{0.975,19} = 2.093$. CI: 
+\[
+99.87 \pm 2.093 \times 0.0335 = 99.87 \pm 0.07\,\Omega = [99.80, 99.94]\,\Omega
+\]
+. Since $100.0\,\Omega$ is outside the CI, the measured mean is statistically significantly different from 100\,$\Omega$ at the 95\% level, suggesting a systematic offset of $-0.13\,\Omega$ (0.13\%).
 \item Pooled SE $= \sqrt{0.20^2/12 + 0.18^2/15} = \sqrt{0.00333 + 0.00216} = 0.0741$\,psi. $t = (0.35 - 0.22)/0.0741 = 1.75$. Approximate $\nu = 22$. $t_{\text{crit}} = 2.074$. Since $1.75 < 2.074$: fail to reject the null hypothesis. The methods do not give significantly different results at the 5\% level.
 \item Linear fit: $y = 0.002003x + 0.0018$, $R^2 = 0.99998$. Residuals: $+0.001, +0.005, -0.003, +0.009, -0.010$\,mV. Maximum residual is 0.010\,mV. No systematic pattern. The linear model is excellent.
 \item Two sensors measuring temperature in the same environment will be strongly correlated because they respond to the same physical temperature changes, not because one causes the other. A third variable (actual temperature) drives both. Correlation does not imply causation.
-\item For two-sample $t$-test detecting $\delta = 0.1$\,mV ($20\% \times 0.5$) from $s = 0.5$\,mV: $N \approx 2(1.96 + 0.84)^2 \times 0.5^2 / 0.1^2 = 2 \times 7.84 \times 2.5 = 392$ per group. This is a large number because the effect (20\%) is small relative to the noise. If the expected improvement were 50\%, $N$ drops to approximately 63 per group.
+\item For two-sample $t$-test detecting $\delta = 0.1$\,mV ($20\% \times 0.5$) from $s = 0.5$\,mV: 
+\[
+N \approx 2(1.96 + 0.84)^2 \times 0.5^2 / 0.1^2 = 2 \times 7.84 \times 2.5 = 392
+\]
+ per group. This is a large number because the effect (20\%) is small relative to the noise. If the expected improvement were 50\%, $N$ drops to approximately 63 per group.
 \end{enumerate}

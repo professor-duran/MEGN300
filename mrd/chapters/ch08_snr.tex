@@ -182,7 +182,11 @@ Initial testing showed $\pm$2\,\degC{} oscillation at 60\,Hz (visible in FFT wit
 \section{Noise in the Signal Chain}
 Noise at the sensor end is amplified by the full system gain and dominates the output. Noise at the DAQ end is not amplified. \textbf{Golden rule}: amplify as early as possible, as close to the sensor as possible.
 
-For a two-stage system with gains $G_1$ and $G_2$ and stage noise $V_{n,1}$, $V_{n,2}$: $V_{n,\text{out}} = \sqrt{(G_1 G_2 V_{n,\text{src}})^2 + (G_2 V_{n,1})^2 + V_{n,2}^2}$. The first stage's noise is amplified by $G_2$; the second stage's noise appears directly.
+For a two-stage system with gains $G_1$ and $G_2$ and stage noise $V_{n,1}$, $V_{n,2}$: 
+\[
+V_{n,\text{out}} = \sqrt{(G_1 G_2 V_{n,\text{src}})^2 + (G_2 V_{n,1})^2 + V_{n,2}^2}
+\]
+. The first stage's noise is amplified by $G_2$; the second stage's noise appears directly.
 
 \section{SNR Improvement Techniques}
 \textbf{Averaging}: $N$ averages reduces random noise by $\sqrt{N}$, improving SNR by $10\log_{10}(N)$\,dB. 100 averages $= +$20\,dB. Does not help with systematic errors or correlated noise.

@@ -187,7 +187,11 @@ Feedforward control measures a disturbance before it affects the output and appl
 \section{Model-Based Open-Loop: Inverse Dynamics}
 For systems where the plant dynamics are well-characterized, \textbf{inverse dynamics} computes the exact input needed to produce the desired output trajectory. If the plant transfer function is $G_p(s)$, the required input is $U(s) = Y_{\text{desired}}(s) / G_p(s)$.
 
-For the ThermoRig: to ramp the temperature from 25\,\degC{} to 80\,\degC{} in exactly 60\,s with a linear ramp: the desired trajectory is $T(t) = 25 + 0.917t$ for $0 \leq t \leq 60$\,s. The required heater power includes both the steady-state loss compensation and the transient power to heat the thermal mass: $P(t) = hA(T(t) - T_{\text{amb}}) + mC_p \cdot dT/dt = hA(25 + 0.917t - 22) + 30.6 \times 0.917$. The second term is a constant 28\,W needed to maintain the ramp rate. The first term increases linearly as the temperature rises.
+For the ThermoRig: to ramp the temperature from 25\,\degC{} to 80\,\degC{} in exactly 60\,s with a linear ramp: the desired trajectory is $T(t) = 25 + 0.917t$ for $0 \leq t \leq 60$\,s. The required heater power includes both the steady-state loss compensation and the transient power to heat the thermal mass: 
+\[
+P(t) = hA(T(t) - T_{\text{amb}}) + mC_p \cdot dT/dt = hA(25 + 0.917t - 22) + 30.6 \times 0.917
+\]
+. The second term is a constant 28\,W needed to maintain the ramp rate. The first term increases linearly as the temperature rises.
 
 This is open-loop because no temperature measurement is used during the ramp. If the model is perfect, the actual trajectory matches the desired trajectory exactly. In practice, model uncertainty produces a tracking error of 5--15\%, which is why feedforward is almost always combined with feedback.
 

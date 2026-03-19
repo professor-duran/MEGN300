@@ -5,8 +5,8 @@
 \addcontentsline{toc}{chapter}{Quick Reference Tables}
 
 \section*{Sensor Selection Guide}
-\begin{center}
-\begin{tabular}{p{2.5cm}p{3cm}p{2cm}p{2cm}p{3cm}}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{l l l l X}
 \toprule
 \textbf{Measurand} & \textbf{Sensor Type} & \textbf{Range} & \textbf{Accuracy} & \textbf{Output} \\
 \midrule
@@ -20,7 +20,7 @@ Proximity & Ultrasonic & 2\,cm--4\,m & $\pm 3$\,mm & Pulse width \\
 Current & Hall effect (ACS712) & $\pm 30$\,A & $\pm 1.5\%$ & Analog voltage \\
 Light & Photodiode & varies & varies & Current ($\mu$A) \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \section*{ADC Resolution and LSB Size}
@@ -39,18 +39,18 @@ Light & Photodiode & varies & varies & Current ($\mu$A) \\
 \end{center}
 
 \section*{Filter Type Comparison}
-\begin{center}
-\begin{tabular}{p{2.5cm}p{3cm}p{3cm}p{3.5cm}}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{l l l X}
 \toprule
 \textbf{Filter} & \textbf{Passband} & \textbf{Rolloff} & \textbf{Best For} \\
 \midrule
 Butterworth & Maximally flat & $-20n$\,dB/dec & General purpose \\
 Chebyshev I & Ripple in passband & Steeper than Butter. & Sharp cutoff needed \\
 Chebyshev II & Ripple in stopband & Steep, flat passband & Rejecting specific band \\
-Bessel & Maximally flat group delay & Gentlest rolloff & Preserving waveform shape \\
+Bessel & Max.\ flat group delay & Gentlest rolloff & Preserving waveform shape \\
 Elliptic & Ripple in both bands & Steepest possible & Minimum order needed \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \section*{Thermocouple Types}

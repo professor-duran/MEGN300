@@ -185,7 +185,11 @@ No actuator connects directly to a microcontroller GPIO pin. Every motor needs a
 \begin{enumerate}[leftmargin=1.5em]
 \item Type K thermocouple. Justification: range covers 200--800\,\degC{} (RTDs max out at $\sim$850\,\degC{} but are more expensive; thermistors cannot reach 200\,\degC{}). Type K accuracy is $\pm$2.2\,\degC{} or $\pm$0.75\% (whichever is larger), meeting the $\pm$2\,\degC{} requirement above $\sim$290\,\degC{}. An exposed-junction bead thermocouple has $\tau < 0.5$\,s in moving gas, meeting the 1\,s requirement. Signal conditioning: thermocouple amplifier with cold-junction compensation (e.g., AD8495 or MAX31855 digital), providing a voltage or digital output compatible with the DAQ.
 \item Piezoelectric sensors generate charge in response to mechanical stress ($Q = d \times F$ where $d$ is the piezoelectric coefficient). For a static load, the charge is generated at the moment of application, but then leaks away through the finite insulation resistance of the crystal and the input impedance of the charge amplifier (time constant $\tau = R_{\text{insulation}} \times C_{\text{crystal}}$, typically seconds to minutes). After $5\tau$, the output decays to zero even though the force remains. Dynamic forces continuously generate new charge, maintaining the output signal.
-\item Speed $= 400\,\text{pulses/s} \div 200\,\text{steps/rev} = 2\,\text{rev/s} = 120\,\text{RPM}$. Since 120\,RPM $<$ 600\,RPM stall threshold, yes, this speed is achievable.
+\item Speed 
+\[
+= 400\,\text{pulses/s} \div 200\,\text{steps/rev} = 2\,\text{rev/s} = 120\,\text{RPM}
+\]
+. Since 120\,RPM $<$ 600\,RPM stall threshold, yes, this speed is achievable.
 \end{enumerate}
 
 

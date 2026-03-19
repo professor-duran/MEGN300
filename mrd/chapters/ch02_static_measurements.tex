@@ -167,7 +167,11 @@ When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\D
 \end{figure}
 
 \begin{examplebox}[ThermoRig: RTD in a Wheatstone Bridge]
-A Pt100 RTD ($R_0 = 100.0\,\Omega$ at 0\,\degC{}, $\alpha = 0.00385$\,\degC{}$^{-1}$) is placed in a quarter-bridge with $V_{ex} = 5.0$\,V and three 100.0\,$\Omega$ precision resistors. At 25\,\degC{}: $R_{RTD} = 100(1 + 0.00385 \times 25) = 109.6\,\Omega$. Bridge output: $V_o = 5.0 \times (109.6/(109.6+100) - 100/(100+100)) = 5.0 \times (0.5229 - 0.5000) = 114.5$\,mV. Sensitivity: 114.5\,mV / 25\,\degC{} = 4.58\,mV/\degC{}.
+A Pt100 RTD ($R_0 = 100.0\,\Omega$ at 0\,\degC{}, $\alpha = 0.00385$\,\degC{}$^{-1}$) is placed in a quarter-bridge with $V_{ex} = 5.0$\,V and three 100.0\,$\Omega$ precision resistors. At 25\,\degC{}: $R_{RTD} = 100(1 + 0.00385 \times 25) = 109.6\,\Omega$. Bridge output: 
+\[
+V_o = 5.0 \times (109.6/(109.6+100) - 100/(100+100)) = 5.0 \times (0.5229 - 0.5000) = 114.5
+\]
+\,mV. Sensitivity: 114.5\,mV / 25\,\degC{} = 4.58\,mV/\degC{}.
 
 Self-heating check: bridge current through RTD $= V_{ex}/(2R) \approx 25$\,mA. Power dissipated in RTD $= I^2 R = 0.025^2 \times 110 = 0.069$\,W. Self-heating coefficient for a Pt100 in still air $\approx$ 0.5\,\degC{}/mW $\to$ self-heating error $= 0.069 \times 0.5 = 0.035$\,\degC{}. Acceptable for $\pm$0.5\,\degC{} accuracy, but reduce $V_{ex}$ to 1\,V for higher precision.
 \end{examplebox}
@@ -354,7 +358,15 @@ The transfer standard must be more stable than accurate: it does not need to hol
 \subsection{Answers}
 \begin{enumerate}[leftmargin=1.5em]
 \item End-point line: slope $= (4.99 - 0.02)/(500 - 0) = 9.94\,\text{mV/psi}$, intercept $= 0.02\,\text{V}$. Predicted at each point: 0.02, 1.014, 2.008, 3.002, 3.996, 4.99. Residuals: 0, $-$0.004, 0.022, $-$0.022, 0.024, 0. Max $|$residual$|$ = 0.024\,V. FSO = 4.97\,V. Linearity = $0.024/4.97 \times 100 = 0.48\%$ FSO. Sensitivity = 9.94\,mV/psi.
-\item $1/T = A + B \ln R + C (\ln R)^3 = 1.125 \times 10^{-3} + 2.347 \times 10^{-4} \times \ln(10000) + 0.856 \times 10^{-7} \times (\ln 10000)^3$. $\ln(10000) = 9.2103$. $1/T = 1.125 \times 10^{-3} + 2.161 \times 10^{-3} + 6.69 \times 10^{-5} = 3.353 \times 10^{-3}$. $T = 298.2\,\text{K} = 25.1$\,\degC{}.
+\item 
+\[
+1/T = A + B \ln R + C (\ln R)^3 = 1.125 \times 10^{-3} + 2.347 \times 10^{-4} \times \ln(10000) + 0.856 \times 10^{-7} \times (\ln 10000)^3
+\]
+. $\ln(10000) = 9.2103$. 
+\[
+1/T = 1.125 \times 10^{-3} + 2.161 \times 10^{-3} + 6.69 \times 10^{-5} = 3.353 \times 10^{-3}
+\]
+. $T = 298.2\,\text{K} = 25.1$\,\degC{}.
 \item Hysteresis $= |2.53 - 2.48| / 3.00 \times 100 = 1.67\%$ FSO.
 \item LSB $= 10\,\text{V} / 2^{12} = 10/4096 = 2.44\,\text{mV}$. Temperature resolution $= 2.44\,\text{mV} / 10\,\text{mV/\degC{}} = 0.244\,$\degC{}.
 \end{enumerate}

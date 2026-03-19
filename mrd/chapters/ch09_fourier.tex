@@ -150,7 +150,11 @@ x(t) = \frac{a_0}{2} + \sum_{n=1}^{\infty}\left[a_n\cos(2\pi n f_0 t) + b_n\sin(
 where $a_n = (2/T)\int_0^T x(t)\cos(2\pi n f_0 t)\,dt$ and $b_n = (2/T)\int_0^T x(t)\sin(2\pi n f_0 t)\,dt$. The amplitude of the $n$th harmonic is $c_n = \sqrt{a_n^2 + b_n^2}$.
 
 \section{Common Waveforms}
-\textbf{Square wave}: $x(t) = (4A/\pi)[\sin(\omega_0 t) + \sin(3\omega_0 t)/3 + \sin(5\omega_0 t)/5 + \cdots]$. Only odd harmonics, amplitudes $\propto 1/n$. Sharp edges require many harmonics.
+\textbf{Square wave}: 
+\[
+x(t) = (4A/\pi)[\sin(\omega_0 t) + \sin(3\omega_0 t)/3 + \sin(5\omega_0 t)/5 + \cdots]
+\]
+. Only odd harmonics, amplitudes $\propto 1/n$. Sharp edges require many harmonics.
 
 \textbf{Triangle wave}: odd harmonics, amplitudes $\propto 1/n^2$. Converges faster because transitions are smooth.
 
@@ -232,7 +236,11 @@ While the Fourier series handles periodic signals, many instrumentation signals 
 
 \textbf{Exponential decay}: $\mathcal{F}\{e^{-t/\tau}u(t)\} = \tau/(1+j2\pi f\tau)$. This is the impulse response of a first-order system, confirming that the frequency response is $1/\sqrt{1+(\omega\tau)^2}$.
 
-\textbf{Gaussian pulse}: $\mathcal{F}\{e^{-t^2/(2\sigma^2)}\} = \sigma\sqrt{2\pi} \cdot e^{-2(\pi f\sigma)^2}$. A Gaussian in time has a Gaussian spectrum. The ``uncertainty principle'': the product of the time-domain width and frequency-domain width is constant. Narrower in time = wider in frequency. This is a fundamental constraint on simultaneous time and frequency resolution.
+\textbf{Gaussian pulse}: 
+\[
+\mathcal{F}\{e^{-t^2/(2\sigma^2)}\} = \sigma\sqrt{2\pi} \cdot e^{-2(\pi f\sigma)^2}
+\]
+. A Gaussian in time has a Gaussian spectrum. The ``uncertainty principle'': the product of the time-domain width and frequency-domain width is constant. Narrower in time = wider in frequency. This is a fundamental constraint on simultaneous time and frequency resolution.
 
 \section{The Short-Time Fourier Transform (STFT) and Spectrograms}
 The standard FFT computes the frequency content over the entire signal duration. For signals whose frequency content changes with time (motor speed ramp-up, earthquake, speech), the \textbf{Short-Time Fourier Transform} divides the signal into overlapping segments, computes the FFT of each, and displays the result as a time-frequency map called a \textbf{spectrogram} (or waterfall plot).
@@ -361,7 +369,15 @@ In vibration analysis, envelope analysis detects amplitude-modulated signals pro
 \begin{enumerate}[leftmargin=1.5em]
 \item At 100\,Hz: $M = 1/\sqrt{1+(100/500)^2} = 0.981$ (nearly passed). At 300\,Hz: $M = 0.857$. At 500\,Hz: $M = 0.707$ ($-3$\,dB point). At 700\,Hz: $M = 0.581$. At 900\,Hz: $M = 0.486$. The higher harmonics that define the sharp edges of the square wave are progressively attenuated; the output will look like a rounded square wave with slower rise/fall times.
 \item Nyquist: $f_s > 2 \times f_{\max} = 2 \times 250 = 500$\,Hz minimum. In practice, use $f_s \geq 2.5 \times 250 = 625$\,Hz or higher.
-\item Triangle wave: $x(t) = \frac{8A}{\pi^2}\left[\sin(2\pi f_0 t) - \frac{1}{9}\sin(6\pi f_0 t) + \frac{1}{25}\sin(10\pi f_0 t) - \cdots\right]$. With $A = 2$\,V, $f_0 = 1000$\,Hz: $x(t) = \frac{16}{\pi^2}\left[\sin(2000\pi t) - \frac{1}{9}\sin(6000\pi t) + \frac{1}{25}\sin(10000\pi t)\right] \approx 1.621\sin(2000\pi t) - 0.180\sin(6000\pi t) + 0.065\sin(10000\pi t)$.
+\item Triangle wave: 
+\[
+x(t) = \frac{8A}{\pi^2}\left[\sin(2\pi f_0 t) - \frac{1}{9}\sin(6\pi f_0 t) + \frac{1}{25}\sin(10\pi f_0 t) - \cdots\right]
+\]
+. With $A = 2$\,V, $f_0 = 1000$\,Hz: 
+\[
+x(t) = \frac{16}{\pi^2}\left[\sin(2000\pi t) - \frac{1}{9}\sin(6000\pi t) + \frac{1}{25}\sin(10000\pi t)\right] \approx 1.621\sin(2000\pi t) - 0.180\sin(6000\pi t) + 0.065\sin(10000\pi t)
+\]
+.
 \end{enumerate}
 
 
