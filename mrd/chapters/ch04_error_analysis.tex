@@ -2,10 +2,10 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{Error Analysis and Uncertainty}
-\label{ch:error}\index{uncertainty!propagation}\index{RSS}\index{GUM}
+\label{ch:error}\index{uncertainty!propagation}\index{RSS\index{RSS (root sum of squares)}}\index{GUM}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~3 (Weeks 3--4)}: Read before the uncertainty analysis assignment. Focus on propagation of uncertainty (RSS method) and confidence intervals. The Monte Carlo section is enrichment for advanced projects. \textbf{Related}: Statistics in Chapter~\ref{ch:stats} (p.\,\pageref{ch:stats}); measurement fundamentals in Chapter~\ref{ch:measurement_theory} (p.\,\pageref{ch:measurement_theory}).
+\textbf{Module~3 (Weeks 3--4)}: Read before the uncertainty analysis assignment. Focus on propagation of uncertainty (RSS method) and confidence interval\index{confidence interval}s. The Monte Carlo\index{Monte Carlo simulation} section is enrichment for advanced projects. \textbf{Related}: Statistics in Chapter~\ref{ch:stats} (p.\,\pageref{ch:stats}); measurement fundamentals in Chapter~\ref{ch:measurement_theory} (p.\,\pageref{ch:measurement_theory}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -129,7 +129,7 @@ Before building a measurement system, estimate the total uncertainty from manufa
 \node[font=\scriptsize\sffamily\itshape, text=WarnOrange, align=center] at (2.0,-0.8) {Dominant contributor:\\improve this first};
 \draw[-{Stealth[length=2mm]}, WarnOrange, thick] (2.0,-0.5) -- (2.0,0.1);
 \end{tikzpicture}
-\caption{RSS error budget for a temperature measurement system. The sensor dominates; improving the ADC has diminishing returns. Always improve the dominant contributor first.}
+\caption{RSS error budget\index{error budget} (Figure~\ref{fig:error_budget}) for a temperature measurement system. The sensor dominates; improving the ADC has diminishing returns. Always improve the dominant contributor first.}
 \label{fig:error_budget}
 \end{figure}
 
@@ -144,7 +144,7 @@ Before building a measurement system, estimate the total uncertainty from manufa
 \section{The Philosophy of Uncertainty}
 Every measured value is an estimate accompanied by a range within which the true value is believed to lie. A reading of ``23.5\,\degC{}'' is meaningless without knowing whether the uncertainty is $\pm$0.1\,\degC{} or $\pm$5\,\degC{}.
 
-\section{Type A and Type B Evaluation}
+\section{Type A\index{uncertainty!Type A} and Type B\index{uncertainty!Type B} Evaluation}
 \textbf{Type A (statistical)}: from repeated measurements. Standard uncertainty of the mean: $u_A = s/\sqrt{N}$. As $N$ increases, $u_A$ decreases (but doubling $N$ only reduces by $\sqrt{2}$).
 
 \textbf{Type B (non-statistical)}: from datasheets, calibration certificates, engineering judgment. For $\pm a$ specification with rectangular distribution: $u_B = a/\sqrt{3}$. Normal distribution (95\%): $u_B = a/2$.
@@ -186,7 +186,7 @@ Accuracy $=$ total uncertainty (systematic + random). Precision $=$ repeatabilit
 The dominant contributor determines the total. A 10\% improvement in the largest source has more impact than 50\% improvement in all minor sources combined.
 
 \begin{tipbox}[The 80/20 Rule]
-In most systems, 80\% of total uncertainty comes from one or two sources. Find them first. Display the error budget as a pie chart of variance contributions; the largest slice is where you invest effort.
+In most systems, 80\% of total uncertainty comes from one or two sources. Find them first. Display the error budget as a pie chart of variance contributions (Figure~\ref{fig:variance_breakdown}); the largest slice is where you invest effort.
 \end{tipbox}
 
 \section{Reporting Measurements}
@@ -283,7 +283,7 @@ While a full Gauge R\&R study is beyond MEGN~300 scope, understanding the concep
 \section{Bayesian Uncertainty (Conceptual)}
 The GUM framework treats uncertainty as a property of the measurement procedure. An alternative approach, gaining traction in metrology, is \textbf{Bayesian uncertainty}: uncertainty represents the degree of belief about the true value given the data and prior knowledge. The posterior distribution $p(\mu | \text{data})$ combines the likelihood (from the measurements) with the prior (from previous knowledge, datasheets, physics).
 
-Bayesian methods are particularly powerful when: (1) you have informative prior knowledge (e.g., the temperature cannot be negative), (2) the data is limited (small $N$), or (3) the measurement equation is highly nonlinear. While MEGN~300 uses the classical GUM approach, awareness of Bayesian methods is valuable for advanced metrological work.
+Bayesian methods are particularly powerful when: (1) you have informative prior knowledge (e.g., the temperature cannot be negative), (2) the data are limited (small $N$), or (3) the measurement equation is highly nonlinear. While MEGN~300 uses the classical GUM approach, awareness of Bayesian methods is valuable for advanced metrological work.
 \section{Variance, Covariance, and Correlation}
 \subsection{Variance}
 The variance of a set of $N$ measurements $\{x_1, x_2, \ldots, x_N\}$ with mean $\bar{x}$ is:

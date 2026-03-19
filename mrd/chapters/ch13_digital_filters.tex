@@ -33,7 +33,7 @@
 % Specs below
 \node[font=\tiny\sffamily, MinesSilver, align=center, text width=2.5cm] at (0,-1.4) {$f_{\text{pass}}$, $f_{\text{stop}}$,\\ripple, attenuation};
 \end{tikzpicture}
-\caption{Digital filter design workflow. Start by specifying the passband, stopband, and required performance. Choose FIR if linear phase (pulse shape preservation) is needed; choose IIR if sharper cutoff with fewer coefficients is the priority. Always verify the implemented filter against a known signal before using it on measurement data.}
+\caption{Digital filter design workflow. Start by specifying the passband, stopband, and required performance. Choose FIR if linear phase\index{linear phase} (pulse shape preservation) is needed; choose IIR if sharper cutoff with fewer coefficients is the priority. Always verify the implemented filter against a known signal before using it on measurement data.}
 \label{fig:filter_workflow}
 \end{figure}
 
@@ -64,7 +64,7 @@ IIR filters achieve sharper roll-off with fewer coefficients than FIR, but they 
                 inner sep=8pt, text width=5cm},
 ]
 \node[col] (fir) at (0,0) {
-\textbf{\color{MinesBlue}FIR (Finite Impulse Response)}\\[4pt]
+\textbf{\color{MinesBlue}FIR (Finite Impulse Response, Figure~\ref{fig:fir_iir})}\\[4pt]
 $y[n] = \sum_{k=0}^{M} b_k x[n-k]$\\[4pt]
 \textcolor{AccentTeal}{\checkmark} Always stable\\
 \textcolor{AccentTeal}{\checkmark} Linear phase (symmetric)\\
@@ -144,7 +144,7 @@ Design a 50-tap FIR low-pass filter with cutoff at 100\,Hz for data sampled at 1
 
 \textbf{Step 4}: normalize so the DC gain is unity: divide all $b[n]$ by their sum.
 
-The resulting filter has a $-3$\,dB cutoff at approximately 100\,Hz, transition bandwidth of $\sim$40\,Hz (80--120\,Hz), and stopband rejection of ${\sim}{-53}$\,dB (Hamming window property). The group delay is exactly 25 samples (2.5\,ms at 1\,kS/s).
+The resulting filter has a $-3$\,dB cutoff at approximately 100\,Hz, transition bandwidth of $\sim$40\,Hz (80--120\,Hz), and stopband rejection of ${\sim}{-53}$\,dB (Hamming window property). The group delay\index{group delay} is exactly 25 samples (2.5\,ms at 1\,kS/s).
 
 In LabVIEW, this entire design is accomplished by the ``FIR Windowed Coefficients'' VI: specify the sampling rate, cutoff frequency, number of taps, and window type. The VI outputs the coefficient array, which you wire to the ``FIR Filter'' VI.
 
@@ -198,7 +198,7 @@ LabVIEW offers several filtering VIs, each suited to different applications:
 
 \textbf{Filter Express VI}: one-click configuration (type, response, order, cutoff). Processes the entire waveform in one call. Best for: offline analysis of acquired data, quick prototyping.
 
-\textbf{IIR Filter VI}: takes a waveform and returns a filtered waveform. Supports Butterworth, Chebyshev, Bessel, and Elliptic responses. Offers ``reverse filtering'' option that applies the filter forward and backward, canceling phase distortion (zero-phase filtering, only for offline data).
+\textbf{IIR Filter VI}: takes a waveform and returns a filtered waveform. Supports Butterworth, Chebyshev, Bessel, and Elliptic responses. Offers ``reverse filtering'' option that applies the filter forward and backward, canceling phase distortion (zero-phase filtering\index{zero-phase filtering}, only for offline data).
 
 \textbf{FIR Windowed Filter VI}: generates and applies an FIR filter. Specify taps, cutoff, window type. Best for: linear-phase requirements, real-time filtering with known group delay.
 

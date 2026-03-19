@@ -2,10 +2,10 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{Signal-to-Noise Ratio}
-\label{ch:snr}\index{signal-to-noise ratio}\index{SNR}\index{noise!sources}
+\label{ch:snr}\index{signal-to-noise\index{SNR (signal-to-noise ratio)} ratio}\index{SNR}\index{noise!sources}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~4 (Weeks 5--6)}: Read alongside the ADC chapter. Focus on noise sources, SNR calculation in dB, and the grounding/shielding sections. These directly apply to debugging noisy signals in the lab. \textbf{Related}: ADC fundamentals in Chapter~\ref{ch:analog_digital} (p.\,\pageref{ch:analog_digital}); filtering in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}).
+\textbf{Module~4 (Weeks 5--6)}: Read alongside the ADC chapter. Focus on noise sources, SNR calculation in dB, and the grounding/shielding\index{shielding} sections. These directly apply to debugging noisy signals in the lab. \textbf{Related}: ADC fundamentals in Chapter~\ref{ch:analog_digital} (p.\,\pageref{ch:analog_digital}); filtering in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}).
 \end{tipbox}
 
 \begin{industrybox}{EMI Shielding in EV Test Cells}
@@ -131,7 +131,7 @@ The most common noise source in lab measurements is 60\,Hz pickup from AC power 
 
 
 \section{Dynamic Range}
-The \textbf{dynamic range} of a measurement system is the ratio of the largest measurable signal to the smallest detectable signal (noise floor):
+The \textbf{dynamic range\index{dynamic range}} of a measurement system is the ratio of the largest measurable signal to the smallest detectable signal (noise floor\index{noise floor}):
 \begin{equation}
 \text{DR}_{\text{dB}} = 20 \log_{10}\left(\frac{V_{\text{max}}}{V_{\text{noise floor}}}\right)
 \end{equation}
@@ -139,7 +139,7 @@ For an ideal $n$-bit ADC: $\text{DR} = 6.02n + 1.76$\,dB. A 16-bit ADC has a the
 
 \section{Grounding Best Practices for Low-Noise Measurements}
 \begin{enumerate}[leftmargin=1.5em]
-\item \textbf{Single-point (star) ground}: all ground returns meet at one physical point near the power supply. Prevents ground loops.
+\item \textbf{Single-point (star) ground}: all ground returns meet at one physical point near the power supply. Prevents ground loop\index{ground loop}s.
 \item \textbf{Differential inputs}: measure the voltage difference between two wires, rejecting common-mode noise (60\,Hz hum, ground offsets). Always use differential mode on NI DAQs when measuring bridge circuits, thermocouples, or any sensor in a noisy environment.
 \item \textbf{Shielded cables}: the shield connects to ground at \emph{one end only} (typically the DAQ end). Grounding at both ends creates a ground loop that couples noise.
 \item \textbf{Twisted pairs}: twisting the signal and return wires reduces magnetic pickup because induced voltages cancel in adjacent twists.
@@ -204,10 +204,6 @@ The first stage's noise is amplified by $G_2$; the second stage's noise appears 
 Noise is characterized by its power spectral density (PSD), measured in V$^2$/Hz (or equivalently nV/$\sqrt{\text{Hz}}$ for voltage noise density). The total noise voltage in a measurement with bandwidth $B$ is $V_n = e_n \sqrt{B}$ where $e_n$ is the noise density. This is why reducing measurement bandwidth directly reduces noise.
 
 Op-amp noise density is specified on the datasheet as $e_n$ (input-referred voltage noise) and $i_n$ (input-referred current noise). For an op-amp with $e_n = 10$\,nV/$\sqrt{\text{Hz}}$ and bandwidth $B = 10$\,kHz: $V_n = 10 \times \sqrt{10000} = 1$\,$\mu$V RMS input-referred noise.
-
-\section{Dynamic Range}
-The dynamic range is the ratio between the largest and smallest signals the system can measure simultaneously: $\text{DR} = 20\log_{10}(V_{\max}/V_{\min,\text{detectable}})$\,dB. For an ideal $n$-bit ADC, $\text{DR} = 6.02n + 1.76$\,dB. In practice, noise limits the minimum detectable signal, reducing the effective dynamic range.
-
 \section{Ground Loops: Diagnosis and Cure}
 A ground loop occurs when two or more ground connections create a closed current path. Current flowing through the finite impedance of the ground conductor creates a voltage drop that appears as noise. Symptoms: large 60\,Hz component in the FFT, noise that changes when you touch the cable, noise that depends on the position of nearby equipment.
 
@@ -254,7 +250,7 @@ With $G_1 = 100$: even if the second stage has $NF_2 = 10$\,dB ($F_2 = 10$), its
 \section{Noise Measurement Techniques}
 To characterize the noise of your measurement system: (1) Short the input (connect the two differential inputs together). (2) Acquire $N \geq 10{,}000$ samples at the normal operating sample rate. (3) Compute the RMS of the acquired data: this is the total system noise floor. (4) Compute the FFT: peaks at specific frequencies indicate EMI (60\,Hz, switching noise); a flat floor indicates thermal/shot noise.
 
-Compare the measured noise to the theoretical prediction from the noise budget. If the measured noise significantly exceeds the prediction, look for: ground loops, EMI pickup, inadequate decoupling, or oscillating amplifiers.
+Compare the measured noise to the theoretical prediction from the noise budget. If the measured noise significantly exceeds the prediction, look for: ground loops, EMI pickup, inadequate decoupling\index{decoupling capacitor}, or oscillating amplifiers.
 
 \section{Signal Recovery from Noise}
 \textbf{Coherent averaging (signal averaging)}: for repetitive signals (triggered waveforms), average $N$ acquisitions. Random noise cancels; the signal accumulates. SNR improves by $\sqrt{N}$. Used in oscilloscopes, vibration analyzers, and evoked-potential medical instruments.
@@ -298,9 +294,9 @@ The DAQ and signal conditioning circuits require clean power. A switching regula
 For an op-amp with PSRR $= 80$\,dB at 100\,kHz, a 20\,mV power supply ripple produces $20 \times 10^{-4} = 0.002$\,mV ($2\,\mu$V) at the output. At gain 1000, this becomes 2\,mV, which may be significant for millivolt-level measurements. Solution: use a linear regulator after the switching regulator (the linear regulator's PSRR further attenuates the switching noise by 40--60\,dB), or power the analog circuits from a separate linear supply.
 
 \section{SNR Improvement: A Quantitative Case Study}
-ThermoRig initial setup: thermocouple ($e_n = 2\,\mu$V$/\sqrt{\text{Hz}}$, measured at sensor), INA128 ($G = 611$), no anti-alias filter, RSE input mode, DAQ at $\pm$10\,V range, 1\,kS/s.
+ThermoRig initial setup: thermocouple ($e_n = 2\,\mu$V$/\sqrt{\text{Hz}}$, measured at sensor), INA128 ($G = 603$), no anti-alias filter, RSE input mode, DAQ at $\pm$10\,V range, 1\,kS/s.
 
-\textbf{Initial SNR}: signal at 80\,\degC{} $= 3.3$\,mV $\times 611 = 2.0$\,V. Noise at output: 120\,mV RMS (dominated by 60\,Hz at 80\,mV and broadband above 100\,Hz at 90\,mV). SNR $= 20\log(2.0/0.12) = 24$\,dB. Terrible.
+\textbf{Initial SNR}: signal at 80\,\degC{} $= 3.3$\,mV $\times 603 = 2.0$\,V. Noise at output: 120\,mV RMS (dominated by 60\,Hz at 80\,mV and broadband above 100\,Hz at 90\,mV). SNR $= 20\log(2.0/0.12) = 24$\,dB. Terrible.
 
 \textbf{Fix 1}: switch to Differential mode. 60\,Hz drops from 80\,mV to 2\,mV ($\sim$30\,dB improvement in 60\,Hz component).
 
@@ -324,7 +320,7 @@ This is why the noise budget matters: it directly determines how much of the ADC
 \section{Noise Floor and Minimum Detectable Signal}
 The minimum detectable signal (MDS) is typically defined as the signal level equal to the RMS noise floor (SNR $= 0$\,dB) or 3$\times$ the noise floor (SNR $= 10$\,dB, commonly used). Any signal below the MDS is buried in noise and cannot be reliably measured.
 
-For the ThermoRig with 0.8\,mV total output noise (after all improvements): MDS $= 3 \times 0.8 = 2.4$\,mV, corresponding to $2.4/(611 \times 0.041) = 0.096$\,\degC{} at the thermocouple. Any temperature change smaller than 0.1\,\degC{} cannot be reliably detected. This is $10\times$ better than the $\pm$1\,\degC{} requirement, meaning the system has ample SNR margin.
+For the ThermoRig with 0.8\,mV total output noise (after all improvements): MDS $= 3 \times 0.8 = 2.4$\,mV, corresponding to $2.4/(603 \times 0.041) = 0.097$\,\degC{} at the thermocouple. Any temperature change smaller than 0.1\,\degC{} cannot be reliably detected. This is $10\times$ better than the $\pm$1\,\degC{} requirement, meaning the system has ample SNR margin.
 
 \section{Noise in Data Acquisition Systems}
 The total noise at the DAQ output includes contributions from multiple sources, combined by RSS:

@@ -2,10 +2,10 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{Analog Filter Design}
-\label{ch:analog_filters}\index{filter!low-pass}\index{filter!Butterworth}\index{filter!Chebyshev}\index{filter!Bessel}\index{cutoff frequency}\index{Sallen-Key}
+\label{ch:analog_filters}\index{filter!low-pass}\index{filter!Butterworth}\index{filter!Chebyshev}\index{filter!Bessel}\index{cutoff frequency}\index{Sallen-Key\index{Sallen-Key topology}}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~6 (Weeks 9--10)}: Read before the filter design lab. Focus on the Butterworth vs.\ Chebyshev comparison, the Sallen-Key topology, and the component calculation procedure. The Bode plot interpretation section is used repeatedly in the control systems module. \textbf{Related}: DSP fundamentals in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}); digital filters in Chapter~\ref{ch:digital_filters} (p.\,\pageref{ch:digital_filters}).
+\textbf{Module~6 (Weeks 9--10)}: Read before the filter design lab. Focus on the Butterworth vs.\ Chebyshev comparison, the Sallen-Key topology, and the component calculation procedure. The Bode plot\index{Bode plot} interpretation section is used repeatedly in the control systems module. \textbf{Related}: DSP fundamentals in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}); digital filters in Chapter~\ref{ch:digital_filters} (p.\,\pageref{ch:digital_filters}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -45,7 +45,7 @@
 \end{axis}
 \end{scope}
 \end{tikzpicture}
-\caption{Left: first-order passive RC low-pass filter. Right: Bode magnitude response comparing 1st order ($-20$\,dB/dec) and 2nd order ($-40$\,dB/dec). A first-order filter is often insufficient for anti-aliasing.}
+\caption{Left: first-order passive RC low-pass filter (Figure~\ref{fig:rc_bode}). Right: Bode magnitude response comparing 1st order ($-20$\,dB/dec) and 2nd order ($-40$\,dB/dec). A first-order filter is often insufficient for anti-aliasing.}
 \label{fig:rc_bode}
 \end{figure}
 
@@ -133,7 +133,7 @@ Active filters use operational amplifiers to provide gain, buffering, and steepe
 \addplot[domain=0.1:10, samples=300, thick, WarnOrange]
     {x<0.85 ? -0.5+0.5*cos(deg(8*x)) : -10*log10(1+x^10)-3};
 \addlegendentry{Chebyshev (sharp)}
-% 4th-order Bessel (gentler rolloff)
+% 4th-order Bessel (gentler rolloff\index{rolloff})
 \addplot[domain=0.1:10, samples=300, thick, AccentTeal] {-10*log10(1+x^4*0.5+x^8*0.1)};
 \addlegendentry{Bessel (linear phase)}
 % -3 dB line
@@ -141,7 +141,7 @@ Active filters use operational amplifiers to provide gain, buffering, and steepe
 \node[font=\tiny\sffamily, MinesSilver] at (axis cs:0.15,-5) {$-3$\,dB};
 \end{axis}
 \end{tikzpicture}
-\caption{Bode magnitude comparison of 4th-order Butterworth, Chebyshev, and Bessel low-pass filters. Chebyshev has the steepest rolloff but passband ripple. Bessel has the gentlest rolloff but preserves pulse shape (linear phase). Butterworth is the default.}
+\caption{Bode magnitude comparison of 4th-order Butterworth, Chebyshev, and Bessel responses (Figure~\ref{fig:filter_compare}) low-pass filters. Chebyshev has the steepest rolloff but passband ripple. Bessel has the gentlest rolloff but preserves pulse shape (linear phase). Butterworth is the default.}
 \label{fig:filter_compare}
 \end{figure}
 
@@ -234,17 +234,7 @@ The MFB is preferred when $Q > 2$ because the Sallen-Key requires gain close to 
 \section{State Variable Filter}
 The state-variable (or biquad) topology uses two integrators and a summing amplifier to provide simultaneous low-pass, band-pass, and high-pass outputs from a single circuit. Advantages: $f_c$ and $Q$ can be adjusted independently (by changing different component values), and the circuit is less sensitive to component tolerances than Sallen-Key at high $Q$. Disadvantage: requires three op-amps per second-order section (vs.\ one for Sallen-Key).
 
-The state variable is the topology of choice for tunable filters, notch filters (by summing the LP and HP outputs), and precision band-pass filters used in vibration analysis.
-
-\section{Switched-Capacitor Filters}
-Switched-capacitor (SC) filters simulate resistors using capacitors and electronic switches: $R_{\text{eq}} = 1/(f_{\text{clk}} \cdot C)$. By changing the clock frequency, the cutoff frequency changes proportionally. Available as complete ICs:
-
-\textbf{MAX291/MAX292}: 8th-order Butterworth or Bessel LP. Clock-to-cutoff ratio of 100:1. For $f_c = 1$\,kHz: apply a 100\,kHz clock. For $f_c = 10$\,Hz: apply a 1\,kHz clock. No external components needed beyond a clock source and decoupling capacitors.
-
-\textbf{LTC1068}: quad 2nd-order sections configurable as LP, HP, BP, or notch. For complex filter shapes.
-
-SC filters are ideal for anti-aliasing in systems where the sample rate (and therefore the required $f_c$) changes dynamically. They introduce clock feedthrough noise at $f_{\text{clk}}$ and its harmonics, which must be removed by a simple RC post-filter.
-
+The state variable is the topology of choice for tunable filters, notch filter\index{filter!notch}s (by summing the LP and HP outputs), and precision band-pass filters used in vibration analysis.
 \section{Filter Design Software Tools}
 Analog Devices Filter Wizard (\url{https://tools.analog.com/en/filterwizard/}): enter the specifications (type, order, cutoff, passband ripple), and the tool generates a complete schematic with component values, including specific op-amp recommendations.
 

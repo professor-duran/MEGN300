@@ -2,10 +2,10 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{Fundamentals of Digital Signal Processing}
-\label{ch:dsp}\index{aliasing}\index{Nyquist theorem}\index{sampling}\index{oversampling}
+\label{ch:dsp}\index{aliasing}\index{Nyquist\index{Nyquist frequency} theorem}\index{sampling}\index{oversampling}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~6 (Weeks 9--10)}: Read the aliasing and anti-aliasing sections before the filter design lab. The Nyquist theorem and its practical implications (always filter before sampling) are foundational. \textbf{Related}: ADC settings in Chapter~\ref{ch:analog_digital} (p.\,\pageref{ch:analog_digital}); analog filter design in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}); digital filter design in Chapter~\ref{ch:digital_filters} (p.\,\pageref{ch:digital_filters}).
+\textbf{Module~6 (Weeks 9--10)}: Read the aliasing and anti-aliasing\index{anti-aliasing filter} sections before the filter design lab. The Nyquist theorem and its practical implications (always filter before sampling) are foundational. \textbf{Related}: ADC settings in Chapter~\ref{ch:analog_digital} (p.\,\pageref{ch:analog_digital}); analog filter design in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}); digital filter design in Chapter~\ref{ch:digital_filters} (p.\,\pageref{ch:digital_filters}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -100,10 +100,6 @@ Step 1: determine signal bandwidth $f_{\max}$. Step 2: design analog LP filter w
 Sampling much faster than Nyquist minimum: (1) relaxes anti-alias filter requirements; (2) spreads quantization noise over wider bandwidth, so digital filtering improves resolution ($\sim$0.5 bits per octave of oversampling); (3) improves time-domain resolution.
 
 Sigma-delta ADCs exploit 64--256$\times$ oversampling with noise shaping to achieve 24-bit resolution at modest bandwidth.
-
-\section{Dithering}
-Adding small random noise before quantization linearizes the process when signal amplitude is comparable to LSB. The dither noise is then reduced by averaging, revealing sub-LSB signals.
-
 \section{Reconstruction}
 Converting digital to analog requires a DAC followed by a reconstruction filter (LP filter smoothing the staircase output). The ideal filter is a sinc function (brick-wall at $f_s/2$). In practice, smooth analog filters with zero-order hold compensation are used.
 
@@ -153,7 +149,7 @@ Design an anti-aliasing system for measuring vibration from 0 to 500\,Hz:
 
 \textbf{Step 4}: increase to 8th-order (two cascaded 4th-order stages): $-160$\,dB/decade. At $f_N$: $8 \times 6 = 48$\,dB. Still insufficient for 16-bit, but adequate for 8-bit. For 16-bit, either increase the sample rate (more oversampling) or use a higher-order filter.
 
-\textbf{Step 5}: alternatively, oversample at $f_s = 10{,}240$\,S/s ($20\times f_{\max}$). Now $f_N = 5120$\,Hz. A 4th-order Butterworth at $f_c = 640$\,Hz provides $-80\log_{10}(5120/640) = -80 \times 0.903 = 72$\,dB at $f_N$. Combined with subsequent digital filtering and decimation: adequate for 14-bit.
+\textbf{Step 5}: alternatively, oversample at $f_s = 10{,}240$\,S/s ($20\times f_{\max}$). Now $f_N = 5120$\,Hz. A 4th-order Butterworth at $f_c = 640$\,Hz provides $-80\log_{10}(5120/640) = -80 \times 0.903 = 72$\,dB at $f_N$. Combined with subsequent digital filtering and decimation\index{decimation}: adequate for 14-bit.
 
 This example illustrates the fundamental tradeoff: sharper anti-alias filters allow lower sample rates, while higher sample rates allow simpler anti-alias filters.
 

@@ -5,7 +5,7 @@
 \label{ch:static}\index{calibration!static}\index{Wheatstone bridge}\index{sensitivity}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~1 (Weeks 1--2)}: Read alongside the calibration lab. Focus on the calibration procedure, least-squares regression, and the sensor comparison table. Return to the Wheatstone bridge section when you encounter strain gauges in Module~7. \textbf{Related}: Measurement fundamentals in Chapter~\ref{ch:measurement_theory} (p.\,\pageref{ch:measurement_theory}); dynamic response in Chapter~\ref{ch:dynamic} (p.\,\pageref{ch:dynamic}).
+\textbf{Module~1 (Weeks 1--2)}: Read alongside the calibration lab. Focus on the calibration procedure, least-squares\index{least-squares regression} regression, and the sensor comparison table. Return to the Wheatstone bridge section when you encounter strain gauges in Module~7. \textbf{Related}: Measurement fundamentals in Chapter~\ref{ch:measurement_theory} (p.\,\pageref{ch:measurement_theory}); dynamic response in Chapter~\ref{ch:dynamic} (p.\,\pageref{ch:dynamic}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -39,7 +39,7 @@
 \node[font=\scriptsize\sffamily, AccentTeal] at (0,-0.3) {To INA};
 \node[font=\scriptsize\sffamily\bfseries, WarnOrange] at (2.2,-2.2) {Sensor ($R_4$)};
 \end{tikzpicture}
-\caption{Wheatstone bridge circuit. $R_4$ is the sensor element (e.g., RTD or strain gauge). When balanced ($R_1 R_4 = R_2 R_3$), $V_{\text{out}} = 0$. A change in sensor resistance produces a differential output proportional to $\Delta R/R$, measured by an instrumentation amplifier.}
+\caption{Wheatstone bridge circuit. $R_4$ is the sensor element (e.g., RTD\index{RTD (resistance temperature detector)} or strain gauge). When balanced ($R_1 R_4 = R_2 R_3$), $V_{\text{out}} = 0$. A change in sensor resistance produces a differential output proportional to $\Delta R/R$, measured by an instrumentation amplifier.}
 \label{fig:wheatstone}
 \end{figure}
 
@@ -64,7 +64,7 @@ y = mx + b
 where $y$ = sensor output, $x$ = measurand, $m$ = sensitivity (slope), and $b$ = zero offset (intercept). The sensitivity $m$ and offset $b$ are determined by least-squares regression on the calibration data.
 
 \subsection{Nonlinear Calibration}
-Some sensors are inherently nonlinear (e.g., thermistors: $R = R_0 e^{\beta(1/T - 1/T_0)}$). For these, use a polynomial fit ($y = a_0 + a_1 x + a_2 x^2 + \cdots$) or a lookup table with interpolation. The Steinhart-Hart equation provides a three-coefficient model for thermistors that is accurate to $\pm$0.01\,\degC{} over wide ranges.
+Some sensors are inherently nonlinear (e.g., thermistor\index{thermistor}s: $R = R_0 e^{\beta(1/T - 1/T_0)}$). For these, use a polynomial fit ($y = a_0 + a_1 x + a_2 x^2 + \cdots$) or a lookup table with interpolation. The Steinhart-Hart\index{Steinhart-Hart equation} equation provides a three-coefficient model for thermistors that is accurate to $\pm$0.01\,\degC{} over wide ranges.
 
 \begin{examplebox}[ThermoRig: Static Calibration of a Type K Thermocouple]
 Calibration standard: NIST-traceable ice point (0.0\,\degC{}) and boiling point (100.0\,\degC{} at local altitude, corrected for barometric pressure in Golden, CO: $\approx$95.0\,\degC{} at 5,675\,ft elevation). Additional points at 25\,\degC{} and 50\,\degC{} using a calibrated water bath.
@@ -115,7 +115,7 @@ V_o = V_{ex} \left(\frac{R_1}{R_1 + R_2} - \frac{R_3}{R_3 + R_4}\right)
 \end{equation}
 When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\Delta R$ in one arm produces:
 \begin{equation}
-\Delta V_o \approx \frac{V_{ex}}{4} \cdot \frac{\Delta R}{R} \quad \text{(quarter-bridge)}\footnote{This is the linearized approximation, valid for $\Delta R / R \ll 1$ (i.e., strains below ${\sim}5000\,\mu\epsilon$). The exact expression is $\Delta V_o = V_{ex} \cdot (\Delta R/R) / (4 + 2\Delta R/R)$, which matters for large strains or for high-accuracy absolute strain measurement.}
+\Delta V_o \approx \frac{V_{ex}}{4} \cdot \frac{\Delta R}{R} \quad \text{(quarter-bridge\index{bridge!quarter})}\footnote{This is the linearized approximation, valid for $\Delta R / R \ll 1$ (i.e., strains below ${\sim}5000\,\mu\epsilon$). The exact expression is $\Delta V_o = V_{ex} \cdot (\Delta R/R) / (4 + 2\Delta R/R)$, which matters for large strains or for high-accuracy absolute strain measurement.}
 \end{equation}
 
 \subsection{Bridge Configurations}
@@ -162,7 +162,7 @@ When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\D
 \end{scope}
 \node[font=\scriptsize\sffamily\itshape, WarnOrange] at (7.5,-2.6) {Orange = active sensor elements; white = fixed reference resistors};
 \end{tikzpicture}
-\caption{Wheatstone bridge configurations. Sensitivity doubles with each step: quarter-bridge ($1$ active element), half-bridge ($2$), full-bridge ($4$). Full bridge also provides complete temperature compensation.}
+\caption{Wheatstone bridge configurations. Sensitivity doubles with each step (Figure~\ref{fig:bridge}): quarter-bridge ($1$ active element), half-bridge\index{bridge!half} ($2$), full-bridge\index{bridge!full} ($4$). Full bridge also provides complete temperature compensation.}
 \label{fig:bridge}
 \end{figure}
 
@@ -197,7 +197,7 @@ The reference standard must be at least 4$\times$ more accurate than the sensor 
 (1) Thermal equilibrium (15+ minutes after power-on). (2) Apply 5--7 known inputs spanning the full range. (3) Record sensor output at each. (4) Repeat sweep in reverse (detect hysteresis). (5) Repeat 3--5 times (quantify repeatability). (6) Fit calibration curve. (7) Calculate residuals and report uncertainty.
 
 \subsection{Linear vs.\ Polynomial Calibration}
-For linear sensors (RTDs, LVDTs): $y = mx + b$ via least-squares regression. Sensitivity $m$ and offset $b$. For nonlinear sensors (thermistors, wide-range thermocouples): polynomial $y = a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n$ using LabVIEW's General Polynomial Fit VI. Report the goodness-of-fit $R^2$.
+For linear sensors (RTDs, LVDTs): $y = mx + b$ via least-squares regression. Sensitivity $m$ and offset $b$. For nonlinear sensors (thermistors, wide-range thermocouple\index{thermocouple}s): polynomial $y = a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n$ using LabVIEW's General Polynomial Fit VI. Report the goodness-of-fit $R^2$.
 
 \begin{warningbox}[Do Not Extrapolate Beyond Calibration Range]
 A calibration curve is valid only within the range of inputs used to generate it. Beyond this range, the sensor may saturate, exhibit unexpected nonlinearity, or produce physically meaningless outputs. Always recalibrate over a wider range if measurements approach the boundaries.
@@ -275,7 +275,7 @@ Cold junction compensation: $\pm$0.10\,\degC{} (from the AD595 CJC IC accuracy).
 
 INA128 gain error: $\pm$0.05\% $\times$ 80\,\degC{} $= \pm$0.04\,\degC{}.
 
-INA128 offset: 50\,$\mu$V $\times$ 611 gain $= 30.5$\,mV, equivalent to $\pm$0.01\,\degC{} after calibration.
+INA128 offset: 50\,$\mu$V $\times$ 603 gain $= 30.5$\,mV, equivalent to $\pm$0.01\,\degC{} after calibration.
 
 ADC quantization: $\pm$0.5 LSB $= \pm$0.15\,mV $\to \pm$0.004\,\degC{} (negligible).
 

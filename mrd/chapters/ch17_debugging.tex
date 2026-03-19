@@ -5,7 +5,7 @@
 \label{ch:debugging}\index{debugging!methodology}\index{debugging!pyramid}\index{signal walk}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~8D / Design Challenge}: Read before the integration phase of the design challenge. The debugging pyramid and signal walk protocol are your primary tools when things do not work. Return to this chapter any time a lab produces unexpected results. \textbf{Related}: Circuit fundamentals in Chapter~\ref{ch:circuits} (p.\,\pageref{ch:circuits}); SNR and grounding in Chapter~\ref{ch:snr} (p.\,\pageref{ch:snr}).
+\textbf{Module~8D / Design Challenge}: Read before the integration phase of the design challenge. The debugging pyramid (Figure~\ref{fig:debug_pyramid}) and signal walk protocol are your primary tools when things do not work. Return to this chapter any time a lab produces unexpected results. \textbf{Related}: Circuit fundamentals in Chapter~\ref{ch:circuits} (p.\,\pageref{ch:circuits}); SNR and grounding in Chapter~\ref{ch:snr} (p.\,\pageref{ch:snr}).
 \end{tipbox}
 
 \begin{warningbox}[Read This Chapter First]
@@ -65,13 +65,13 @@ Hardware debugging follows a systematic process. Resist the urge to start changi
 Before applying power, inspect the physical assembly. Check for: solder bridges (adjacent pads connected by a blob of solder, especially on fine-pitch ICs), cold joints (dull, grainy solder that did not flow properly), missing components, wrong component orientation (electrolytic capacitors, diodes, ICs), loose wires, and pinched or abraded insulation. A 10$\times$ magnifier or loupe is essential. Many hardware failures are visible before any electrical test.
 
 \subsection{Continuity and Short-Circuit Check}
-With power off, use the multimeter's continuity mode to verify: (1) power and ground are not shorted (beep between VCC and GND means a dead short that will destroy the supply or blow a fuse), (2) all ground connections are continuous (no open ground paths), and (3) signal connections reach their intended destinations (probe both ends of each wire or trace).
+With power off, use the multimeter\index{multimeter}'s continuity mode to verify: (1) power and ground are not shorted (beep between VCC and GND means a dead short that will destroy the supply or blow a fuse), (2) all ground connections are continuous (no open ground paths), and (3) signal connections reach their intended destinations (probe both ends of each wire or trace).
 
 \subsection{Power-Up Sequence}
 Apply power through a current-limited bench supply. Set the current limit to 50\,mA initially. If the circuit draws more than expected, something is wrong; do not increase the limit until you find out why. Monitor the supply current as you increase the voltage to the operating level. A healthy circuit draws a predictable current; a fault draws either zero (open connection) or excessive current (short circuit). Measure every power rail voltage with a multimeter and compare to the expected values before connecting any ICs or modules.
 
 \subsection{Signal Tracing}
-Once power is verified, inject a known signal at the input and trace it through each stage of the signal chain with an oscilloscope or multimeter. At each node, compare the measured signal to the expected value (calculated from the circuit design). When the measured value deviates from the expected value, you have localized the fault to the stage between the last good node and the first bad node.
+Once power is verified, inject a known signal at the input and trace it through each stage of the signal chain with an oscilloscope\index{oscilloscope} or multimeter. At each node, compare the measured signal to the expected value (calculated from the circuit design). When the measured value deviates from the expected value, you have localized the fault to the stage between the last good node and the first bad node.
 
 \begin{tipbox}[The Signal Walk]
 Start at the sensor (or a signal generator substituting for the sensor). Measure the output voltage. Move the probe one stage downstream: after the voltage divider, after the amplifier, at the ADC input pin. At each point, verify the signal is correct in amplitude, offset, and frequency content. When you find the first point where the signal is wrong, the fault is between that point and the previous (good) point. This narrows the search to one component or one interface.
@@ -133,7 +133,7 @@ LabVIEW provides built-in debugging tools that are more powerful than serial pri
 
 \textbf{Highlight Execution} (light bulb icon): animates dataflow on the block diagram, showing values moving along wires in real time. Useful for understanding execution order and spotting unexpected data paths. Warning: slows execution dramatically; do not use for timing-critical debugging.
 
-\textbf{Probes}: right-click any wire and select ``Probe'' to watch its value update in real time without stopping execution. Place probes at the output of every major processing stage to monitor the signal chain live.
+\textbf{Probes}: right-click any wire and select ``Probe'' to watch its value update in real-time without stopping execution. Place probes at the output of every major processing stage to monitor the signal chain live.
 
 \textbf{Breakpoints}: pause execution at a specific node. Inspect all wire values at that moment. Step forward one node at a time to trace the exact point where values diverge from expectations.
 
@@ -194,7 +194,7 @@ The first instrument you reach for. Measures DC/AC voltage, current, resistance,
 Essential for: viewing signal waveforms, measuring timing relationships, capturing transient events (glitches, spikes, ringing), verifying PWM duty cycle and frequency, diagnosing communication protocols (SPI clock, I2C timing). Learn to set the trigger correctly; an untriggered oscilloscope display is useless noise. Use the ``Single'' trigger mode to capture one-time events (power-on transients, fault spikes).
 
 \subsection{Logic Analyzer}
-For digital communication debugging (SPI, I2C, UART). Captures multiple digital signals simultaneously and decodes protocol frames. Many affordable USB logic analyzers ($<$\$20) work with free software (PulseView/sigrok). Use when: I2C devices are not responding, SPI data is corrupted, UART baud rate mismatch is suspected.
+For digital communication debugging (SPI, I2C, UART). Captures multiple digital signals simultaneously and decodes protocol frames. Many affordable USB logic analyzers ($<$\$20) work with free software (PulseView/sigrok). Use when: I2C devices are not responding, SPI data are corrupted, UART baud rate mismatch is suspected.
 
 \subsection{Bench Power Supply}
 Use the current-limit feature as a diagnostic tool, not just a safety feature. A circuit that draws 50\,mA normally but suddenly draws 500\,mA has a fault. The current limit prevents damage while you investigate. Vary the supply voltage slowly and observe when the circuit starts and stops functioning; this reveals voltage margin issues.

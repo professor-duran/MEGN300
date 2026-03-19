@@ -5,7 +5,7 @@
 \label{ch:closedloop}\index{control!closed-loop}\index{feedback}\index{stability}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~9 (Weeks 13--14)}: Read after the open-loop chapter. Focus on feedback block diagrams, stability concepts (gain/phase margin), and the step response characteristics (overshoot, settling time). \textbf{Related}: Open-loop in Chapter~\ref{ch:openloop} (p.\,\pageref{ch:openloop}); PID tuning in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
+\textbf{Module~9 (Weeks 13--14)}: Read after the open-loop chapter. Focus on feedback block diagrams, stability concepts (gain/phase margin\index{phase margin}), and the step response characteristics (overshoot, settling time). \textbf{Related}: Open-loop in Chapter~\ref{ch:openloop} (p.\,\pageref{ch:openloop}); PID tuning in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -67,7 +67,7 @@ Closed-loop control measures the output (the \textbf{process variable}, PV), com
 \draw[-{Stealth[length=2mm]}, WarnOrange, thick] (5.5,1.2) -- (5.5,0.35);
 \node[font=\scriptsize\sffamily, WarnOrange] at (5.5,1.5) {Disturbance $d$};
 \end{tikzpicture}
-\caption{Standard feedback control loop. The summing junction computes error $e = \text{SP} - \text{PV}$. Disturbances enter at the plant but the feedback loop detects and corrects their effect.}
+\caption{Standard feedback control\index{control!feedback} loop. The summing junction computes error $e = \text{SP} - \text{PV}$. Disturbances enter at the plant but the feedback loop detects and corrects their effect.}
 \label{fig:feedback_loop}
 \end{figure}
 
@@ -81,7 +81,7 @@ The summing junction computes $e = \text{SP} - \text{PV}$. The controller proces
 \end{itemize}
 
 \section{Stability}
-A feedback system can become \textbf{unstable} if the loop gain is too high or the phase shift around the loop reaches $-180$\ang{} at a frequency where the gain is still $>$1. An unstable system oscillates with growing amplitude. Stability analysis tools: Bode plots (gain and phase margins), root locus, and Nyquist criterion. For MEGN~300, the key takeaway is: excessive controller gain causes instability (oscillation).
+A feedback system can become \textbf{unstable} if the loop gain is too high or the phase shift around the loop reaches $-180$\ang{} at a frequency where the gain is still $>$1. An unstable system oscillates with growing amplitude. Stability analysis tools: Bode plots (gain and phase margins), root locus\index{root locus}, and Nyquist criterion. For MEGN~300, the key takeaway is: excessive controller gain causes instability (oscillation).
 
 \begin{tipbox}[The Stability Rule of Thumb]
 If your controller output oscillates, the gain is too high. Reduce proportional gain first, then check if the oscillation stops. If the system responds sluggishly but does not oscillate, the gain may be too low.
@@ -117,7 +117,7 @@ For a step input, the steady-state error depends on the \textbf{system type} (nu
 
 
 \section{The Feedback Principle}
-Closed-loop control measures the actual output (process variable, PV) and compares it to the desired output (setpoint, SP). The difference is the error: $e(t) = \text{SP} - \text{PV}$. The controller uses this error to compute a control action $u(t)$ that drives the error toward zero. This is the fundamental mechanism of all feedback control: measure, compare, correct.
+Closed-loop control measures the actual output (Figure~\ref{fig:feedback_loop}) (process variable, PV) and compares it to the desired output (setpoint, SP). The difference is the error: $e(t) = \text{SP} - \text{PV}$. The controller uses this error to compute a control action $u(t)$ that drives the error toward zero. This is the fundamental mechanism of all feedback control: measure, compare, correct.
 
 \section{Closed-Loop Block Diagram Components}
 \textbf{Setpoint (SP)}: the desired output value, specified by the user or a higher-level controller.
@@ -142,10 +142,6 @@ A transfer function $G(s)$ describes the input-output relationship in the Laplac
 \textbf{Type 1} (one integrator): zero steady-state error for step inputs, finite for ramp inputs. PI control adds the required integrator.
 
 \textbf{Type 2} (two integrators): zero steady-state error for step and ramp inputs. Rarely needed in instrumentation.
-
-\section{Stability}
-A closed-loop system is stable if and only if all poles of the closed-loop transfer function have negative real parts (lie in the left half of the $s$-plane). In practice, stability is assessed using gain margin (how much the gain can increase before instability) and phase margin (how much additional phase lag can be tolerated). For robust performance, aim for gain margin $> 6$\,dB and phase margin $> 45^{\circ}$.
-
 \section{Closed-Loop Advantages}
 \textbf{Disturbance rejection}: feedback detects and corrects the effect of disturbances. A door opening in a heated room causes a temperature drop that the controller detects and compensates by increasing heater power.
 
@@ -155,7 +151,7 @@ A closed-loop system is stable if and only if all poles of the closed-loop trans
 
 
 \section{Sensitivity and Complementary Sensitivity}
-The closed-loop transfer function from setpoint to output is the \textbf{complementary sensitivity function} $T(s) = L(s)/(1+L(s))$ where $L(s) = G_c(s)G_p(s)$ is the open-loop transfer function. The \textbf{sensitivity function} $S(s) = 1/(1+L(s))$ describes how disturbances affect the output. Note that $S + T = 1$ (for the standard unity-feedback architecture with $H(s) = 1$): you cannot simultaneously reduce sensitivity to disturbances at all frequencies. This is the fundamental limitation of feedback control.
+The closed-loop transfer function from setpoint to output is the \textbf{complementary sensitivity\index{complementary sensitivity} function\index{sensitivity function}} $T(s) = L(s)/(1+L(s))$ where $L(s) = G_c(s)G_p(s)$ is the open-loop transfer function. The \textbf{sensitivity function} $S(s) = 1/(1+L(s))$ describes how disturbances affect the output. Note that $S + T = 1$ (for the standard unity-feedback architecture with $H(s) = 1$): you cannot simultaneously reduce sensitivity to disturbances at all frequencies. This is the fundamental limitation of feedback control.
 
 At low frequencies where $|L| \gg 1$: $T \approx 1$ (output tracks setpoint), $S \approx 1/L \ll 1$ (disturbances are strongly rejected). At high frequencies where $|L| \ll 1$: $T \approx L \ll 1$ (output does not track fast setpoint changes), $S \approx 1$ (disturbances pass through unattenuated).
 
@@ -197,7 +193,7 @@ Adding integral action ($K_i > 0$) makes the system Type~1: $K_p \to \infty$, $e
 
 \section{Stability Analysis Methods}
 \subsection{Bode Plot Method}
-Plot the magnitude and phase of $L(j\omega)$ vs.\ frequency. The system is stable if the gain margin (gain below 0\,dB at the $-180^{\circ}$ phase frequency) and phase margin (phase above $-180^{\circ}$ at the 0\,dB gain frequency) are both positive.
+Plot the magnitude and phase of $L(j\omega)$ vs.\ frequency. The system is stable if the gain margin\index{gain margin} (gain below 0\,dB at the $-180^{\circ}$ phase frequency) and phase margin (phase above $-180^{\circ}$ at the 0\,dB gain frequency) are both positive.
 
 For the ThermoRig PI controller: $L(s) = (10 + 0.5/s) \times 1/(1+30s)$ (P$=10$, I$=0.5$, plant time constant $= 30$\,s). The Bode plot shows crossover at $\sim$0.05\,Hz with ${\sim}50^{\circ}$ phase margin. This is adequate (${>}\,45^{\circ}$). Increasing $K_p$ to 20 reduces the phase margin to ${\sim}30^{\circ}$, making the response oscillatory.
 

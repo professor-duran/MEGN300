@@ -2,10 +2,10 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{PID Control}
-\label{ch:pid}\index{PID control}\index{Ziegler-Nichols}\index{integral windup}
+\label{ch:pid}\index{PID control}\index{Ziegler-Nichols\index{Ziegler-Nichols tuning}}\index{integral\index{PID!integral} windup}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~9 (Weeks 13--14)}: Read before the PID tuning lab. Focus on P/I/D individual effects, Ziegler-Nichols tuning, and integral windup. The ThermoRig PID example is directly applicable to the lab. \textbf{Related}: Closed-loop fundamentals in Chapter~\ref{ch:closedloop} (p.\,\pageref{ch:closedloop}); high-power output stages in Chapter~\ref{ch:highpower} (p.\,\pageref{ch:highpower}).
+\textbf{Module~9 (Weeks 13--14)}: Read before the PID tuning lab. Focus on P/I/D individual effects, Ziegler-Nichols tuning, and integral windup\index{integral windup}. The ThermoRig PID example is directly applicable to the lab. \textbf{Related}: Closed-loop fundamentals in Chapter~\ref{ch:closedloop} (p.\,\pageref{ch:closedloop}); high-power output stages in Chapter~\ref{ch:highpower} (p.\,\pageref{ch:highpower}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -33,7 +33,7 @@
 \draw[MinesBlue, thick] (9.5,0) -- (9.5,-2.5) -- (sensor);
 \draw[arr] (sensor) -| (sum);
 \end{tikzpicture}
-\caption{PID controller block diagram. The error $e(t) = r(t) - y_{\text{measured}}(t)$ drives three parallel paths: proportional (speed), integral (accuracy), derivative (damping). The sensor feedback path introduces its own dynamics and noise.}
+\caption{PID controller\index{PID controller} block diagram. The error $e(t) = r(t) - y_{\text{measured}}(t)$ drives three parallel paths: proportional\index{PID!proportional} (speed), integral (accuracy), derivative\index{PID!derivative} (damping). The sensor feedback path introduces its own dynamics and noise.}
 \label{fig:pid_block}
 \end{figure}
 
@@ -85,7 +85,7 @@ $u_D = K_d \cdot de/dt$. Output is proportional to the rate of change of error. 
 \node[font=\tiny\sffamily, WarnOrange, anchor=west] at (axis cs:9.1,0.9) {offset};
 \end{axis}
 \end{tikzpicture}
-\caption{Step response comparison: P-only has steady-state offset, PI eliminates offset but overshoots, PID provides fast settling with minimal overshoot. Tune P first, then I, then D.}
+\caption{Step response comparison: P-only has steady-state offset, PI eliminates offset (Figure~\ref{fig:pid}) but overshoots, PID provides fast settling with minimal overshoot. Tune P first, then I, then D (Figure~\ref{fig:pid_steps}).}
 \label{fig:pid_steps}
 \end{figure}
 
@@ -139,7 +139,7 @@ The ThermoRig controls a 100\,W cartridge heater to maintain a metal block at a 
 
 
 \section{From PID Output to Physical Actuator}
-The PID controller computes a control variable $u(t)$ as a percentage (0--100\%). This abstract number must be converted into a physical actuation signal:
+The PID controller (Figure~\ref{fig:pid_block}) computes a control variable $u(t)$ as a percentage (0--100\%). This abstract number must be converted into a physical actuation signal:
 
 \textbf{For a DC motor} (speed control): $u$ maps to PWM duty cycle. At $u = 50\%$, the MOSFET switches the motor supply at 50\% duty, delivering half the average voltage. The PWM frequency (1--25\,kHz) is fast enough that the motor's inertia smooths the pulsed current.
 
@@ -225,7 +225,7 @@ When the actuator saturates (e.g., heater at 100\% duty, valve fully open), the 
 \node[font=\tiny\sffamily, AccentTeal, anchor=west] at (axis cs:3.4,1.08) {12\% OS};
 \end{axis}
 \end{tikzpicture}
-\caption{Integral windup: without anti-windup (left), the integral accumulates during saturation, causing 80\%+ overshoot. With anti-windup clamping (right), the integral is frozen during saturation, limiting overshoot to $\sim$12\%. Always enable anti-windup.}
+\caption{Integral windup (Figure~\ref{fig:windup}): without anti-windup\index{anti-windup} (left), the integral accumulates during saturation, causing 80\%+ overshoot. With anti-windup clamping (right), the integral is frozen during saturation, limiting overshoot to $\sim$12\%. Always enable anti-windup.}
 \label{fig:windup}
 \end{figure}
 
@@ -264,7 +264,7 @@ When the setpoint changes suddenly (step change), the proportional and derivativ
 When switching between manual and automatic control modes, a poorly implemented PID can produce a large output jump. Bumpless transfer initializes the integral term so that the automatic output matches the manual output at the moment of transfer.
 
 \subsection{Cascade Control}
-For systems with multiple time constants (e.g., a heater heating a metal block that heats a fluid), cascade control uses two nested loops: an inner (fast) loop controls the heater temperature, and an outer (slow) loop controls the fluid temperature. The outer loop's output becomes the inner loop's setpoint. This rejects disturbances faster by addressing them at the inner loop before they propagate to the outer variable.
+For systems with multiple time constants (e.g., a heater heating a metal block that heats a fluid), cascade control\index{cascade control} uses two nested loops: an inner (fast) loop controls the heater temperature, and an outer (slow) loop controls the fluid temperature. The outer loop's output becomes the inner loop's setpoint. This rejects disturbances faster by addressing them at the inner loop before they propagate to the outer variable.
 
 \begin{examplebox}[ThermoRig: Complete PID Implementation in LabVIEW]
 The ThermoRig PID loop runs at 10\,Hz ($T_s = 0.1$\,s). The NI DAQ reads the thermocouple (averaged over 10 readings per cycle for noise reduction). The PID VI computes the output (0--100\% duty cycle). The output drives the SSR via a digital output toggled at 1\,Hz time-proportional rate.
@@ -292,18 +292,6 @@ $u_I = K_i \int e\,dt$: output proportional to the accumulated error over time. 
 
 \subsection{Derivative (D) Term}
 $u_D = K_d \cdot de/dt$: output proportional to the rate of change of error. It provides predictive action, reducing overshoot and improving stability by ``braking'' when the error is decreasing rapidly. However, it amplifies high-frequency noise. In practice, the derivative is computed from the PV (not the error) to avoid setpoint step spikes, and a low-pass filter is applied to the derivative signal.
-
-\section{Tuning Methods}
-\subsection{Ziegler-Nichols Closed-Loop Method}
-(1) Set $K_i = 0$ and $K_d = 0$ (P-only). (2) Increase $K_p$ until the system oscillates at constant amplitude. Record this $K_p$ as $K_u$ (ultimate gain) and the oscillation period as $T_u$ (ultimate period). (3) Calculate gains from the Z-N table:
-
-P-only: $K_p = 0.5 K_u$. PI: $K_p = 0.45 K_u$, $T_i = T_u/1.2$. PID: $K_p = 0.6 K_u$, $T_i = T_u/2$, $T_d = T_u/8$.
-
-Z-N tuning produces aggressive response with significant overshoot ($\sim$25\%). Use it as a starting point and manually reduce $K_p$ and increase $T_i$ for less aggressive behavior.
-
-\subsection{Manual Tuning}
-(1) Set $K_i = 0$, $K_d = 0$. Increase $K_p$ until the response is fast with acceptable overshoot ($<$10\%). (2) Gradually increase $K_i$ to eliminate the steady-state offset. Too much $K_i$ causes slow oscillation. (3) Add $K_d$ to reduce overshoot and improve settling. Too much $K_d$ causes high-frequency jitter (noise amplification).
-
 \section{Anti-Windup}
 When the actuator saturates (e.g., heater at 100\% power), the integral term continues to accumulate error, growing very large. When the error finally changes sign, the massive accumulated integral drives the output far past the setpoint, causing enormous overshoot. This is \textbf{integral windup}.
 

@@ -4,16 +4,16 @@
 \chapter{Analog vs.\ Digital Systems}\label{ch:analog_digital}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~4 (Weeks 5--6)}: Read the full chapter before the ADC/sampling lab. The sampling theorem, quantization error, and NI DAQ configuration sections are directly applied in that lab. \textbf{Related}: SNR in Chapter~\ref{ch:snr} (p.\,\pageref{ch:snr}); DSP fundamentals in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}).
+\textbf{Module~4 (Weeks 5--6)}: Read the full chapter before the ADC/sampling lab. The sampling theorem, quantization\index{quantization} error, and NI DAQ configuration sections are directly applied in that lab. \textbf{Related}: SNR in Chapter~\ref{ch:snr} (p.\,\pageref{ch:snr}); DSP fundamentals in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}).
 \end{tipbox}
 
 \section{Continuous and Discrete Signals}
 An \textbf{analog signal} is continuous in both time and amplitude: it can take any value at any instant. A \textbf{digital signal} is discrete in both time (sampled at intervals) and amplitude (quantized to finite levels). The real world is analog; computers are digital. The boundary between them is the most critical interface in any measurement system.
 
 \section{Analog-to-Digital Conversion (ADC)}
-An ADC converts a continuous voltage into a binary number. Three key parameters:
+An ADC converts a continuous voltage (Figure~\ref{fig:adc}) into a binary number. Three key parameters:
 
-\textbf{Resolution} ($n$ bits): determines the number of discrete levels $= 2^n$. A 12-bit ADC divides the input range into 4096 levels. The \textbf{least significant bit} (LSB) voltage:
+\textbf{Resolution} ($n$ bits): determines the number of discrete levels $= 2^n$. A 12-bit ADC divides the input range into 4096 levels. The \textbf{least significant bit} (LSB\index{LSB (least significant bit)}) voltage:
 \begin{equation}
 \text{LSB} = \frac{V_{\text{range}}}{2^n}
 \end{equation}
@@ -75,13 +75,13 @@ The best practice in modern instrumentation: use high-quality analog signal cond
 
 
 \section{Sample-and-Hold (S/H)}
-An ADC takes a finite time to complete a conversion (the \textbf{aperture time}). If the input voltage changes during conversion, the result is erroneous. A sample-and-hold circuit captures the analog voltage on a capacitor at the sampling instant and holds it constant while the ADC converts. Most modern ADCs include an internal S/H, but at high sampling rates or with fast-changing signals, the S/H settling time becomes a limitation.
+An ADC takes a finite time to complete a conversion (the \textbf{aperture time}). If the input voltage changes during conversion, the result is erroneous. A sample-and-hold circuit captures the analog voltage on a capacitor at the sampling instant and holds it constant while the ADC converts. Most modern ADCs include an internal S/H, but at high sampling rate\index{sampling rate}s or with fast-changing signals, the S/H settling time becomes a limitation.
 
 \textbf{Aperture jitter}: random variation in the sampling instant. Creates timing uncertainty that converts to amplitude noise. For a sinusoidal signal of frequency $f$ and amplitude $V_p$:
 \begin{equation}
 V_{\text{noise,jitter}} = 2\pi f \cdot V_p \cdot t_{\text{jitter}}
 \end{equation}
-At high frequencies, jitter becomes the dominant noise source, limiting effective resolution. For the low-frequency measurements typical of the USB-6001 ($<$1\,kHz), clock jitter is negligible compared to quantization noise and is not a practical concern.
+At high frequencies, jitter becomes the dominant noise source, limiting effective resolution. For the low-frequency measurements typical of the USB-6001\index{NI USB-6001} ($<$1\,kHz), clock jitter is negligible compared to quantization noise and is not a practical concern.
 
 \section{Multiplexing}
 A DAQ system often uses a single ADC shared among multiple input channels via an \textbf{analog multiplexer} (MUX). The MUX switches channels sequentially, so the effective per-channel sampling rate is $f_s / N_{\text{channels}}$. This introduces a \textbf{channel-to-channel skew}: adjacent channels are sampled at slightly different times.
@@ -121,7 +121,7 @@ An analog low-pass filter must be present before the ADC in every properly desig
 \section{Quantization in Depth}
 An $n$-bit ADC divides $V_{\text{range}}$ into $2^n$ levels. The LSB voltage is $V_{\text{range}}/2^n$. Quantization error is $\pm$0.5\,LSB with RMS value $\text{LSB}/\sqrt{12}$. For $\pm$10\,V range: 12-bit gives 4.88\,mV LSB; 14-bit gives 1.22\,mV; 16-bit gives 0.305\,mV. Each additional bit halves the LSB.
 
-The Effective Number of Bits (ENOB) quantifies actual resolution: ENOB $= (\text{SINAD} - 1.76)/6.02$. A 16-bit ADC may have ENOB of only 13--14 at full speed. Always check ENOB in the datasheet.
+The Effective Number of Bits (ENOB\index{ENOB}) quantifies actual resolution: ENOB $= (\text{SINAD} - 1.76)/6.02$. A 16-bit ADC may have ENOB of only 13--14 at full speed. Always check ENOB in the datasheet.
 
 \section{Sample-and-Hold and Aperture Effects}
 The ADC needs a stable input during conversion. A sample-and-hold (S/H) captures the signal at a precise instant. Without it, fast-changing signals cause aperture error: $\epsilon = 2\pi f \cdot A \cdot t_a$ where $t_a$ is the aperture time. For $<$0.5\,LSB error: $t_a < \text{LSB}/(2\pi f A)$.
@@ -261,7 +261,7 @@ If $U = 1.0$ (signal fills the entire range): you use all $n$ bits. If $U = 0.5$
 
 \textbf{Design strategy}: set the signal conditioning gain so that the maximum expected signal (plus noise margin) reaches 80--90\% of the ADC's full-scale input. Leave 10--20\% headroom for unexpected peaks, noise spikes, and component tolerances. This maximizes the effective resolution while preventing clipping.
 
-Example: thermocouple conditioned by INA128 with $G = 611$. Maximum TC output at 200\,\degC{}: $200 \times 0.041 = 8.2$\,mV. After amplification: $8.2 \times 611 = 5.01$\,V. Using the 0--5\,V DAQ range: $U = 5.01/5.0 = 1.0$. Excellent range utilization. But with the default $\pm$10\,V range: $U = 5.01/20 = 0.25$, losing 2 bits of effective resolution.
+Example: thermocouple conditioned by INA128 with $G = 603$. Maximum TC output at 200\,\degC{}: $200 \times 0.041 = 8.2$\,mV. After amplification: $8.2 \times 603 = 4.94$\,V. Using the 0--5\,V DAQ range: $U = 4.94/5.0 = 0.99$. Excellent range utilization. But with the default $\pm$10\,V range: $U = 4.94/20 = 0.25$, losing 2 bits of effective resolution.
 
 \section{Timing Accuracy and Jitter}
 The accuracy of time-domain measurements (period, frequency, phase) depends on the sampling clock accuracy and jitter:

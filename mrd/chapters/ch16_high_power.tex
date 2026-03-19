@@ -2,7 +2,7 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{High-Power Devices and Switches}
-\label{ch:highpower}\index{MOSFET}\index{relay}\index{SSR}\index{flyback diode}\index{PWM}\index{H-bridge}
+\label{ch:highpower}\index{MOSFET}\index{relay}\index{SSR}\index{flyback diode\index{flyback diode} (Figure~\ref{fig:mosfet_flyback})}\index{PWM\index{PWM (pulse width modulation)}}\index{H-bridge}
 
 \begin{tipbox}[When to Read This Chapter]
 \textbf{Module~8 (Weeks 11--12)}: Read before the high-power switching lab. Focus on MOSFET gate drive, flyback diodes, PWM, and the relay vs.\ MOSFET vs.\ SSR comparison. The safety warnings in this chapter are critical. \textbf{Related}: Circuit fundamentals in Chapter~\ref{ch:circuits} (p.\,\pageref{ch:circuits}); PID output stages in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
@@ -52,7 +52,7 @@
 \node[font=\tiny\sffamily, WarnOrange] at (axis cs:3.5,0.95) {$\bar{V}$};
 \end{axis}
 \end{tikzpicture}
-\caption{Pulse Width Modulation (PWM) at three duty cycles. The MOSFET switches rapidly between fully on ($V_s$) and fully off (0\,V). The average voltage $\bar{V} = D \times V_s$ (orange dashed) is proportional to the duty cycle $D$. An inductive load (motor coil) smooths the pulsed current into a nearly DC value proportional to $D$. The ThermoRig heater uses time-proportional PWM through an SSR.}
+\caption{Pulse Width Modulation (Figure~\ref{fig:pwm}) (PWM) at three duty cycles. The MOSFET switches rapidly between fully on ($V_s$) and fully off (0\,V). The average voltage $\bar{V} = D \times V_s$ (orange dashed) is proportional to the duty cycle $D$. An inductive load (motor coil) smooths the pulsed current into a nearly DC value proportional to $D$. The ThermoRig heater uses time-proportional PWM through an SSR.}
 \label{fig:pwm}
 \end{figure}
 
@@ -143,7 +143,7 @@ An optocoupler transmits a signal across an electrical isolation barrier using l
 Use optocouplers when: (1) switching AC mains (120/240\,VAC), (2) the power ground and signal ground must be kept separate for safety, or (3) ground loops between the controller and the load circuit must be eliminated.
 
 \begin{examplebox}[ThermoRig: Heater Control with SSR and PWM]
-The ThermoRig drives a 120\,VAC, 500\,W cartridge heater through a solid-state relay (SSR, Crydom D2425). The SSR's control input requires 3--32\,VDC at 10\,mA. The ESP32's 3.3\,V GPIO drives the SSR directly (3.3\,V is within the 3--32\,V control range; current draw is 10\,mA, within GPIO limits).
+The ThermoRig drives a 120\,VAC, 500\,W cartridge heater through a solid-state relay\index{solid-state relay} (SSR, Crydom D2425). The SSR's control input requires 3--32\,VDC at 10\,mA. The ESP32's 3.3\,V GPIO drives the SSR directly (3.3\,V is within the 3--32\,V control range; current draw is 10\,mA, within GPIO limits).
 
 PWM at 1\,Hz (slow PWM or ``time-proportional control''): the PID controller outputs a duty cycle (0--100\%). Each second, the heater is ON for $D \times 1$\,s and OFF for $(1-D) \times 1$\,s. This slow switching extends SSR life and avoids EMI from fast switching of AC loads. The thermal mass of the metal block smooths the pulsed heating into a quasi-continuous temperature rise.
 \end{examplebox}
@@ -177,7 +177,7 @@ A \textbf{flyback diode} (Schottky type: 1N5819) placed across the inductive loa
 \section{Relay and SSR Switching}
 \textbf{Electromechanical relays}: a coil creates a magnetic field that physically moves a switch contact. Advantages: complete galvanic isolation between control and load, can switch AC or DC, very high off-resistance. Disadvantages: slow (5--20\,ms), limited cycle life (100k--1M operations), generates EMI at contact bounce. The relay coil is itself an inductive load; drive it through a MOSFET or BJT with a flyback diode.
 
-\textbf{Solid-State Relays (SSR)}: semiconductor switches (triacs for AC, MOSFETs for DC) with optical isolation between control and load. Advantages: fast (microseconds), no contact bounce, unlimited cycle life, silent. Disadvantages: some leakage current when off, voltage drop when on (1--2\,V for triacs), requires heat sinking at high currents.
+\textbf{Solid-State Relays (SSR)}: semiconductor switches (triacs for AC, MOSFETs for DC) with optical isolation between control and load. Advantages: fast (microseconds), no contact bounce, unlimited cycle life, silent. Disadvantages: some leakage current when off, voltage drop when on (1--2\,V for triacs), requires heat sink\index{heat sink}ing at high currents.
 
 \section{PWM for Proportional Control}
 Pulse-Width Modulation (PWM) rapidly switches the load on and off at a fixed frequency, with the ratio of on-time to total period (the \textbf{duty cycle}) controlling the average power delivered. At 50\% duty cycle, the load receives 50\% of the maximum power.
@@ -324,7 +324,7 @@ A buck-boost converter can produce an output voltage either higher or lower than
 The SEPIC (Single-Ended Primary-Inductor Converter) is a popular buck-boost topology that produces a non-inverted output with good regulation. Common ICs: TPS63000 series (Adjustable, 1.8--5.5\,V output, 96\% peak efficiency).
 
 \subsection{Switching Regulator Noise}
-The main disadvantage of all switching regulators is output ripple and electromagnetic interference (EMI). The rapid switching (100\,kHz+) generates noise at the switching frequency and its harmonics. This noise can corrupt sensitive analog measurements.
+The main disadvantage of all switching regulator\index{switching regulator}s is output ripple and electromagnetic interference (EMI). The rapid switching (100\,kHz+) generates noise at the switching frequency and its harmonics. This noise can corrupt sensitive analog measurements.
 
 Mitigation strategies: (1) add an LC output filter (extra inductor + capacitor) after the switching regulator, (2) use an LDO as a post-regulator to clean up the output for analog circuits, (3) keep switching regulator traces physically separated from analog signal traces on the PCB, and (4) use a continuous ground plane under the switching regulator with short, wide power traces. For further layout best practices, consult the grounding and EMI guidelines in Chapter~\ref{ch:snr} (p.\,\pageref{ch:snr}).
 

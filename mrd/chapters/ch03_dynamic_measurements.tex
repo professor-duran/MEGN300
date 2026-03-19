@@ -52,7 +52,7 @@ Described by:
 \end{equation}
 where $\tau$ is the \textbf{time constant} and $K$ is the static sensitivity. First-order systems are characterized by a single energy storage element (e.g., thermal mass of a temperature probe).
 
-\textbf{Step response}: $y(t) = K \cdot x_0 (1 - e^{-t/\tau})$. After one time constant ($t = \tau$), the output reaches 63.2\% of its final value. After $5\tau$, the output is within 0.7\% of final (effectively settled).
+\textbf{Step response}: $y(t) = K \cdot x_0 (1 - e^{-t/\tau})$. After one time constant ($t = \tau$), the output reaches 63.2\% of its final value (Figure~\ref{fig:first_order}). After $5\tau$, the output is within 0.7\% of final (effectively settled).
 
 \textbf{Frequency response}: the magnitude ratio and phase are:
 \begin{align}
@@ -95,7 +95,7 @@ The $-3$\,dB bandwidth (where $M$ drops to $K/\sqrt{2}$) occurs at $\omega = 1/\
 \node[font=\tiny\sffamily, MinesSilver, rotate=-22] at (axis cs:30,-22) {$-20$\,dB/dec};
 \end{axis}
 \end{tikzpicture}
-\caption{First-order system: step response (left) and Bode magnitude (right). The time constant $\tau$ determines both settling time ($5\tau$ to 99\%) and bandwidth ($f_{-3\text{dB}} = 1/2\pi\tau$).}
+\caption{First-order system: step response (left) and Bode magnitude (right). The time constant $\tau$ determines both settling time\index{settling time} ($5\tau$ to 99\%) and bandwidth ($f_{-3\text{dB}} = 1/2\pi\tau$).}
 \label{fig:first_order}
 \end{figure}
 
@@ -112,9 +112,9 @@ Described by:
 \begin{equation}
 \frac{1}{\omega_n^2}\frac{d^2 y}{dt^2} + \frac{2\zeta}{\omega_n}\frac{dy}{dt} + y = K \cdot x(t)
 \end{equation}
-where $\omega_n$ is the \textbf{undamped natural frequency} and $\zeta$ is the \textbf{damping ratio}. Typical second-order sensors: accelerometers, pressure transducers with diaphragms, and force sensors with spring elements.
+where $\omega_n$ is the \textbf{undamped natural frequency\index{natural frequency}} and $\zeta$ is the \textbf{damping ratio\index{damping ratio}}. Typical second-order sensors: accelerometers, pressure transducers with diaphragms, and force sensors with spring elements.
 
-Three damping regimes: \textbf{underdamped} ($\zeta < 1$): oscillatory response with overshoot; \textbf{critically damped} ($\zeta = 1$): fastest non-oscillatory response; \textbf{overdamped} ($\zeta > 1$): slow, no oscillation. Most practical sensors target $\zeta \approx 0.6$--$0.7$ for fast response with minimal overshoot ($<$5\%).
+Three damping regimes: \textbf{underdamped} ($\zeta < 1$): oscillatory response with overshoot\index{overshoot}; \textbf{critically damped} ($\zeta = 1$): fastest non-oscillatory response; \textbf{overdamped} ($\zeta > 1$): slow, no oscillation. Most practical sensors target $\zeta \approx 0.6$--$0.7$ for fast response with minimal overshoot ($<$5\%).
 
 \textbf{Frequency response} magnitude:
 \begin{equation}
@@ -201,11 +201,6 @@ This is a useful design rule: if you need to resolve events with a 1\,ms rise ti
 \item ``Resolve pressure transients with 0.5\,ms rise time'' $\to$ SENS-REQ: Sensor bandwidth $\geq$700\,Hz ($0.35/0.0005$). SENS-REQ: Sensor natural frequency $\geq$3500\,Hz ($5\times$ bandwidth).
 \end{itemize}
 \end{keyconceptbox}
-
-
-\section{Why Dynamic Response Matters}
-In static measurements, we wait for settling. In dynamic measurements, the measurand changes continuously and the sensor must track those changes. If the sensor cannot keep up, it attenuates and phase-shifts the signal, producing incorrect results.
-
 \section{Zero-Order Systems}
 Output instantaneously proportional to input: $y(t) = K \cdot x(t)$. A potentiometric sensor approximates this at low frequencies. No real sensor is truly zero-order; parasitic effects always introduce dynamics.
 
@@ -270,7 +265,7 @@ When multiple dynamic elements are in series (sensor $\to$ amplifier $\to$ filte
 Example: a thermocouple ($\tau = 0.5$\,s, $f_{-3\text{dB}} = 0.32$\,Hz) followed by a 2nd-order Butterworth filter at 10\,Hz. At 0.1\,Hz: thermocouple gain is $-0.4$\,dB, filter gain is $-0.0$\,dB; total is $-0.4$\,dB (acceptable). At 1\,Hz: thermocouple is $-10$\,dB (the sensor, not the filter, limits performance). The system bandwidth is determined by the slowest element.
 
 \begin{examplebox}[ThermoRig: Cascaded Dynamic Response]
-The ThermoRig signal chain dynamic response: thermocouple ($\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz) $\to$ INA128 ($f_{-3\text{dB}} \approx 1.6$\,kHz at $G = 611$, negligible lag at signal frequencies) $\to$ Sallen-Key LP ($f_c = 40$\,Hz, 2nd order, negligible lag below 4\,Hz). The overall system bandwidth is limited entirely by the thermocouple at 0.38\,Hz. The amplifier and filter contribute less than 0.01\,dB of attenuation and less than 0.$1^{\circ}$ of phase shift at frequencies below 1\,Hz. This is typical: in thermal measurement systems, the sensor dynamics dominate.
+The ThermoRig signal chain dynamic response: thermocouple ($\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz) $\to$ INA128 ($f_{-3\text{dB}} \approx 1.6$\,kHz at $G = 603$, negligible lag at signal frequencies) $\to$ Sallen-Key LP ($f_c = 40$\,Hz, 2nd order, negligible lag below 4\,Hz). The overall system bandwidth is limited entirely by the thermocouple at 0.38\,Hz. The amplifier and filter contribute less than 0.01\,dB of attenuation and less than $0.1^{\circ}$ of phase shift at frequencies below 1\,Hz. This is typical: in thermal measurement systems, the sensor dynamics dominate.
 \end{examplebox}
 
 \section{Sensor Dynamic Compensation}
@@ -321,7 +316,7 @@ Instead of sweeping individual frequencies, apply broadband white noise as the i
 
 For thermal systems where white noise temperature input is impractical, use a Pseudo-Random Binary Sequence (PRBS): a square wave that switches between two temperatures at random intervals. The PRBS has a flat spectrum up to a frequency determined by the minimum switching interval, effectively exciting all frequencies simultaneously.
 \section{System Identification from Experimental Data}
-Determining the dynamic model (transfer function) of a sensor or plant from measured data is called \textbf{system identification}. For MEGN~300 applications, two simple methods suffice:
+Determining the dynamic model (transfer function) of a sensor or plant from measured data are called \textbf{system identification}. For MEGN~300 applications, two simple methods suffice:
 
 \subsection{Step Response Method}
 Apply a step input and record the output. For a first-order system: (1) measure the final steady-state value $y_{ss}$, (2) measure the time to reach $0.632 y_{ss}$ to get $\tau$, (3) the transfer function is $G(s) = y_{ss}/(1 + \tau s)$. For a second-order system: (1) measure the peak overshoot $\%OS$ to determine $\zeta$: $\zeta = -\ln(\%OS/100)/\sqrt{\pi^2 + \ln^2(\%OS/100)}$, (2) measure the peak time $t_p$ to determine $\omega_d$: $\omega_d = \pi/t_p$, (3) compute $\omega_n = \omega_d/\sqrt{1-\zeta^2}$, (4) the transfer function is $G(s) = K\omega_n^2/(s^2 + 2\zeta\omega_n s + \omega_n^2)$.

@@ -62,7 +62,7 @@ Every measurement system, from a mercury thermometer to a satellite telemetry ch
 \draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (8.5,-1.0) -- (8.5,-0.2);
 \draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (11.9,-1.0) -- (11.9,-0.2);
 \end{tikzpicture}}%
-\caption{The five-block generalized measurement system with error sources (orange, dashed) entering at each interface. The total system uncertainty is the RSS combination of all contributions.}
+\caption{The five-block generalized measurement system (Figure~\ref{fig:meas_system}) with error sources (orange, dashed) entering at each interface. The total system uncertainty is the RSS combination of all contributions.}
 \label{fig:meas_system}
 \end{figure}
 
@@ -95,7 +95,7 @@ Each block in the measurement chain generates testable requirements:
 \foreach \x/\y in {9.6/0.7, 8.5/-0.4, 9.2/0.9, 8.8/0.3, 9.4/-0.8}
     {\node[dot] at (\x,\y) {};}
 \end{tikzpicture}
-\caption{Accuracy vs.\ precision: the dartboard analogy. High precision with low accuracy (center) indicates systematic bias correctable by calibration. Low precision (right) requires averaging or a better sensor.}
+\caption{Accuracy vs.\ precision: the dartboard analogy (Figure~\ref{fig:accuracy_precision}). High precision with low accuracy (center) indicates systematic bias correctable by calibration. Low precision (right) requires averaging or a better sensor.}
 \label{fig:accuracy_precision}
 \end{figure}
 \index{accuracy}\index{precision}
@@ -226,7 +226,7 @@ All measurements must be traceable to national or international standards. In th
 
 The International System of Units (SI) defines seven base units: meter (length), kilogram (mass), second (time), ampere (electric current), kelvin (temperature), mole (amount of substance), and candela (luminous intensity). All other units are derived from these seven. In instrumentation, the most commonly encountered derived units include pascal (pressure, Pa = N/m$^2$), hertz (frequency, Hz = 1/s), volt (V = W/A), and ohm ($\Omega$ = V/A).
 
-Calibration certificates from accredited laboratories (ISO/IEC~17025) provide the legal basis for measurement traceability. In industrial metrology, calibration intervals are set based on historical drift data, criticality of the measurement, and regulatory requirements. A common starting interval is 12 months, adjusted based on observed stability.
+Calibration certificates from accredited laboratories (ISO/IEC~17025) provide the legal basis for measurement traceability\index{traceability}. In industrial metrology, calibration intervals are set based on historical drift data, criticality of the measurement, and regulatory requirements. A common starting interval is 12 months, adjusted based on observed stability.
 
 \begin{warningbox}[Significant Figures and Reporting]
 Never report a measurement with more significant figures than the uncertainty justifies. If your system uncertainty is $\pm$0.5\,\degC{}, reporting ``23.472\,\degC{}'' is misleading; correct reporting is ``23.5 $\pm$ 0.5\,\degC{}'' or equivalently ``23.5(5)\,\degC{}.'' The number of decimal places in the reported value should match the number of decimal places in the uncertainty.

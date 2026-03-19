@@ -2,7 +2,7 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{Open-Loop Control}
-\label{ch:openloop}\index{control!open-loop}\index{feedforward control}
+\label{ch:openloop}\index{control!open-loop}\index{feedforward\index{control!feedforward} control}
 
 \begin{tipbox}[When to Read This Chapter]
 \textbf{Module~9}: Read this chapter first as an introduction to control systems. It establishes the vocabulary (plant, controller, setpoint, disturbance) and motivates why open-loop control alone is insufficient for most real systems. \textbf{Related}: Closed-loop fundamentals in Chapter~\ref{ch:closedloop} (p.\,\pageref{ch:closedloop}); PID tuning in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
@@ -68,12 +68,6 @@ A refined form of open-loop control that measures the disturbance (not the outpu
 In open-loop control, the controller sends a command to the actuator based on a model or schedule, with no measurement of the actual output. The system has no way to detect or correct errors. Examples: a toaster timer (runs for a fixed duration regardless of toast darkness), a washing machine cycle timer (runs predetermined durations for each phase), and a sprinkler timer (waters for a set time regardless of soil moisture).
 
 Open-loop works when the relationship between input and output is well-characterized and disturbances are small or predictable. It is simple, cheap, and inherently stable (no feedback means no oscillation risk). However, it fails when disturbances are significant, when the plant model is inaccurate, or when precise output control is required.
-
-\section{Feedforward Control}
-Feedforward is an enhanced form of open-loop that measures the disturbance (not the output) and adjusts the control action proactively. Example: measuring outdoor temperature and adjusting the furnace output before the room temperature changes. Feedforward cannot correct for unmeasured disturbances or model errors, but it responds faster than feedback because it does not wait for the output to deviate.
-
-In practice, feedforward is often combined with feedback: the feedforward handles the known, measurable disturbances (fast), while the feedback corrects for everything else (robust). This combined approach is standard in industrial process control.
-
 \section{Limitations of Open-Loop}
 \textbf{No disturbance rejection}: any unmodeled influence (load change, supply variation, environmental shift) directly affects the output with no correction.
 
@@ -83,11 +77,6 @@ In practice, feedforward is often combined with feedback: the feedforward handle
 
 \section{When Open-Loop Is Appropriate}
 Despite its limitations, open-loop control is the right choice when: the cost of feedback sensors is prohibitive, the plant behavior is highly predictable and disturbances are negligible, the required accuracy is coarse (e.g., a traffic light timer), or when stability concerns make feedback dangerous (some chemical processes).
-
-
-\section{Feedforward Control}
-Feedforward measures the disturbance (not the output) and adjusts the control action proactively. Example: measuring outdoor temperature and adjusting furnace output before room temperature changes. Advantages: responds faster than feedback (does not wait for error). Limitations: cannot correct for unmeasured disturbances or model errors. In practice, feedforward is combined with feedback for optimal performance.
-
 \section{Calibration Tables as Open-Loop Control}
 A common form of open-loop control in instrumentation is the calibration table or lookup table. Rather than modeling the sensor's response analytically, the controller stores measured input-output pairs and interpolates between them. Example: a thermocouple's voltage-to-temperature relationship stored as a 100-entry table, with linear interpolation between entries. This is ``open-loop'' because it relies on the accuracy of the stored calibration data, with no feedback to verify the output.
 
@@ -141,11 +130,11 @@ Practical systems often combine both approaches. The state machine manages the h
 \section{Characterizing Plant Dynamics in Open Loop}
 Before designing a controller (open or closed-loop), you must know how the plant responds. The standard method: apply a step input and record the output.
 
-For the ThermoRig in open-loop: set the heater to 50\% duty cycle (step from 0\%) and record the temperature vs.\ time. The response curve shows: (1) a transport delay $L$ (dead time) before the temperature begins rising (heat propagating from the heater to the thermocouple), (2) an exponential-like rise toward the steady-state temperature, and (3) a final steady-state temperature $T_{ss}$.
+For the ThermoRig in open-loop: set the heater to 50\% duty cycle (step from 0\%) and record the temperature vs.\ time. The response curve shows: (1) a transport delay $L$ (dead time\index{dead time}) before the temperature begins rising (heat propagating from the heater to the thermocouple), (2) an exponential-like rise toward the steady-state temperature, and (3) a final steady-state temperature $T_{ss}$.
 
 From this step response, extract three parameters: the process gain $K_p = (T_{ss} - T_{\text{ambient}}) / (\text{duty cycle change})$, the time constant $\tau$ (time to reach 63.2\% of $T_{ss} - T_{\text{ambient}}$), and the dead time $L$ (time from the step to the first observable temperature rise). For the ThermoRig: $K_p \approx 1.1$\,\degC{}/\%, $\tau \approx 30$\,s, $L \approx 3$\,s.
 
-These three parameters ($K_p$, $\tau$, $L$) define a First-Order Plus Dead Time (FOPDT) model: 
+These three parameters ($K_p$, $\tau$, $L$) define a First-Order Plus Dead Time (FOPDT\index{FOPDT model}) model: 
 \[
 G(s) = \frac{K_p \, e^{-Ls}}{1 + \tau s}
 \]

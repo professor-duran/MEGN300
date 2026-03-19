@@ -5,7 +5,7 @@
 \label{ch:heat}\index{heat transfer!conduction}\index{heat transfer!convection}\index{thermal time constant}\index{lumped capacitance}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Reference / Design Challenge}: Read when your project involves thermal management. The thermal resistance model and lumped capacitance method are particularly useful for sizing heaters, estimating cooldown times, and modeling the ThermoRig plant dynamics. \textbf{Related}: Dynamic response in Chapter~\ref{ch:dynamic} (p.\,\pageref{ch:dynamic}); PID control in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
+\textbf{Reference / Design Challenge}: Read when your project involves thermal management. The thermal resistance\index{thermal resistance} model and lumped capacitance method are particularly useful for sizing heaters, estimating cooldown times, and modeling the ThermoRig plant dynamics. \textbf{Related}: Dynamic response in Chapter~\ref{ch:dynamic} (p.\,\pageref{ch:dynamic}); PID control in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -62,7 +62,7 @@ Temperature is the most commonly measured physical quantity in engineering. The 
 This chapter provides the minimum heat transfer background needed for MEGN~300 instrumentation and control projects.
 
 \section{Modes of Heat Transfer}
-Heat energy transfers by three mechanisms: conduction (through solid or stationary fluid), convection (between a surface and a moving fluid), and radiation (electromagnetic waves, no medium required). In most engineering systems, all three occur simultaneously, but one typically dominates.
+Heat energy transfers by three mechanisms: conduction (through solid or stationary fluid), convection (between a surface and a moving fluid), and radiation\index{heat transfer!radiation} (electromagnetic waves, no medium required). In most engineering systems, all three occur simultaneously, but one typically dominates.
 
 \begin{figure}[htbp]
 \centering
@@ -101,7 +101,7 @@ $\sigma = 5.67\times10^{-8}$
 \node[font=\tiny\sffamily\itshape, WarnOrange] at (5.2,-3.1) {to fluid};
 \node[font=\tiny\sffamily\itshape, WarnOrange] at (10.4,-3.1) {EM emission};
 \end{tikzpicture}
-\caption{The three modes of heat transfer with governing equations and typical coefficient ranges. Convection coefficient $h$ varies by three orders of magnitude, making it the dominant design variable for sensor thermal time constants.}
+\caption{The three modes of heat transfer (Figure~\ref{fig:heat_modes}) with governing equations and typical coefficient ranges. Convection coefficient $h$ varies by three orders of magnitude, making it the dominant design variable for sensor thermal time constants.}
 \label{fig:heat_modes}
 \end{figure}
 
@@ -151,7 +151,7 @@ For back-of-envelope calculations in MEGN~300: $h \approx 10$\,W/m$^2\cdot$K for
 \end{tipbox}
 
 \section{Radiation}
-Radiation is heat transfer by electromagnetic waves. It requires no medium and is significant at high temperatures or in vacuum. The Stefan-Boltzmann law for a gray body:
+Radiation is heat transfer by electromagnetic waves. It requires no medium and is significant at high temperatures or in vacuum. The Stefan-Boltzmann\index{Stefan-Boltzmann law} law for a gray body:
 \begin{equation}
 \dot{Q}_{\text{rad}} = \epsilon \sigma A (T_s^4 - T_{\text{surr}}^4)
 \end{equation}
@@ -187,7 +187,7 @@ where $m$ is the mass (kg) and $C_p$ is the specific heat capacity (J/kg$\cdot$K
 $dT/dt = 150/30.6 = 4.9$\,\degC{}/s. This is the initial heating rate (when losses are small). As the specimen heats up, losses increase and $dT/dt$ decreases, following an exponential approach to steady state.
 
 \subsection{The Lumped Capacitance Model}
-When the thermal resistance within the object (conduction) is much smaller than the thermal resistance at the surface (convection), the object's temperature is approximately uniform. This is the \textbf{lumped capacitance} assumption, valid when the Biot number $\text{Bi} = hL_c/k < 0.1$, where $L_c = V/A_s$ is the characteristic length (volume/surface area).
+When the thermal resistance within the object (conduction) is much smaller than the thermal resistance at the surface (convection), the object's temperature is approximately uniform. This is the \textbf{lumped capacitance} assumption, valid when the Biot number\index{Biot number} $\text{Bi} = hL_c/k < 0.1$, where $L_c = V/A_s$ is the characteristic length (volume/surface area).
 
 Under lumped capacitance, the transient temperature response to a step change in environment is:
 \begin{equation}
@@ -269,7 +269,7 @@ The \textbf{view factor} $F_{12}$ describes the fraction of radiation leaving su
 For MEGN~300 applications at moderate temperatures ($< 200$\,\degC{}), the simplified form $\dot{Q}_{\text{rad}} = \epsilon\sigma A(T_s^4 - T_{\text{surr}}^4)$ with $\epsilon$ as the surface emissivity is usually sufficient.
 
 \section{Dimensional Analysis and Nusselt Number}
-In advanced heat transfer, the convection coefficient $h$ is predicted using dimensionless correlations. The \textbf{Nusselt number} $\text{Nu} = hL/k_{\text{fluid}}$ is the dimensionless heat transfer coefficient. It depends on the \textbf{Reynolds number} $\text{Re} = \rho v L / \mu$ (forced convection) or the \textbf{Rayleigh number} $\text{Ra} = g\beta\Delta T L^3/(\nu\alpha)$ (natural convection).
+In advanced heat transfer, the convection coefficient $h$ is predicted using dimensionless correlations. The \textbf{Nusselt number\index{Nusselt number}} $\text{Nu} = hL/k_{\text{fluid}}$ is the dimensionless heat transfer coefficient. It depends on the \textbf{Reynolds number\index{Reynolds number}} $\text{Re} = \rho v L / \mu$ (forced convection) or the \textbf{Rayleigh number} $\text{Ra} = g\beta\Delta T L^3/(\nu\alpha)$ (natural convection).
 
 For natural convection from a vertical plate: $\text{Nu} = 0.59 \, \text{Ra}^{1/4}$ for $10^4 < \text{Ra} < 10^9$. This allows you to estimate $h$ from the geometry and temperature difference without experimental measurement.
 

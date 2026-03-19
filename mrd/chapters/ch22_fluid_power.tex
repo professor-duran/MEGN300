@@ -52,7 +52,7 @@ Fluid power systems use pressurized liquids (hydraulics) or gases (pneumatics) t
 
 \textbf{Density} ($\rho$, kg/m$^3$): mass per unit volume. Water: 998\,kg/m$^3$ at 20\,\degC{}. Hydraulic oil: 850--900\,kg/m$^3$. Air at sea level: 1.225\,kg/m$^3$.
 
-\textbf{Viscosity}: resistance to flow. \textbf{Dynamic viscosity} ($\mu$, Pa$\cdot$s): water at 20\,\degC{} is $1.002 \times 10^{-3}$\,Pa$\cdot$s; hydraulic oil is 10--100$\times$ higher. \textbf{Kinematic viscosity} ($\nu = \mu/\rho$, m$^2$/s): determines flow regime (laminar vs. turbulent) via the Reynolds number.
+\textbf{Viscosity}: resistance to flow. \textbf{Dynamic viscosity} ($\mu$, Pa$\cdot$s): water at 20\,\degC{} is $1.002 \times 10^{-3}$\,Pa$\cdot$s; hydraulic oil is 10--100$\times$ higher. \textbf{Kinematic viscosity} ($\nu = \mu/\rho$, m$^2$/s): determines flow regime (laminar\index{flow!laminar} vs. turbulent\index{flow!turbulent}) via the Reynolds number.
 
 \textbf{Compressibility}: liquids are nearly incompressible (bulk modulus of water: 2.2\,GPa; hydraulic oil: 1.4--1.7\,GPa). Gases are highly compressible. This fundamental difference drives the design split between hydraulic and pneumatic systems.
 
@@ -82,7 +82,7 @@ For steady, incompressible, inviscid flow along a streamline:
 \begin{equation}
 P_1 + \frac{1}{2}\rho v_1^2 + \rho g z_1 = P_2 + \frac{1}{2}\rho v_2^2 + \rho g z_2
 \end{equation}
-This conservation of energy equation connects pressure, velocity, and elevation. It is the foundation of many flow measurement devices: Venturi meters, orifice plates, and Pitot tubes all create a velocity change that produces a measurable pressure difference.
+This conservation of energy equation connects pressure, velocity, and elevation. It is the foundation of many flow measurement devices: Venturi meters, orifice plate\index{orifice plate}s, and Pitot tubes all create a velocity change that produces a measurable pressure difference.
 
 \subsection{Continuity Equation}
 For incompressible flow, mass conservation requires:
@@ -135,7 +135,7 @@ Hydraulic systems use pressurized oil (typically 100--350\,bar, 1500--5000\,psi)
 
 \textbf{Pump}: converts mechanical energy (from an electric motor or engine) into fluid flow at pressure. Types: gear (fixed displacement, simple, tolerant of contamination), vane (variable displacement, quieter), and piston (highest pressure and efficiency, most expensive).
 
-\textbf{Actuators}: hydraulic cylinders (linear motion) and hydraulic motors (rotary motion). A 50\,mm bore cylinder at 200\,bar produces $F = P \times A = 200 \times 10^5 \times (\pi/4)(0.05)^2 = 39.3$\,kN ($\sim$8800\,lbf) from a compact package.
+\textbf{Actuators}: hydraulic cylinder\index{hydraulic cylinder}s (linear motion) and hydraulic motors (rotary motion). A 50\,mm bore cylinder at 200\,bar produces $F = P \times A = 200 \times 10^5 \times (\pi/4)(0.05)^2 = 39.3$\,kN ($\sim$8800\,lbf) from a compact package.
 
 \textbf{Directional control valves}: route fluid to actuators. Described by number of ports and positions (4/3 = four ports, three positions). Center condition (what happens when the valve is centered) affects system behavior: closed-center locks the actuator in place; open-center allows free movement; tandem-center unloads the pump while holding the actuator.
 

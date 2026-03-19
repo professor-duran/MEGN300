@@ -5,7 +5,7 @@
 \label{ch:fft}\index{FFT}\index{spectral leakage}\index{windowing}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~5 (Weeks 7--8)}: Read alongside the FFT lab. Focus on windowing, spectral leakage, and the LabVIEW FFT configuration. The frequency resolution formula ($\Delta f = f_s / N$) is used in every spectral analysis for the rest of the course. \textbf{Related}: Fourier theory in Chapter~\ref{ch:fourier} (p.\,\pageref{ch:fourier}); DSP in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}).
+\textbf{Module~5 (Weeks 7--8)}: Read alongside the FFT lab. Focus on windowing, spectral leakage, and the LabVIEW FFT configuration. The frequency resolution\index{frequency resolution} formula ($\Delta f = f_s / N$) is used in every spectral analysis for the rest of the course. \textbf{Related}: Fourier theory in Chapter~\ref{ch:fourier} (p.\,\pageref{ch:fourier}); DSP in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -22,7 +22,7 @@ Worst leakage\\
 Use: periodic signals\\that fill the window
 };
 \node[win] (hann) at (3.8,0) {
-\textbf{\color{AccentTeal}Hanning}\\[2pt]
+\textbf{\color{AccentTeal}Hanning\index{Hanning window}}\\[2pt]
 Good resolution\\
 Good leakage\\
 \textbf{Default for MEGN~300}\\
@@ -117,20 +117,13 @@ Hanning (Hann): best general-purpose choice; good frequency resolution with mode
 \node[font=\tiny\sffamily\itshape, AccentTeal, align=center] at (axis cs:70,-15) {Energy concentrated\\in narrow peak};
 \end{axis}
 \end{tikzpicture}
-\caption{Spectral leakage: without windowing (left), a 60.5\,Hz signal smears across many FFT bins. With a Hanning window (right), sidelobe energy is suppressed and the peak sharpens. Always window unless the signal is exactly periodic in the acquisition window.}
+\caption{Spectral leakage (Figure~\ref{fig:leakage}): without windowing (left), a 60.5\,Hz signal smears across many FFT bins. With a Hanning window (right), sidelobe energy is suppressed and the peak sharpens. Always window unless the signal is exactly periodic in the acquisition window.}
 \label{fig:leakage}
 \end{figure}
 
 \section{Practical FFT in LabVIEW}
-In LabVIEW, use the \texttt{FFT Power Spectrum and PSD} VI. Set: $N$ (power of 2 for efficiency), window type, and averaging mode. The output is a 1D array of power spectral density (PSD) values in $\text{V}^2/\text{Hz}$ or amplitude spectrum in V\textsubscript{RMS}.
+In LabVIEW, use the \texttt{FFT Power Spectrum and PSD} VI. Set: $N$ (power of 2 for efficiency), window type, and averaging mode. The output is a 1D array of power spectral density\index{PSD (power spectral density)} (PSD) values in $\text{V}^2/\text{Hz}$ or amplitude spectrum in V\textsubscript{RMS}.
 
-
-\section{Power Spectral Density (PSD)}
-The PSD describes how the signal's power is distributed across frequencies, normalized by the frequency resolution:
-\begin{equation}
-\text{PSD}(f) = \frac{|X(f)|^2}{N \cdot f_s} \quad [\text{V}^2/\text{Hz}]
-\end{equation}
-PSD is independent of the FFT length $N$ and sampling rate $f_s$, making it suitable for comparing measurements taken with different acquisition parameters. Use PSD for broadband (continuous) signals like vibration and noise. Use amplitude spectrum for discrete tones (known frequencies).
 
 \section{Averaging for Spectral Estimates}
 A single FFT of noisy data has high variance. Averaging reduces this variance:
@@ -175,7 +168,7 @@ For random or broadband signals, the magnitude spectrum depends on the FFT lengt
 \begin{equation}
 \text{PSD}[k] = \frac{|X[k]|^2}{N \cdot \Delta f} \quad \text{(units: V$^2$/Hz)}
 \end{equation}
-The PSD is independent of record length, making it the correct representation for comparing noise floors, characterizing random vibration, and specifying sensor noise performance.
+The PSD is independent of record length, making it the correct representation for comparing noise floors, characterizing random vibration, and specifying sensor noise performance. Use PSD for broadband (continuous) signals like vibration and noise. Use amplitude spectrum for discrete tones (known frequencies).
 
 \section{Windowing: Theory and Practice}
 The FFT assumes the signal is exactly periodic within the acquisition window of $N$ samples. If this assumption is violated (which it almost always is for real signals), the resulting discontinuity at the window boundaries produces \textbf{spectral leakage}: the energy of a single frequency smears across adjacent bins, reducing amplitude accuracy and frequency resolution.
@@ -212,39 +205,6 @@ To improve the effective averaging rate without acquiring more data, successive 
 \item \textbf{Confusing linear and dB scales}: a peak at $-40$\,dB is not ``almost zero''; it is 1\% of full scale.
 \item \textbf{Ignoring DC offset}: a large DC component (bin 0) can mask nearby low-frequency content. Remove the mean before computing the FFT.
 \end{enumerate}
-
-
-\section{From DFT to FFT}
-The DFT: $X[k] = \sum_{n=0}^{N-1} x[n]\,e^{-j2\pi kn/N}$, $k = 0,\ldots,N-1$. Direct computation: $O(N^2)$. The FFT (Cooley-Tukey, 1965) reduces this to $O(N\log_2 N)$. For $N = 1024$: 100$\times$ speedup. For $N = 10^6$: 50,000$\times$.
-
-\section{FFT Output Interpretation}
-$X[k]$ is complex: magnitude $|X[k]|$ gives amplitude at frequency $f_k = k \cdot f_s/N$; phase $\angle X[k]$ gives the phase angle. Only bins $k = 0$ to $N/2$ are unique for real input.
-
-\textbf{Frequency resolution}: $\Delta f = f_s/N$. To resolve 99\,Hz from 101\,Hz ($\Delta f = 2$\,Hz) at 1\,kS/s requires $N \geq 500$ (0.5\,s of data). Better resolution requires longer acquisition.
-
-\section{Power Spectral Density}
-For random signals, the magnitude spectrum depends on $N$. The PSD normalizes: $\text{PSD}[k] = |X[k]|^2/(N\cdot\Delta f)$ (units: V$^2$/Hz). PSD is independent of record length, making it the correct representation for noise characterization.
-
-\section{Windowing}
-The FFT assumes the signal is periodic within the window. Non-periodic signals create discontinuities at the window edges, causing spectral leakage. A window function tapers the signal to zero at both ends.
-
-\textbf{Rectangular}: best resolution, worst sidelobes ($-13$\,dB). Use only for exactly periodic signals.
-
-\textbf{Hanning}: good general-purpose choice. $-31$\,dB sidelobes.
-
-\textbf{Flat-top}: wide main lobe but $<$0.01\,dB amplitude error. Use for calibration.
-
-\textbf{Blackman-Harris}: $-92$\,dB sidelobes. Use when small signals near large ones must be detected.
-
-\section{Spectral Averaging and Overlap}
-A single FFT of noisy data produces a noisy spectrum. Average $M$ FFTs to reduce variance by $M$. With 50\% overlap between successive blocks, approximately 90\% of data is used. LabVIEW's Power Spectrum supports overlap processing natively.
-
-\begin{examplebox}[ThermoRig: Identifying Switching Noise]
-FFT of TC signal at 10\,kS/s ($N = 8192$) reveals: 60\,Hz peak (mains coupling) and 500\,Hz peak (aliased 500\,kHz switching regulator). Hanning window confirms both are discrete tones. Fix: 100\,Hz anti-alias filter eliminates the aliased component.
-\end{examplebox}
-
-\section{Common FFT Pitfalls}
-(1) Forgetting anti-alias filter: aliases look real. (2) Not windowing: leakage smears peaks. (3) Too few points: poor resolution. (4) Confusing linear and dB scales: $-40$\,dB is 1\%, not ``almost zero.'' (5) Large DC offset masks low-frequency content; remove mean before FFT.
 
 
 \section{Choosing FFT Parameters for MEGN 300 Labs}
@@ -305,7 +265,7 @@ In LabVIEW: the Sound and Vibration Toolkit includes order analysis VIs. Without
 Cepstral analysis is an advanced vibration diagnostics technique not covered in MEGN~300 exams. It is included for students whose projects involve rotating machinery fault detection.
 \end{advancedbox}
 \section{Cepstral Analysis (Overview)}
-The \textbf{cepstrum} is the inverse FFT of the log magnitude spectrum: $c[n] = \text{IFFT}(\log|X[k]|)$. It separates multiplicative effects in the frequency domain (which become additive in the log domain) into individual components. The cepstrum is particularly useful for detecting periodic patterns in the spectrum, such as harmonics of a fundamental frequency or sidebands around a carrier. In vibration analysis, cepstral analysis detects bearing defects (which produce a family of harmonics and sidebands) more reliably than spectral analysis alone.
+The \textbf{cepstrum\index{cepstrum}} is the inverse FFT of the log magnitude spectrum: $c[n] = \text{IFFT}(\log|X[k]|)$. It separates multiplicative effects in the frequency domain (which become additive in the log domain) into individual components. The cepstrum is particularly useful for detecting periodic patterns in the spectrum, such as harmonics of a fundamental frequency or sidebands around a carrier. In vibration analysis, cepstral analysis detects bearing defects (which produce a family of harmonics and sidebands) more reliably than spectral analysis alone.
 
 The ``quefrency'' axis of the cepstrum has units of time: a peak at quefrency $\tau_q$ indicates a periodic pattern in the spectrum with spacing $1/\tau_q$\,Hz. For a bearing defect at frequency $f_d$ with harmonics at $2f_d$, $3f_d$, etc.: the cepstrum shows a peak at $\tau_q = 1/f_d$.
 

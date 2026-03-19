@@ -5,7 +5,7 @@
 \label{ch:stats}\index{statistics!descriptive}\index{confidence interval}\index{hypothesis testing}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~3 (Weeks 3--4)}: Read alongside Chapter~4. Focus on $t$-tests, confidence intervals, and outlier detection (Chauvenet's criterion). These are applied in every lab report for the rest of the semester. \textbf{Related}: Error analysis in Chapter~\ref{ch:error} (p.\,\pageref{ch:error}).
+\textbf{Module~3 (Weeks 3--4)}: Read alongside Chapter~4. Focus on $t$-test\index{$t$-test}s, confidence intervals, and outlier detection (Chauvenet\index{Chauvenet criterion}'s criterion). These are applied in every lab report for the rest of the semester. \textbf{Related}: Error analysis in Chapter~\ref{ch:error} (p.\,\pageref{ch:error}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -49,12 +49,12 @@ Every measurement contains noise. Every experiment has limited sample size. Ever
 \subsection{Measures of Central Tendency}
 The \textbf{arithmetic mean} $\bar{x} = (1/N)\sum x_i$ is the best estimate of the true value when errors are symmetric and random. It minimizes the sum of squared deviations from the data.
 
-The \textbf{median} is the middle value when data is sorted. It is robust to outliers: a single extreme measurement shifts the mean but barely affects the median. Use the median when you suspect outliers or when the data distribution is skewed.
+The \textbf{median} is the middle value when data are sorted. It is robust to outliers: a single extreme measurement shifts the mean but barely affects the median. Use the median when you suspect outliers or when the data distribution is skewed.
 
 The \textbf{mode} is the most frequently occurring value. It is primarily useful for categorical data or for identifying the peak of a multi-modal distribution (which may indicate two distinct populations in the data, such as measurements taken before and after a calibration shift).
 
 \subsection{Measures of Spread}
-The \textbf{sample standard deviation} $s = \sqrt{(1/(N-1))\sum(x_i - \bar{x})^2}$ quantifies the typical scatter of individual measurements. It has the same units as the data.
+The \textbf{sample standard deviation\index{standard deviation}} $s = \sqrt{(1/(N-1))\sum(x_i - \bar{x})^2}$ quantifies the typical scatter of individual measurements. It has the same units as the data.
 
 The \textbf{range} (max $-$ min) is the simplest measure of spread but is sensitive to outliers and increases with sample size. It is useful for quick quality checks but should not be used for formal uncertainty analysis.
 
@@ -65,7 +65,7 @@ The standard error $\text{SE} = s/\sqrt{N}$ quantifies the uncertainty of the \e
 
 \section{Probability Distributions in Instrumentation}
 \subsection{Normal (Gaussian) Distribution}
-The most important distribution in measurement science. Random errors from many independent sources combine to produce a normal distribution (Central Limit Theorem). Properties: symmetric, bell-shaped, fully characterized by mean $\mu$ and standard deviation $\sigma$. 68.3\% of data falls within $\pm 1\sigma$, 95.4\% within $\pm 2\sigma$, 99.7\% within $\pm 3\sigma$.
+The most important distribution in measurement science (Figure~\ref{fig:normal_dist}). Random errors from many independent sources combine to produce a normal distribution (Central Limit Theorem). Properties: symmetric, bell-shaped, fully characterized by mean $\mu$ and standard deviation $\sigma$. 68.3\% of data falls within $\pm 1\sigma$, 95.4\% within $\pm 2\sigma$, 99.7\% within $\pm 3\sigma$.
 
 In instrumentation, the normal distribution models: thermal noise voltages, repeated measurement scatter, calibration residuals, and manufacturing tolerances. When a datasheet specifies ``accuracy: $\pm$1\% (3$\sigma$),'' it means 99.7\% of units meet the specification, but 0.3\% may exceed it.
 
@@ -76,7 +76,7 @@ Equal probability across the range $[a, b]$. Mean $= (a+b)/2$. Standard deviatio
 When estimating the mean from a small sample ($N < 30$), the normal distribution underestimates the tails. The $t$-distribution, with $\nu = N-1$ degrees of freedom, provides wider confidence intervals that account for the uncertainty in estimating $\sigma$ from $s$. As $N \to \infty$, $t \to$ normal. For $N = 5$: the 95\% $t$-factor is 2.78 (vs.\ 1.96 for normal). For $N = 10$: 2.26. For $N = 30$: 2.04.
 
 \subsection{Chi-Squared Distribution}
-The distribution of the sample variance $s^2$ scaled by $(N-1)/\sigma^2$. Used to construct confidence intervals for the variance itself and for goodness-of-fit testing. In MEGN~300, you encounter it when assessing whether the scatter in your calibration data is consistent with the claimed sensor accuracy.
+The distribution of the sample variance $s^2$ scaled by $(N-1)/\sigma^2$. Used to construct confidence intervals for the variance itself and for goodness-of-fit testing. In MEGN~300, you encounter it when assessing whether the scatter in your calibration data are consistent with the claimed sensor accuracy.
 
 \section{Confidence Intervals}
 A confidence interval provides a range within which the true value is expected to lie with a specified probability. The 95\% confidence interval for the mean:
@@ -102,7 +102,7 @@ t = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{s_1^2/N_1 + s_2^2/N_2}}
 Use this to determine whether two measurement methods give significantly different results, whether a design change significantly affected performance, or whether two batches of sensors have different characteristics.
 
 \subsection{p-Values}
-The $p$-value is the probability of observing a test statistic at least as extreme as the one computed, assuming the null hypothesis is true. Convention: $p < 0.05$ (5\% significance level) is considered statistically significant. $p < 0.01$ is highly significant. $p > 0.1$ is not significant.
+The $p$-value\index{$p$-value} is the probability of observing a test statistic at least as extreme as the one computed, assuming the null hypothesis is true. Convention: $p < 0.05$ (5\% significance level) is considered statistically significant. $p < 0.01$ is highly significant. $p > 0.1$ is not significant.
 
 \begin{warningbox}[Statistical Significance vs.\ Practical Significance]
 A statistically significant result is not necessarily practically important. With enough data ($N = 10{,}000$), even a 0.001\,\degC{} difference between two sensors is statistically significant ($p < 0.05$). But if your accuracy requirement is $\pm$1\,\degC{}, this difference is irrelevant. Always evaluate whether the observed effect size matters for your application, not just whether $p < 0.05$.
@@ -170,7 +170,7 @@ Practical consequence: even if individual sensor readings have a non-normal dist
 \subsection{CLT in Averaging}
 When you average $N$ measurements: (1) the mean converges toward the true value (law of large numbers), (2) the distribution of the mean becomes normal (CLT), and (3) the standard deviation of the mean is $s/\sqrt{N}$. All three facts together justify the standard practice of ``measure $N$ times and report the mean with uncertainty $\pm t \cdot s/\sqrt{N}$.''
 
-\section{Analysis of Variance (ANOVA)}
+\section{Analysis of Variance (ANOVA\index{ANOVA})}
 When comparing more than two groups (e.g., three calibration methods, four sensor brands, five operators), the two-sample $t$-test is insufficient (running multiple $t$-tests inflates the false-positive rate). ANOVA tests whether the means of $k$ groups are all equal simultaneously.
 
 The key insight: ANOVA partitions the total variance in the data into \textbf{between-group variance} (due to actual differences among the groups) and \textbf{within-group variance} (due to random measurement scatter). The $F$-statistic is the ratio:
@@ -200,9 +200,9 @@ After fitting a model to calibration data, how do you know the model is adequate
 \textbf{Chi-squared test}: $\chi^2 = \sum(e_i/u_i)^2$ where $u_i$ is the uncertainty of each data point. If $\chi^2/(N-p) \approx 1$ (where $p$ is the number of fitted parameters): the model fits the data within the expected uncertainty. $\chi^2/(N-p) \gg 1$: the model does not fit (or the uncertainties are underestimated). $\chi^2/(N-p) \ll 1$: the model overfits (or the uncertainties are overestimated).
 
 \section{Time Series Analysis Basics}
-Laboratory data is often collected as a time series (sequential measurements over time). Beyond the standard statistics above, time series data has temporal structure:
+Laboratory data are often collected as a time series (sequential measurements over time). Beyond the standard statistics above, time series data has temporal structure:
 
-\textbf{Trend}: a long-term drift in the mean (sensor aging, environmental change). Detected by: linear regression on the time series, or comparing means of the first and last thirds of the data.
+\textbf{Trend}: a long-term drift in the mean (sensor aging, environmental change). Detected by: linear regression\index{regression!linear} on the time series, or comparing means of the first and last thirds of the data.
 
 \textbf{Periodicity}: oscillation at a specific frequency (60\,Hz pickup, diurnal temperature cycle, periodic machine operation). Detected by: FFT of the time series.
 

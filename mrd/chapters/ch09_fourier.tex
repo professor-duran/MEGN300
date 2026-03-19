@@ -59,12 +59,12 @@ Flat spectrum
 \draw[WarnOrange, thick] (3,0) -- (4,0);
 \end{scope}
 \end{tikzpicture}
-\caption{Fourier spectra of common periodic waveforms. Square and triangle waves contain only odd harmonics; sawtooth contains all harmonics. The roll-off rate determines how many harmonics carry significant energy, which in turn determines the bandwidth required to faithfully measure the signal.}
+\caption{Fourier spectra of common periodic waveforms. Square and triangle waves contain only odd harmonics (Figure~\ref{fig:common_spectra}); sawtooth contains all harmonics. The roll-off rate determines how many harmonics carry significant energy, which in turn determines the bandwidth required to faithfully measure the signal.}
 \label{fig:common_spectra}
 \end{figure}
 
 \section{The Fourier Principle}
-Any periodic signal $x(t)$ with period $T$ can be represented as a sum of sinusoids at the fundamental frequency $f_0 = 1/T$ and its integer harmonics:
+Any periodic signal $x(t)$ with period $T$ can be represented as a sum of sinusoids at the fundamental frequency\index{fundamental frequency} $f_0 = 1/T$ and its integer harmonics:
 \begin{equation}
 x(t) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \left[ a_n \cos(2\pi n f_0 t) + b_n \sin(2\pi n f_0 t) \right]
 \end{equation}
@@ -167,9 +167,9 @@ A measurement system must pass all significant harmonics. A sensor measuring a 1
 Truncating the series near a discontinuity produces $\sim$9\% overshoot that narrows but never disappears with more terms. In instrumentation, this manifests as ``ringing'' when a filter truncates harmonics.
 
 \section{From Series to Transform}
-The Fourier series applies to periodic signals. The Fourier transform generalizes to non-periodic signals (transients, events) by letting the period approach infinity. The discrete version (DFT/FFT) is the computational tool used in digital systems (Chapter~8).
+The Fourier series applies to periodic signals. The Fourier transform\index{Fourier transform} generalizes to non-periodic signals (transients, events) by letting the period approach infinity. The discrete version (DFT/FFT) is the computational tool used in digital systems (Chapter~8).
 
-\begin{tipbox}[Parseval's Theorem]
+\begin{tipbox}[Parseval\index{Parseval theorem}'s Theorem]
 Total signal energy is the same in time and frequency domains: $\sum|x[n]|^2 = (1/N)\sum|X[k]|^2$. A filter removing frequency components removes their energy. If noise is concentrated in a narrow band (e.g., 60\,Hz), a notch filter removes that energy without affecting the rest.
 \end{tipbox}
 

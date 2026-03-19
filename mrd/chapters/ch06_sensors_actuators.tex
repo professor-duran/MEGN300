@@ -5,7 +5,7 @@
 \label{ch:sensors}\index{sensor!classification}\index{actuator}\index{transduction}
 
 \begin{tipbox}[When to Read This Chapter]
-\textbf{Module~8B}: Read when selecting sensors and actuators for the design challenge. The transduction principles and selection decision tree help you match sensors to your measurement requirements. \textbf{Related}: Static calibration in Chapter~\ref{ch:static} (p.\,\pageref{ch:static}); signal conditioning in Chapter~\ref{ch:amplifiers} (p.\,\pageref{ch:amplifiers}).
+\textbf{Module~8B}: Read when selecting sensors and actuators for the design challenge. The transduction principles and selection decision tree (Figure~\ref{fig:sensor_decision}) help you match sensors to your measurement requirements. \textbf{Related}: Static calibration in Chapter~\ref{ch:static} (p.\,\pageref{ch:static}); signal conditioning in Chapter~\ref{ch:amplifiers} (p.\,\pageref{ch:amplifiers}).
 \end{tipbox}
 
 \begin{figure}[htbp]
@@ -54,17 +54,17 @@ The five-block measurement architecture is not an academic abstraction. In DOE v
 \section{Sensor Classification}
 
 \subsection{By Transduction Mechanism}
-\textbf{Resistive}: the measurand changes the resistance of a sensing element. Examples: strain gauges (piezoresistive effect in metal foil), RTDs (temperature coefficient of resistance in platinum wire), thermistors (large resistance change in semiconductor oxide), potentiometers (wiper position changes resistance). Output is a resistance change, typically measured with a Wheatstone bridge or voltage divider.
+\textbf{Resistive}: the measurand changes the resistance of a sensing element. Examples: strain gauge\index{strain gauge}s (piezoresistive effect in metal foil), RTDs (temperature coefficient of resistance in platinum wire), thermistors (large resistance change in semiconductor oxide), potentiometers (wiper position changes resistance). Output is a resistance change, typically measured with a Wheatstone bridge or voltage divider.
 
-\textbf{Capacitive}: the measurand changes the capacitance of a parallel-plate or interdigitated structure by varying plate area, gap distance, or dielectric constant. Examples: MEMS accelerometers (proof mass displacement changes gap), humidity sensors (dielectric changes with moisture absorption), touchscreens (finger proximity changes fringe capacitance). Output is a capacitance change, measured with an oscillator circuit or capacitance-to-digital converter.
+\textbf{Capacitive}: the measurand changes the capacitance of a parallel-plate or interdigitated structure by varying plate area, gap distance, or dielectric constant. Examples: MEMS accelerometer\index{accelerometer}s (proof mass displacement changes gap), humidity sensors (dielectric changes with moisture absorption), touchscreens (finger proximity changes fringe capacitance). Output is a capacitance change, measured with an oscillator circuit or capacitance-to-digital converter.
 
-\textbf{Inductive/Electromagnetic}: the measurand changes inductance or generates a voltage via Faraday's law. Examples: LVDTs (Linear Variable Differential Transformer, displacement changes coupling between primary and secondary coils), tachometers (rotation generates AC voltage proportional to speed), eddy current sensors (proximity of a conductive target changes coil impedance). Output is an AC voltage or impedance change.
+\textbf{Inductive/Electromagnetic}: the measurand changes inductance or generates a voltage via Faraday's law. Examples: LVDT\index{LVDT}s (Linear Variable Differential Transformer, displacement changes coupling between primary and secondary coils), tachometers (rotation generates AC voltage proportional to speed), eddy current sensors (proximity of a conductive target changes coil impedance). Output is an AC voltage or impedance change.
 
 \textbf{Piezoelectric}: mechanical stress generates a charge (or conversely, applied voltage produces strain). Examples: dynamic force/pressure sensors (quartz or PZT crystals), accelerometers (mass on crystal produces charge proportional to acceleration), ultrasonic transducers (PZT element vibrates at ultrasonic frequencies). Piezoelectric sensors measure only dynamic (changing) quantities; they cannot measure static force because the charge leaks away.
 
 \textbf{Thermoelectric}: a temperature difference at the junction of two dissimilar metals generates a voltage (Seebeck effect). The thermocouple is the primary example. Output is a small voltage ($\sim$10--60\,$\mu$V/\degC{} depending on type) requiring amplification and cold-junction compensation.
 
-\textbf{Optical/Photoelectric}: light intensity, wavelength, or interference pattern changes with the measurand. Examples: photodiodes and phototransistors (light to current), fiber-optic sensors (strain changes light transmission), pyrometers (infrared radiation from a surface indicates temperature without contact), encoders (light through a slotted disc produces digital pulses for position/speed).
+\textbf{Optical/Photoelectric}: light intensity, wavelength, or interference pattern changes with the measurand. Examples: photodiode\index{photodiode}s and phototransistors (light to current), fiber-optic sensors (strain changes light transmission), pyrometers (infrared radiation from a surface indicates temperature without contact), encoders (light through a slotted disc produces digital pulses for position/speed).
 
 \subsection{By Output Type}
 \textbf{Analog output}: a continuous voltage or current proportional to the measurand. Requires an ADC for digital processing. Examples: thermocouples, strain gauges (with bridge), pressure transducers (4--20\,mA loop).
@@ -113,7 +113,7 @@ When selecting a sensor for a project, evaluate these specifications against you
 \textbf{Digital temperature ICs} (DS18B20, TMP36): integrated sensor with built-in ADC and digital output. Convenient (one-wire or analog voltage output, no bridge or amplifier needed). Limited accuracy ($\pm 0.5$\,\degC{} typical) and range. Best for: simple projects where convenience outweighs precision.
 
 \subsection{Strain and Force Sensors}
-\textbf{Foil strain gauges}: resistive (gauge factor $\sim$2 for metal foil), bonded to the structure under test. Output is ${\sim}2$\,mV/V at full scale (e.g., 20\,mV with 10\,V excitation), requiring a Wheatstone bridge and instrumentation amplifier to bring the signal into the ADC range. Resolution: sub-microstrain with proper amplification. Best for: structural analysis, load measurement via calibrated members.
+\textbf{Foil strain gauges}: resistive (gauge factor\index{gauge factor} $\sim$2 for metal foil), bonded to the structure under test. Output is ${\sim}2$\,mV/V at full scale (e.g., 20\,mV with 10\,V excitation), requiring a Wheatstone bridge and instrumentation amplifier to bring the signal into the ADC range. Resolution: sub-microstrain with proper amplification. Best for: structural analysis, load measurement via calibrated members.
 
 \textbf{Load cells}: strain gauges bonded to a precision machined element (bending beam, S-type, or compression). Factory-calibrated with a known sensitivity (mV/V). Best for: direct force or weight measurement.
 
