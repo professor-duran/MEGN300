@@ -4,6 +4,10 @@
 \chapter{Fundamentals of Heat Transfer}
 \label{ch:heat}\index{heat transfer!conduction}\index{heat transfer!convection}\index{thermal time constant}\index{lumped capacitance}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Reference / Design Challenge}: Read when your project involves thermal management. The thermal resistance model and lumped capacitance method are particularly useful for sizing heaters, estimating cooldown times, and modeling the ThermoRig plant dynamics. \textbf{Related}: Dynamic response in Chapter~\ref{ch:dynamic} (p.\,\pageref{ch:dynamic}); PID control in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
@@ -242,7 +246,7 @@ Thermal interface materials (TIMs) fill the air gaps:
 For the ThermoRig thermocouple: attaching the bead to the specimen surface with thermal paste reduces the contact resistance from $\sim$100\,K/W (dry contact) to $\sim$10\,K/W, significantly improving the temperature measurement accuracy and reducing the apparent time constant.
 
 \section{Radiation Shields and View Factors}
-In high-temperature applications or vacuum environments, radiation becomes the dominant heat transfer mode. \textbf{Radiation shields} (polished metal foils between hot and cold surfaces) reduce radiative heat transfer by introducing additional resistances in the radiation path. Each shield approximately halves the radiation heat transfer. Three shields reduce it by $\sim$$8\times$.
+In high-temperature applications or vacuum environments, radiation becomes the dominant heat transfer mode. \textbf{Radiation shields} (polished metal foils between hot and cold surfaces) reduce radiative heat transfer by introducing additional resistances in the radiation path. Each shield approximately halves the radiation heat transfer. Three shields reduce it by ${\sim}8{\times}$.
 
 The \textbf{view factor} $F_{12}$ describes the fraction of radiation leaving surface~1 that reaches surface~2. For two parallel plates: $F_{12} \approx 1$. For a small surface facing a large enclosure: $F_{12} = 1$. For a sensor mounted on a surface facing a room: $F_{12}$ depends on the geometry but is typically 0.5--0.8. The radiation exchange between surfaces 1 and 2:
 \begin{equation}

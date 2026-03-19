@@ -4,6 +4,10 @@
 \chapter{Circuit Fundamentals}
 \label{ch:circuits}\index{Ohm's law}\index{Kirchhoff's laws}\index{voltage divider}\index{Thevenin equivalent}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~7 (Weeks 11--12)}: Read before the signal conditioning lab. Sections on Ohm's Law, voltage dividers, Thevenin equivalents, and impedance are prerequisites for the amplifier chapter. The wire gauge and SI prefix tables are useful references all semester. \textbf{Related}: Amplifiers in Chapter~\ref{ch:amplifiers} (p.\,\pageref{ch:amplifiers}); high-power switching in Chapter~\ref{ch:highpower} (p.\,\pageref{ch:highpower}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
@@ -229,7 +233,7 @@ Current rises as $I(t) = I_{\text{final}}(1 - e^{-t/\tau})$ when voltage is appl
 \section{AC Circuit Fundamentals}
 
 \subsection{Impedance}
-In AC circuits, resistance generalizes to impedance ($Z$), which has both magnitude and phase. For a resistor: $Z_R = R$ (purely real, voltage and current in phase). For a capacitor: $Z_C = 1/(j\omega C)$ (current leads voltage by 90$^\circ$). For an inductor: $Z_L = j\omega L$ (current lags voltage by 90$^\circ$). Impedances combine like resistances: in series they add, in parallel the reciprocals add. Ohm's Law applies using impedance: $V = IZ$.
+In AC circuits, resistance generalizes to impedance ($Z$), which has both magnitude and phase. For a resistor: $Z_R = R$ (purely real, voltage and current in phase). For a capacitor: $Z_C = 1/(j\omega C)$ (current leads voltage by $90^{\circ}$). For an inductor: $Z_L = j\omega L$ (current lags voltage by $90^{\circ}$). Impedances combine like resistances: in series they add, in parallel the reciprocals add. Ohm's Law applies using impedance: $V = IZ$.
 
 \subsection{RMS Values}
 Alternating signals are characterized by their root-mean-square (RMS) value, which represents the equivalent DC value that delivers the same average power to a resistive load:

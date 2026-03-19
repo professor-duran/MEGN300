@@ -4,6 +4,10 @@
 \chapter{Dynamic Measurements}
 \label{ch:dynamic}\index{time constant}\index{dynamic response!first-order}\index{bandwidth}\index{rise time}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~2 (Weeks 3--4)}: Read the full chapter. The first-order time constant and frequency response sections are critical for the dynamic response lab. The second-order system section is reference material for the control systems module later. \textbf{Related}: Static characteristics in Chapter~\ref{ch:static} (p.\,\pageref{ch:static}); filter design in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}
@@ -209,7 +213,7 @@ Output instantaneously proportional to input: $y(t) = K \cdot x(t)$. A potentiom
 For step input of magnitude $A$ at $t = 0$: $y(t) = KA(1 - e^{-t/\tau})$. At $\tau$: 63.2\%. At $2\tau$: 86.5\%. At $3\tau$: 95.0\%. At $5\tau$: 99.3\% (``settled''). If $\tau = 0.5$\,s, settling takes 2.5\,s.
 
 \subsection{Frequency Response}
-Magnitude: $|H| = 1/\sqrt{1+(\omega\tau)^2}$. Phase: $\phi = -\arctan(\omega\tau)$. At $f_{-3\text{dB}} = 1/(2\pi\tau)$: amplitude is 70.7\% (29\% error), phase is $-45^\circ$. For $<$5\% amplitude error: stay below $f_{-3\text{dB}}/3$. For $<$1\%: below $f_{-3\text{dB}}/7$.
+Magnitude: $|H| = 1/\sqrt{1+(\omega\tau)^2}$. Phase: $\phi = -\arctan(\omega\tau)$. At $f_{-3\text{dB}} = 1/(2\pi\tau)$: amplitude is 70.7\% (29\% error), phase is $-45^{\circ}$. For $<$5\% amplitude error: stay below $f_{-3\text{dB}}/3$. For $<$1\%: below $f_{-3\text{dB}}/7$.
 
 \subsection{Measuring the Time Constant}
 Apply step input (plunge thermocouple into hot water). Record output vs.\ time. Find time at 63.2\% of step change. That time is $\tau$. Alternatively: plot $\ln(1 - y/y_\infty)$ vs.\ $t$; slope is $-1/\tau$.
@@ -266,7 +270,7 @@ When multiple dynamic elements are in series (sensor $\to$ amplifier $\to$ filte
 Example: a thermocouple ($\tau = 0.5$\,s, $f_{-3\text{dB}} = 0.32$\,Hz) followed by a 2nd-order Butterworth filter at 10\,Hz. At 0.1\,Hz: thermocouple gain is $-0.4$\,dB, filter gain is $-0.0$\,dB; total is $-0.4$\,dB (acceptable). At 1\,Hz: thermocouple is $-10$\,dB (the sensor, not the filter, limits performance). The system bandwidth is determined by the slowest element.
 
 \begin{examplebox}[ThermoRig: Cascaded Dynamic Response]
-The ThermoRig signal chain dynamic response: thermocouple ($\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz) $\to$ INA128 ($f_{-3\text{dB}} \approx 1.6$\,kHz at $G = 611$, negligible lag at signal frequencies) $\to$ Sallen-Key LP ($f_c = 40$\,Hz, 2nd order, negligible lag below 4\,Hz). The overall system bandwidth is limited entirely by the thermocouple at 0.38\,Hz. The amplifier and filter contribute less than 0.01\,dB of attenuation and less than 0.1$^\circ$ of phase shift at frequencies below 1\,Hz. This is typical: in thermal measurement systems, the sensor dynamics dominate.
+The ThermoRig signal chain dynamic response: thermocouple ($\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz) $\to$ INA128 ($f_{-3\text{dB}} \approx 1.6$\,kHz at $G = 611$, negligible lag at signal frequencies) $\to$ Sallen-Key LP ($f_c = 40$\,Hz, 2nd order, negligible lag below 4\,Hz). The overall system bandwidth is limited entirely by the thermocouple at 0.38\,Hz. The amplifier and filter contribute less than 0.01\,dB of attenuation and less than 0.$1^{\circ}$ of phase shift at frequencies below 1\,Hz. This is typical: in thermal measurement systems, the sensor dynamics dominate.
 \end{examplebox}
 
 \section{Sensor Dynamic Compensation}

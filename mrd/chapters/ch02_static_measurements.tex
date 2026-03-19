@@ -4,6 +4,10 @@
 \chapter{Static Measurements}
 \label{ch:static}\index{calibration!static}\index{Wheatstone bridge}\index{sensitivity}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~1 (Weeks 1--2)}: Read alongside the calibration lab. Focus on the calibration procedure, least-squares regression, and the sensor comparison table. Return to the Wheatstone bridge section when you encounter strain gauges in Module~7. \textbf{Related}: Measurement fundamentals in Chapter~\ref{ch:measurement_theory} (p.\,\pageref{ch:measurement_theory}); dynamic response in Chapter~\ref{ch:dynamic} (p.\,\pageref{ch:dynamic}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
@@ -111,7 +115,7 @@ V_o = V_{ex} \left(\frac{R_1}{R_1 + R_2} - \frac{R_3}{R_3 + R_4}\right)
 \end{equation}
 When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\Delta R$ in one arm produces:
 \begin{equation}
-\Delta V_o \approx \frac{V_{ex}}{4} \cdot \frac{\Delta R}{R} \quad \text{(quarter-bridge)}
+\Delta V_o \approx \frac{V_{ex}}{4} \cdot \frac{\Delta R}{R} \quad \text{(quarter-bridge)}\footnote{This is the linearized approximation, valid for $\Delta R / R \ll 1$ (i.e., strains below ${\sim}5000\,\mu\epsilon$). The exact expression is $\Delta V_o = V_{ex} \cdot (\Delta R/R) / (4 + 2\Delta R/R)$, which matters for large strains or for high-accuracy absolute strain measurement.}
 \end{equation}
 
 \subsection{Bridge Configurations}
@@ -289,7 +293,7 @@ For a typical strain of 1000\,$\mu\epsilon$ ($= 0.1\%$): $\Delta R/R = 2.0 \time
 The quality of the gauge bond determines measurement accuracy. Clean the surface with solvent (acetone, then isopropanol). Abrade lightly with 320-grit sandpaper. Apply a thin, uniform layer of cyanoacrylate (strain gauge cement). Position the gauge and clamp for 60 seconds. Verify electrical continuity ($R = 120 \pm 0.5\,\Omega$ for a 120\,$\Omega$ gauge). Any air bubble, misalignment, or excess adhesive degrades the measurement.
 
 \subsection{Temperature Compensation}
-Thermal expansion of the structure and the gauge causes apparent strain that is not due to mechanical loading. A quarter-bridge on a steel beam sees approximately $23\,\mu\epsilon$/\degC{} from thermal effects alone. The half-bridge compensates: mount two gauges on the same material; one active (in the strain field), one passive (nearby but unstrained). Temperature affects both equally, canceling in the bridge output.
+Thermal expansion of the structure and the gauge causes apparent strain that is not due to mechanical loading. A quarter-bridge on a steel beam sees approximately $23\,\mu\epsilon$/\degC{} from thermal effects alone. The half-bridge compensates: mount two gauges on the same material; one active (in the strain field), one passive (nearby but unstrained). Temperature affects both equally, canceling in the bridge output. Note that compensation is effective only if both gauges are at the same temperature; a temperature gradient across the structure (e.g., near a heat source) will produce a differential thermal signal that the bridge cannot distinguish from mechanical strain.
 \section{Sensor Fusion and Redundancy}
 When a single sensor cannot meet the accuracy or reliability requirement, combining multiple sensors improves performance. \textbf{Homogeneous redundancy}: multiple identical sensors measuring the same quantity, with outputs averaged to reduce random noise by $\sqrt{N}$. Also provides fault detection: if one sensor deviates significantly from the others, it is likely faulty. \textbf{Heterogeneous fusion}: combining different sensor types (e.g., thermocouple for fast response + RTD for accuracy). A Kalman filter or complementary filter can combine them optimally, using each sensor's strengths.
 

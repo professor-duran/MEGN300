@@ -4,6 +4,10 @@
 \chapter{Digital Filter Design}
 \label{ch:digital_filters}\index{filter!digital}\index{FIR filter}\index{IIR filter}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~6 (Weeks 9--10)}: Read after the analog filter chapter. Focus on FIR vs.\ IIR tradeoffs, the window design method, and the LabVIEW filter implementation. The control-loop interaction section is important for Module~9. \textbf{Related}: Analog filters in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}); PID control in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
@@ -139,7 +143,7 @@ Design a 50-tap FIR low-pass filter with cutoff at 100\,Hz for data sampled at 1
 
 \textbf{Step 4}: normalize so the DC gain is unity: divide all $b[n]$ by their sum.
 
-The resulting filter has a $-3$\,dB cutoff at approximately 100\,Hz, transition bandwidth of $\sim$40\,Hz (80--120\,Hz), and stopband rejection of $\sim$$-53$\,dB (Hamming window property). The group delay is exactly 25 samples (2.5\,ms at 1\,kS/s).
+The resulting filter has a $-3$\,dB cutoff at approximately 100\,Hz, transition bandwidth of $\sim$40\,Hz (80--120\,Hz), and stopband rejection of ${\sim}{-53}$\,dB (Hamming window property). The group delay is exactly 25 samples (2.5\,ms at 1\,kS/s).
 
 In LabVIEW, this entire design is accomplished by the ``FIR Windowed Coefficients'' VI: specify the sampling rate, cutoff frequency, number of taps, and window type. The VI outputs the coefficient array, which you wire to the ``FIR Filter'' VI.
 
@@ -167,11 +171,11 @@ This requires only two state variables per biquad section, minimizing memory and
 \section{Real-Time Filtering in Control Loops}
 When a digital filter is used inside a control loop (e.g., filtering the sensor signal before feeding it to the PID controller), the filter introduces delay that affects control stability.
 
-\textbf{FIR delay}: an $M$-tap FIR introduces exactly $M/2$ samples of group delay. For $M = 50$ at 1\,kS/s: 25\,ms delay. At the controller's crossover frequency, this delay contributes phase lag: $\phi = 360 \times f \times 0.025$ degrees. At $f = 10$\,Hz: $\phi = 90^\circ$, which is likely to destabilize the loop.
+\textbf{FIR delay}: an $M$-tap FIR introduces exactly $M/2$ samples of group delay. For $M = 50$ at 1\,kS/s: 25\,ms delay. At the controller's crossover frequency, this delay contributes phase lag: $\phi = 360 \times f \times 0.025$ degrees. At $f = 10$\,Hz: $\phi = 90^{\circ}$, which is likely to destabilize the loop.
 
 \textbf{IIR delay}: varies with frequency. A 2nd-order Butterworth at $f_c = 100$\,Hz introduces approximately 3\,ms of group delay at 10\,Hz (much less than the equivalent FIR). This is why IIR filters are preferred in control applications where phase delay matters.
 
-\textbf{Design rule}: the filter's group delay at the controller's crossover frequency should contribute less than $20^\circ$ of phase lag. For a 10\,Hz crossover: max delay $= 20/(360 \times 10) = 5.6$\,ms. A 2nd-order IIR at $f_c = 50$\,Hz easily meets this; a 50-tap FIR at 1\,kS/s does not.
+\textbf{Design rule}: the filter's group delay at the controller's crossover frequency should contribute less than $20^{\circ}$ of phase lag. For a 10\,Hz crossover: max delay $= 20/(360 \times 10) = 5.6$\,ms. A 2nd-order IIR at $f_c = 50$\,Hz easily meets this; a 50-tap FIR at 1\,kS/s does not.
 
 \section{Notch Filter Design}
 A notch (band-reject) filter removes a single frequency. The second-order IIR notch:

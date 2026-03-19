@@ -1,7 +1,11 @@
 % Chapter 7: Analog vs. Digital Systems
 % Auto-generated from megn300_master_reference.tex
 
-\chapter{Analog vs.\ Digital Systems}
+\chapter{Analog vs.\ Digital Systems}\label{ch:analog_digital}
+
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~4 (Weeks 5--6)}: Read the full chapter before the ADC/sampling lab. The sampling theorem, quantization error, and NI DAQ configuration sections are directly applied in that lab. \textbf{Related}: SNR in Chapter~\ref{ch:snr} (p.\,\pageref{ch:snr}); DSP fundamentals in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}).
+\end{tipbox}
 
 \section{Continuous and Discrete Signals}
 An \textbf{analog signal} is continuous in both time and amplitude: it can take any value at any instant. A \textbf{digital signal} is discrete in both time (sampled at intervals) and amplitude (quantized to finite levels). The real world is analog; computers are digital. The boundary between them is the most critical interface in any measurement system.
@@ -77,7 +81,7 @@ An ADC takes a finite time to complete a conversion (the \textbf{aperture time})
 \begin{equation}
 V_{\text{noise,jitter}} = 2\pi f \cdot V_p \cdot t_{\text{jitter}}
 \end{equation}
-At high frequencies, jitter becomes the dominant noise source, limiting effective resolution.
+At high frequencies, jitter becomes the dominant noise source, limiting effective resolution. For the low-frequency measurements typical of the USB-6001 ($<$1\,kHz), clock jitter is negligible compared to quantization noise and is not a practical concern.
 
 \section{Multiplexing}
 A DAQ system often uses a single ADC shared among multiple input channels via an \textbf{analog multiplexer} (MUX). The MUX switches channels sequentially, so the effective per-channel sampling rate is $f_s / N_{\text{channels}}$. This introduces a \textbf{channel-to-channel skew}: adjacent channels are sampled at slightly different times.
@@ -108,7 +112,7 @@ The physical world is inherently analog: temperature, pressure, velocity, and st
 \section{Sampling Theory}
 Sampling converts a continuous-time signal into a discrete-time sequence. The Nyquist-Shannon sampling theorem states: a bandlimited signal with maximum frequency $f_{\max}$ can be perfectly reconstructed from its samples if $f_s > 2f_{\max}$. The frequency $f_s/2$ is the Nyquist frequency. Any content above it aliases into the baseband and cannot be removed digitally. The only defense is an analog anti-alias filter before the ADC.
 
-In practice, use $f_s \geq 10 \times f_{\max}$ for general measurement, $f_s \geq 20 \times f_{\text{bandwidth}}$ for control systems, and $f_s = 2.56 \times f_{\max}$ for vibration analysis.
+In practice, use $f_s \geq 10 \times f_{\max}$ for general measurement, $f_s \geq 20 \times f_{\text{bandwidth}}$ for control systems, and $f_s = 2.56 \times f_{\max}$ for vibration analysis (the factor 2.56 provides a ${\sim}28\%$ guard band above Nyquist for the anti-aliasing filter transition band, preventing aliased energy near $f_{\max}$ from corrupting the spectrum).
 
 \begin{warningbox}[Anti-Alias Filter Is Mandatory]
 An analog low-pass filter must be present before the ADC in every properly designed system. It cannot be implemented in software because aliasing occurs at the moment of sampling. Set the cutoff at or below $f_s/2$ with sufficient rolloff (4th order minimum) to attenuate out-of-band content by at least 60\,dB.
@@ -199,7 +203,7 @@ Using a breadboard for signal conditioning circuits in a final project is the mo
 \section{Data Conversion Pipeline}
 The complete data pipeline from analog sensor to engineering units involves multiple conversion stages, each with its own error contribution:
 
-(1)~\textbf{Sensor}: physical quantity $\to$ electrical signal. Error: sensor accuracy, linearity, hysteresis.
+(1)~\textbf{Sensor}: physical quantity $\to$ electrical signal. Uncertainty contributions: accuracy, linearity, hysteresis, repeatability.
 
 (2)~\textbf{Signal conditioning}: raw electrical $\to$ conditioned electrical (amplified, filtered). Error: gain error, offset, noise.
 

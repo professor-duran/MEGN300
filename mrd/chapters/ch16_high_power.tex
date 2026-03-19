@@ -4,6 +4,10 @@
 \chapter{High-Power Devices and Switches}
 \label{ch:highpower}\index{MOSFET}\index{relay}\index{SSR}\index{flyback diode}\index{PWM}\index{H-bridge}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~8 (Weeks 11--12)}: Read before the high-power switching lab. Focus on MOSFET gate drive, flyback diodes, PWM, and the relay vs.\ MOSFET vs.\ SSR comparison. The safety warnings in this chapter are critical. \textbf{Related}: Circuit fundamentals in Chapter~\ref{ch:circuits} (p.\,\pageref{ch:circuits}); PID output stages in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}
@@ -249,7 +253,7 @@ Motors, incandescent lamps, and capacitive loads draw much higher current at tur
 
 \textbf{DC motors}: inrush current $= V_{\text{supply}} / R_{\text{armature}}$, typically $5$--$10\times$ the running current. A motor that runs at 2\,A may draw 15\,A at startup. The MOSFET, wiring, and fuse must handle this inrush without tripping or failing.
 
-\textbf{Incandescent lamps}: cold filament resistance is $\sim$$1/10$ of hot resistance. A 100\,W lamp (0.83\,A at 120\,V running) draws $\sim$8\,A at turn-on for the first 100\,ms.
+\textbf{Incandescent lamps}: cold filament resistance is ${\sim}1/10$ of hot resistance. A 100\,W lamp (0.83\,A at 120\,V running) draws $\sim$8\,A at turn-on for the first 100\,ms.
 
 \textbf{Capacitive loads}: charging a capacitor bank produces a current spike $I = V/R_{\text{wire}}$, limited only by the wiring resistance. A 1000\,$\mu$F capacitor charged through 0.1\,$\Omega$ of wiring from 12\,V: peak current $= 120$\,A for a few microseconds. This can weld relay contacts or blow fuses.
 
@@ -322,7 +326,7 @@ The SEPIC (Single-Ended Primary-Inductor Converter) is a popular buck-boost topo
 \subsection{Switching Regulator Noise}
 The main disadvantage of all switching regulators is output ripple and electromagnetic interference (EMI). The rapid switching (100\,kHz+) generates noise at the switching frequency and its harmonics. This noise can corrupt sensitive analog measurements.
 
-Mitigation strategies: (1) add an LC output filter (extra inductor + capacitor) after the switching regulator, (2) use an LDO as a post-regulator to clean up the output for analog circuits, (3) keep switching regulator traces physically separated from analog signal traces on the PCB, and (4) use a continuous ground plane under the switching regulator with short, wide power traces. The Master Reference Document PCB Design chapter (Chapter~16) covers layout best practices for switching regulators.
+Mitigation strategies: (1) add an LC output filter (extra inductor + capacitor) after the switching regulator, (2) use an LDO as a post-regulator to clean up the output for analog circuits, (3) keep switching regulator traces physically separated from analog signal traces on the PCB, and (4) use a continuous ground plane under the switching regulator with short, wide power traces. For further layout best practices, consult the grounding and EMI guidelines in Chapter~\ref{ch:snr} (p.\,\pageref{ch:snr}).
 
 \begin{examplebox}[ThermoRig: Multi-Rail Power Architecture]
 The ThermoRig uses a 12\,V wall adapter as its primary source. A buck converter (LM2596 module) steps 12\,V down to 5\,V at up to 2\,A for the sensor power rail (85\% efficient, 0.3\,W waste heat vs. 2.6\,W for an LDO). An LDO (AMS1117-3.3) then produces 3.3\,V from the 5\,V rail for the ESP32 (66\% efficient, but only 300\,mA, so waste heat is 0.5\,W, manageable). The 12\,V rail directly powers the heater SSR control and the cooling fan. Total power architecture: three voltage rails from one input, with the high-current conversion handled by the switching regulator and the noise-sensitive MCU rail cleaned up by the LDO.

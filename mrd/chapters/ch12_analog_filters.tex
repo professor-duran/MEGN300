@@ -4,6 +4,10 @@
 \chapter{Analog Filter Design}
 \label{ch:analog_filters}\index{filter!low-pass}\index{filter!Butterworth}\index{filter!Chebyshev}\index{filter!Bessel}\index{cutoff frequency}\index{Sallen-Key}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~6 (Weeks 9--10)}: Read before the filter design lab. Focus on the Butterworth vs.\ Chebyshev comparison, the Sallen-Key topology, and the component calculation procedure. The Bode plot interpretation section is used repeatedly in the control systems module. \textbf{Related}: DSP fundamentals in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}); digital filters in Chapter~\ref{ch:digital_filters} (p.\,\pageref{ch:digital_filters}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}
@@ -192,7 +196,7 @@ Second-order ($-40$\,dB/decade) with one op-amp. Equal-component design ($R_1 = 
 \textbf{Bessel}: most linear phase (constant group delay). Preserves pulse shape. Gentlest rolloff. Use for time-domain transient measurements.
 
 \begin{warningbox}[Phase Delay and Control Stability]
-Higher-order filters introduce more phase lag. A 4th-order Butterworth at 100\,Hz has $\sim$180$^\circ$ lag at cutoff. In control loops, this reduces phase margin and can cause instability. Limit filter order and set cutoff well above control bandwidth.
+Higher-order filters introduce more phase lag. A 4th-order Butterworth at 100\,Hz has ${\sim}180^{\circ}$ lag at cutoff. In control loops, this reduces phase margin and can cause instability. Limit filter order and set cutoff well above control bandwidth.
 \end{warningbox}
 
 \section{Notch Filters}

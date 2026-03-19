@@ -4,6 +4,10 @@
 \chapter{Closed-Loop Control}
 \label{ch:closedloop}\index{control!closed-loop}\index{feedback}\index{stability}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~9 (Weeks 13--14)}: Read after the open-loop chapter. Focus on feedback block diagrams, stability concepts (gain/phase margin), and the step response characteristics (overshoot, settling time). \textbf{Related}: Open-loop in Chapter~\ref{ch:openloop} (p.\,\pageref{ch:openloop}); PID tuning in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}
@@ -140,7 +144,7 @@ A transfer function $G(s)$ describes the input-output relationship in the Laplac
 \textbf{Type 2} (two integrators): zero steady-state error for step and ramp inputs. Rarely needed in instrumentation.
 
 \section{Stability}
-A closed-loop system is stable if and only if all poles of the closed-loop transfer function have negative real parts (lie in the left half of the $s$-plane). In practice, stability is assessed using gain margin (how much the gain can increase before instability) and phase margin (how much additional phase lag can be tolerated). For robust performance, aim for gain margin $> 6$\,dB and phase margin $> 45^\circ$.
+A closed-loop system is stable if and only if all poles of the closed-loop transfer function have negative real parts (lie in the left half of the $s$-plane). In practice, stability is assessed using gain margin (how much the gain can increase before instability) and phase margin (how much additional phase lag can be tolerated). For robust performance, aim for gain margin $> 6$\,dB and phase margin $> 45^{\circ}$.
 
 \section{Closed-Loop Advantages}
 \textbf{Disturbance rejection}: feedback detects and corrects the effect of disturbances. A door opening in a heated room causes a temperature drop that the controller detects and compensates by increasing heater power.
@@ -151,14 +155,14 @@ A closed-loop system is stable if and only if all poles of the closed-loop trans
 
 
 \section{Sensitivity and Complementary Sensitivity}
-The closed-loop transfer function from setpoint to output is the \textbf{complementary sensitivity function} $T(s) = L(s)/(1+L(s))$ where $L(s) = G_c(s)G_p(s)$ is the open-loop transfer function. The \textbf{sensitivity function} $S(s) = 1/(1+L(s))$ describes how disturbances affect the output. Note that $S + T = 1$: you cannot simultaneously reduce sensitivity to disturbances at all frequencies. This is the fundamental limitation of feedback control.
+The closed-loop transfer function from setpoint to output is the \textbf{complementary sensitivity function} $T(s) = L(s)/(1+L(s))$ where $L(s) = G_c(s)G_p(s)$ is the open-loop transfer function. The \textbf{sensitivity function} $S(s) = 1/(1+L(s))$ describes how disturbances affect the output. Note that $S + T = 1$ (for the standard unity-feedback architecture with $H(s) = 1$): you cannot simultaneously reduce sensitivity to disturbances at all frequencies. This is the fundamental limitation of feedback control.
 
 At low frequencies where $|L| \gg 1$: $T \approx 1$ (output tracks setpoint), $S \approx 1/L \ll 1$ (disturbances are strongly rejected). At high frequencies where $|L| \ll 1$: $T \approx L \ll 1$ (output does not track fast setpoint changes), $S \approx 1$ (disturbances pass through unattenuated).
 
 \section{Stability Margins in Detail}
-\textbf{Gain margin}: the factor by which the loop gain can increase before the system becomes unstable. Measured at the frequency where the phase is $-180^\circ$. Minimum recommended: 6\,dB (gain can double before instability).
+\textbf{Gain margin}: the factor by which the loop gain can increase before the system becomes unstable. Measured at the frequency where the phase is $-180^{\circ}$. Minimum recommended: 6\,dB (gain can double before instability).
 
-\textbf{Phase margin}: the additional phase lag the system can tolerate before instability. Measured at the gain crossover frequency (where $|L| = 1$). Minimum recommended: $45^\circ$. More phase margin gives less overshoot and more robust behavior.
+\textbf{Phase margin}: the additional phase lag the system can tolerate before instability. Measured at the gain crossover frequency (where $|L| = 1$). Minimum recommended: $45^{\circ}$. More phase margin gives less overshoot and more robust behavior.
 
 In MEGN 300, you assess stability empirically: if the control loop oscillates, reduce $K_p$. If it oscillates with growing amplitude, you are at or beyond the stability boundary. Back off gain by at least 50\%.
 
@@ -193,9 +197,9 @@ Adding integral action ($K_i > 0$) makes the system Type~1: $K_p \to \infty$, $e
 
 \section{Stability Analysis Methods}
 \subsection{Bode Plot Method}
-Plot the magnitude and phase of $L(j\omega)$ vs.\ frequency. The system is stable if the gain margin (gain below 0\,dB at the $-180^\circ$ phase frequency) and phase margin (phase above $-180^\circ$ at the 0\,dB gain frequency) are both positive.
+Plot the magnitude and phase of $L(j\omega)$ vs.\ frequency. The system is stable if the gain margin (gain below 0\,dB at the $-180^{\circ}$ phase frequency) and phase margin (phase above $-180^{\circ}$ at the 0\,dB gain frequency) are both positive.
 
-For the ThermoRig PI controller: $L(s) = (10 + 0.5/s) \times 1/(1+30s)$ (P$=10$, I$=0.5$, plant time constant $= 30$\,s). The Bode plot shows crossover at $\sim$0.05\,Hz with $\sim$50$^\circ$ phase margin. This is adequate ($>$45$^\circ$). Increasing $K_p$ to 20 reduces the phase margin to $\sim$30$^\circ$, making the response oscillatory.
+For the ThermoRig PI controller: $L(s) = (10 + 0.5/s) \times 1/(1+30s)$ (P$=10$, I$=0.5$, plant time constant $= 30$\,s). The Bode plot shows crossover at $\sim$0.05\,Hz with ${\sim}50^{\circ}$ phase margin. This is adequate (${>}\,45^{\circ}$). Increasing $K_p$ to 20 reduces the phase margin to ${\sim}30^{\circ}$, making the response oscillatory.
 
 \subsection{Root Locus (Conceptual)}
 As the proportional gain $K_p$ increases from 0 to infinity, the closed-loop poles trace paths in the complex plane. When poles cross the imaginary axis, the system becomes unstable. Root locus shows the gain at which instability occurs (the ``ultimate gain'' $K_u$) and the frequency of oscillation ($f_u$). This is the theoretical basis for the Ziegler-Nichols tuning method.
@@ -218,7 +222,7 @@ These four specifications are mutually constrained: reducing rise time increases
 
 (3) Tune the controller: Z-N method for initial gains, then manual refinement based on step response observation.
 
-(4) Verify stability and performance: check phase margin ($>$45$^\circ$), overshoot ($<$10\%), settling time (within specification), and steady-state error (zero for step inputs with integral action).
+(4) Verify stability and performance: check phase margin (${>}\,45^{\circ}$), overshoot ($<$10\%), settling time (within specification), and steady-state error (zero for step inputs with integral action).
 
 (5) Test robustness: change the plant conditions (different ambient temperature, different load, different supply voltage) and verify the controller still performs acceptably.
 \section{Closed-Loop Bandwidth and Speed of Response}
@@ -227,7 +231,7 @@ The closed-loop bandwidth $f_{BW}$ determines how fast the system can track chan
 For the ThermoRig with $K_p = 10$, $K_{\text{plant}} = 1$, $\tau = 30$\,s: $f_{BW} = 11/(2\pi \times 30) = 0.058$\,Hz, corresponding to a closed-loop time constant of $30/11 = 2.7$\,s (much faster than the open-loop 30\,s). With $K_p = 50$: $f_{BW} = 0.27$\,Hz, closed-loop time constant $= 0.59$\,s. But the phase margin at this gain may be insufficient.
 
 \section{The Sensitivity Tradeoff}
-The sensitivity function $S(s) = 1/(1 + L(s))$ and the complementary sensitivity function $T(s) = L(s)/(1+L(s))$ satisfy $S + T = 1$ at every frequency. This means: at frequencies where the system tracks the setpoint well ($|T| \approx 1$), it also rejects disturbances well ($|S| \approx 0$). At frequencies where tracking is poor ($|T| \approx 0$), disturbances pass through unattenuated ($|S| \approx 1$).
+The sensitivity function $S(s) = 1/(1 + L(s))$ and the complementary sensitivity function $T(s) = L(s)/(1+L(s))$ satisfy $S + T = 1$ at every frequency (assuming unity feedback, $H(s) = 1$, which is standard in most practical implementations). This means: at frequencies where the system tracks the setpoint well ($|T| \approx 1$), it also rejects disturbances well ($|S| \approx 0$). At frequencies where tracking is poor ($|T| \approx 0$), disturbances pass through unattenuated ($|S| \approx 1$).
 
 The crossover frequency (where $|L| = 1$) separates these two regimes. Below crossover: good tracking and disturbance rejection. Above crossover: no tracking, no disturbance rejection. This is why increasing bandwidth (moving the crossover to higher frequencies) improves performance, subject to the stability constraint.
 

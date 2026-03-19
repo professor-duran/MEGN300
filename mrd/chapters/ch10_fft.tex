@@ -4,6 +4,10 @@
 \chapter{FFT and Complex Signal Decomposition}
 \label{ch:fft}\index{FFT}\index{spectral leakage}\index{windowing}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~5 (Weeks 7--8)}: Read alongside the FFT lab. Focus on windowing, spectral leakage, and the LabVIEW FFT configuration. The frequency resolution formula ($\Delta f = f_s / N$) is used in every spectral analysis for the rest of the course. \textbf{Related}: Fourier theory in Chapter~\ref{ch:fourier} (p.\,\pageref{ch:fourier}); DSP in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}).
+\end{tipbox}
+
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
@@ -266,7 +270,7 @@ The total acquisition time is $T = N \times M / f_s$ where $M$ is the number of 
 \textbf{Sidebands}: peaks flanking a main peak, spaced equally on both sides. Sources: amplitude modulation (bearing defects modulating shaft rotation), frequency modulation (speed fluctuations). The sideband spacing identifies the modulation frequency.
 
 \subsection{Frequency Identification Guide}
-For a machine rotating at $f_r$: shaft imbalance appears at $f_r$. Misalignment at $2f_r$. Gear mesh at $N_{\text{teeth}} \times f_r$. Ball bearing outer race defect at $\sim 0.4 N_{\text{balls}} \times f_r$. Blade pass frequency at $N_{\text{blades}} \times f_r$. Electrical motor slip frequency at $(f_{\text{line}} - N_p f_r)$ where $N_p$ is the number of poles.
+For a machine rotating at $f_r$: shaft imbalance appears at $f_r$. Misalignment at $2f_r$. Gear mesh at $N_{\text{teeth}} \times f_r$. Ball bearing outer race defect (BPFO) at ${\sim}0.4 N_{\text{balls}} \times f_r$ (this is an approximation; exact defect frequencies for inner race (BPFI), outer race (BPFO), and rolling element (BSF) depend on bearing geometry and contact angle; consult the bearing manufacturer datasheet for precise values). Blade pass frequency at $N_{\text{blades}} \times f_r$. Electrical motor slip frequency at $(f_{\text{line}} - N_p f_r)$ where $N_p$ is the number of poles.
 
 \section{Cross-Spectral Analysis}
 When measuring two channels simultaneously (e.g., force input and acceleration output), the \textbf{cross-spectrum} $G_{xy}(f) = X^*(f) \cdot Y(f)$ relates the two signals in the frequency domain. The \textbf{frequency response function} (transfer function magnitude) is:

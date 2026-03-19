@@ -4,6 +4,10 @@
 \chapter{Amplifiers}
 \label{ch:amplifiers}\index{amplifier!operational}\index{amplifier!instrumentation}\index{gain-bandwidth product}\index{CMRR}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~7 (Weeks 11--12)}: Read before the signal conditioning lab. Focus on the instrumentation amplifier (INA128) gain equation, the complete signal chain design, and CMRR. The ThermoRig worked example ties everything together. \textbf{Related}: Circuit fundamentals in Chapter~\ref{ch:circuits} (p.\,\pageref{ch:circuits}); sensor selection in Chapter~\ref{ch:sensors} (p.\,\pageref{ch:sensors}).
+\end{tipbox}
+
 \begin{warningbox}[Op-Amp Non-Idealities: Required Reading]
 Section~\ref{sec:opamp_nonideal} in this chapter (``The Brutal Realities'') is one of the most important in the entire document. Read it before designing any amplifier circuit.
 \end{warningbox}
@@ -73,8 +77,8 @@ Common ICs: INA128, AD620, INA333. CMRR typically $>$100\,dB.
     amp/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
                 minimum width=3.0cm, minimum height=2.0cm, align=center, font=\scriptsize\sffamily},
 ]
-\node[amp] (inv) at (0,0) {\textbf{Inverting}\\$G = -R_f/R_i$\\Phase: $180^\circ$\\Input $Z$: $R_i$};
-\node[amp] (noninv) at (4,0) {\textbf{Non-Inverting}\\$G = 1 + R_f/R_g$\\Phase: $0^\circ$\\Input $Z$: very high};
+\node[amp] (inv) at (0,0) {\textbf{Inverting}\\$G = -R_f/R_i$\\Phase: $180^{\circ}$\\Input $Z$: $R_i$};
+\node[amp] (noninv) at (4,0) {\textbf{Non-Inverting}\\$G = 1 + R_f/R_g$\\Phase: $0^{\circ}$\\Input $Z$: very high};
 \node[amp] (diff) at (8,0) {\textbf{Differential}\\$G = R_f/R_i$\\Rejects CM noise\\Input $Z$: $R_i$};
 \node[amp, draw=AccentTeal, fill=AccentTeal!8] (ina) at (12,0) {\textbf{INA}\\$G = 1 + 50\text{k}/R_G$\\Highest CMRR\\Input $Z$: $>$G$\Omega$};
 % Best for labels
@@ -129,7 +133,7 @@ A complete signal conditioning chain for a resistive sensor:
 \end{enumerate}
 
 \begin{examplebox}[ThermoRig: Complete Signal Chain for Strain Measurement]
-A 350\,$\Omega$ strain gauge in a quarter-bridge (\textbf{ThermoRig Variant: Strain Measurement} --- this example demonstrates the signal chain design process for a resistive sensor, complementing the thermocouple-based ThermoRig) with $V_{ex} = 5$\,V. At 1000\,$\mu\epsilon$: $\Delta V = V_{ex} \times GF \times \epsilon / 4 = 5 \times 2.1 \times 0.001 / 4 = 2.625$\,mV. Signal chain: INA128 at $G = 500$ ($V_{out} = 1.31$\,V), followed by a 2nd-order Butterworth LP at 500\,Hz, feeding a 16-bit ADC ($\pm$5\,V range). ADC resolution at sensor: $10/(65536 \times 500) = 0.305\,\mu$V $= 0.116\,\mu\epsilon$. Noise: INA128 noise ($8\,\text{nV}/\sqrt{\text{Hz}} \times \sqrt{500} = 179$\,nV input-referred) $\to$ referred to strain: $179\,\text{nV} / (5 \times 2.1 / 4) = 0.068\,\mu\epsilon$. Total: well within a $\pm$5\,$\mu\epsilon$ requirement.
+A 350\,$\Omega$ strain gauge in a quarter-bridge (\textbf{ThermoRig Variant: Strain Measurement}; this example demonstrates the signal chain design process for a resistive sensor, complementing the thermocouple-based ThermoRig) with $V_{ex} = 5$\,V. At 1000\,$\mu\epsilon$: $\Delta V = V_{ex} \times GF \times \epsilon / 4 = 5 \times 2.1 \times 0.001 / 4 = 2.625$\,mV. Signal chain: INA128 at $G = 500$ ($V_{out} = 1.31$\,V), followed by a 2nd-order Butterworth LP at 500\,Hz, feeding a 16-bit ADC ($\pm$5\,V range). ADC resolution at sensor: $10/(65536 \times 500) = 0.305\,\mu$V $= 0.116\,\mu\epsilon$. Noise: INA128 noise ($8\,\text{nV}/\sqrt{\text{Hz}} \times \sqrt{500} = 179$\,nV input-referred) $\to$ referred to strain: $179\,\text{nV} / (5 \times 2.1 / 4) = 0.068\,\mu\epsilon$. Total: well within a $\pm$5\,$\mu\epsilon$ requirement.
 \end{examplebox}
 
 
@@ -149,7 +153,7 @@ Key real-world limitations: \textbf{Input offset voltage ($V_{os}$)}: 0.1--5\,mV
 \textbf{Differential}: $V_o = (R_f/R_i)(V_2 - V_1)$. CMRR limited by resistor matching ($\sim$60\,dB for 0.1\% resistors).
 
 \section{Instrumentation Amplifier (INA)}
-Three-op-amp topology: two input buffers + difference amplifier. $G = 1 + 2R/R_G$. CMRR $> 100$\,dB. Very high input impedance ($>10^{10}\,\Omega$). Gain set by single resistor. The gold standard for sensor interfacing.
+Three-op-amp topology: two input buffers + difference amplifier. $G = 1 + 2R/R_G$ (for the INA128 specifically: $G = 1 + 49.4\,\text{k}\Omega / R_G$). CMRR $> 100$\,dB. Very high input impedance ($>10^{10}\,\Omega$). Gain set by single resistor. The gold standard for sensor interfacing.
 
 \begin{examplebox}[ThermoRig: Complete Signal Chain]
 TC produces 0--8.2\,mV (0--200\,\degC{}). DAQ accepts 0--5\,V. Required gain: $G \approx 600$. INA128 ($R = 49.4$\,k$\Omega$): $R_G = 98.8\text{k}/(600-1) = 165\,\Omega$. Use 162\,$\Omega$ standard, $G = 611$. CMRR of 120\,dB rejects 50\,mV ground offset. Signal chain: TC $\to$ INA128 ($G = 611$) $\to$ Sallen-Key LP (40\,Hz) $\to$ NI USB-6001 (diff, 0--5\,V, 100\,S/s).
@@ -301,10 +305,10 @@ f_{\text{max}} = \frac{\text{GBW}}{G}
 For a non-inverting amplifier with $G = 1000$ using a TL072 (GBW $= 3$\,MHz): $f_{\text{max}} = 3000$\,Hz. Any signal above 3\,kHz is \emph{attenuated}, not amplified. A student expecting flat gain from DC to 10\,kHz will measure a signal that rolls off above 3\,kHz and be confused.
 
 \begin{warningbox}[The Gain-Bandwidth Trap]
-If you need $G = 1000$ with bandwidth to 10\,kHz, you need GBW $\geq 10{,}000 \times 1000 = 10$\,MHz (with $10\times$ margin: $\geq 100$\,MHz). No general-purpose op-amp achieves this at reasonable cost. The solution: split the gain into two stages ($G_1 = 100$, $G_2 = 10$). Each stage needs GBW $\geq 100 \times 10000 = 1$\,MHz and GBW $\geq 10 \times 10000 = 100$\,kHz respectively. Both are easily achievable with a TL072.
+If you need $G = 1000$ with bandwidth to 10\,kHz, you need GBW $\geq 10{,}000 \times 1000 = 10$\,MHz (with $10\times$ margin: $\geq 100$\,MHz). Achieving this in a single stage is impractical: even if a high-GBW op-amp exists, the gain peaking, noise gain, and stability margins at $G = 1000$ make single-stage design unreliable. The solution: split the gain into two stages ($G_1 = 100$, $G_2 = 10$). Each stage needs GBW $\geq 100 \times 10000 = 1$\,MHz and GBW $\geq 10 \times 10000 = 100$\,kHz respectively. Both are easily achievable with a TL072.
 \end{warningbox}
 
-\subsection{Input Offset Voltage ($V_{os}$)}
+\subsection{Input Offset Voltage (\texorpdfstring{$V_{os}$}{Vos})}
 The input offset voltage is a small DC voltage that appears between the inverting and non-inverting inputs due to manufacturing mismatches in the input transistor pair. It is amplified by the closed-loop gain just like a real signal:
 \begin{equation}
 V_{\text{output, offset}} = V_{os} \times G
@@ -318,7 +322,7 @@ For thermocouple and strain gauge signal conditioning, the op-amp's $V_{os}$ mus
 
 The INA128 used in the ThermoRig has $V_{os} = 50\,\mu$V maximum (referred to input), which produces only $50 \times 10^{-6} \times 611 = 30.5$\,mV at the output, small enough to be calibrated out. This is why INAs are specified for instrumentation: their offset, drift, and CMRR are optimized for the task.
 
-\subsection{Input Offset Voltage Drift ($dV_{os}/dT$)}
+\subsection{Input Offset Voltage Drift (\texorpdfstring{$dV_{os}/dT$}{dVos/dT})}
 The offset voltage changes with temperature. For a TL072: $10\,\mu$V/\degC{} typical. Over a 20\,\degC{} temperature excursion (lab temperature varying from 18 to 38\,\degC{}): $\Delta V_{os} = 10 \times 20 = 200\,\mu$V. At gain 611: $\Delta V_{\text{output}} = 122$\,mV, equivalent to a 5\,\degC{} measurement error that slowly wanders as the room temperature changes. This appears as a mysterious drift in the data that cannot be traced to the sensor.
 
 For precision applications: use op-amps with $dV_{os}/dT < 1\,\mu$V/\degC{} (OPA2277: $0.1\,\mu$V/\degC{}; LTC2057: $0.015\,\mu$V/\degC{}). Alternatively, calibrate frequently (every 30 minutes in a temperature-variable environment).

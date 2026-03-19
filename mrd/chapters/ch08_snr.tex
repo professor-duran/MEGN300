@@ -4,6 +4,10 @@
 \chapter{Signal-to-Noise Ratio}
 \label{ch:snr}\index{signal-to-noise ratio}\index{SNR}\index{noise!sources}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~4 (Weeks 5--6)}: Read alongside the ADC chapter. Focus on noise sources, SNR calculation in dB, and the grounding/shielding sections. These directly apply to debugging noisy signals in the lab. \textbf{Related}: ADC fundamentals in Chapter~\ref{ch:analog_digital} (p.\,\pageref{ch:analog_digital}); filtering in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}).
+\end{tipbox}
+
 \begin{industrybox}{EMI Shielding in EV Test Cells}
 In the Battery Workforce Challenge and EcoCAR Innovation Challenge, student teams instrument hybrid and electric vehicles with dozens of sensors operating alongside 400\,V traction inverters switching at 10--20\,kHz. The shielding, grounding, and filtering principles in this chapter are the difference between clean thermocouple data and a 60\,Hz artifact that makes thermal management analysis useless. Every cable routing decision and filter cutoff traces directly to an EMI requirement in the vehicle integration specification.
 \end{industrybox}
@@ -266,6 +270,8 @@ A systematic noise characterization should be performed as the first step in any
 (4)~\textbf{FFT analysis}: compute the FFT of the noise data. Identify discrete peaks (60\,Hz, switching frequencies, resonances) vs.\ broadband floor. Address the discrete peaks first (grounding, shielding, filtering), then evaluate whether the broadband floor meets the SNR requirement.
 
 \section{SNR Requirements for Different Measurement Types}
+
+The following values are approximate guidelines that depend on the specific measurement goal. Detecting that a signal is present requires less SNR than accurately measuring its amplitude, which in turn requires less than resolving fine spectral features.
 \textbf{Temperature monitoring ($\pm$1\,\degC{})}: SNR $> 40$\,dB is adequate. Easy to achieve with any modern DAQ.
 
 \textbf{Strain measurement ($\pm$10\,$\mu\epsilon$)}: requires SNR $> 60$\,dB. Demands careful grounding, shielded cabling, and a low-noise INA.

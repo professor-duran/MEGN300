@@ -4,6 +4,10 @@
 \chapter{Fundamentals of Measurement Theory}
 \label{ch:measurement_theory}\index{measurement!definition}\index{measurand}\index{error!systematic}\index{error!random}
 
+\begin{tipbox}[When to Read This Chapter]
+\textbf{Module~1 (Weeks 1--2)}: Read the full chapter. This is the vocabulary foundation for the entire course. Sections on accuracy vs.\ precision, systematic vs.\ random error, and the measurement system model are referenced in every subsequent module. \textbf{Related}: Static calibration in Chapter~\ref{ch:static} (p.\,\pageref{ch:static}); error propagation in Chapter~\ref{ch:error} (p.\,\pageref{ch:error}).
+\end{tipbox}
+
 \section{What Is a Measurement?}
 A measurement is the process of assigning a numerical value to a physical quantity by comparing it to a standard. Every measurement has three components: (1) a \textbf{measurand} (the physical quantity being measured; e.g., temperature, pressure, strain), (2) a \textbf{sensor} (the device that converts the measurand into a signal; e.g., thermocouple, strain gauge, LVDT), and (3) a \textbf{measurement system} (the complete chain from sensor through signal conditioning, data acquisition, and display or storage).
 
@@ -227,32 +231,6 @@ Calibration certificates from accredited laboratories (ISO/IEC~17025) provide th
 Never report a measurement with more significant figures than the uncertainty justifies. If your system uncertainty is $\pm$0.5\,\degC{}, reporting ``23.472\,\degC{}'' is misleading; correct reporting is ``23.5 $\pm$ 0.5\,\degC{}'' or equivalently ``23.5(5)\,\degC{}.'' The number of decimal places in the reported value should match the number of decimal places in the uncertainty.
 \end{warningbox}
 
-\section{Sensor Selection Methodology}
-Choosing the right sensor is the most consequential decision in instrumentation design. A poor choice propagates through the entire signal chain. The process follows five steps.
-
-\textbf{Step 1: Define measurand and environment.} What is the expected range (with margin)? What is the measurement bandwidth? What is the operating environment (temperature, vibration, chemical exposure, EMI)? What mounting constraints exist?
-
-\textbf{Step 2: Accuracy and resolution.} The system accuracy requirement must be decomposed into an error budget. The sensor typically receives 50--70\% of the variance budget. Resolution must be 5--10$\times$ finer than accuracy.
-
-\textbf{Step 3: Dynamic response.} Sensor bandwidth must exceed signal bandwidth by $5\times$--$10\times$. For first-order sensors, the $-3$\,dB frequency must be $5\times$ the highest signal frequency for $<$1\% amplitude error.
-
-\textbf{Step 4: Interface compatibility.} Output type (voltage, current, resistance, digital), output level, impedance, power requirements, wiring configuration (2/3/4-wire).
-
-\textbf{Step 5: Cost, availability, reliability.} Verify the sensor has a complete datasheet. Check distributor stock and lead time.
-
-\section{Measurement System Design Process}
-The six phases: (1) Requirements definition with formal ``shall'' statements. (2) Sensor selection and error budgeting. (3) Signal conditioning design (amplification, filtering, bridge excitation). (4) DAQ configuration (sample rate, bit resolution, input mode, range). (5) Software implementation (LabVIEW: acquisition loop, calibration, filtering, display). (6) Calibration and validation against known standards.
-
-\begin{tipbox}[Five Questions for Every Measurement System]
-Before designing: (1) What am I measuring? (2) How accurately? (3) How fast is it changing? (4) What environment? (5) What do I do with the data? These answers determine every subsequent decision.
-\end{tipbox}
-
-\section{Units, Standards, and Traceability}
-All measurements must be traceable to national standards (NIST in the US). SI base units: meter, kilogram, second, ampere, kelvin, mole, candela. Common derived: pascal (Pa), hertz (Hz), volt (V), ohm ($\Omega$). Calibration certificates from ISO/IEC 17025 accredited labs provide legal traceability. Common calibration interval: 12 months, adjusted based on observed stability.
-
-\begin{warningbox}[Significant Figures]
-Never report more significant figures than the uncertainty justifies. If uncertainty is $\pm$0.5\,\degC{}, report ``23.5 $\pm$ 0.5\,\degC{},'' not ``23.472\,\degC{}.'' Match decimal places in value and uncertainty.
-\end{warningbox}
 \section{Signal Types and Their Characteristics}
 Understanding the nature of the signal produced by a sensor is essential for designing the rest of the measurement chain.
 
