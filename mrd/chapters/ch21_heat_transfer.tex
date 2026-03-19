@@ -159,9 +159,10 @@ where $\epsilon$ is the emissivity (0--1; $\epsilon = 1$ for a perfect blackbody
 
 \subsection{When Radiation Matters}
 At low temperatures ($<$100\,\degC{}), radiation is typically small compared to convection. At 80\,\degC{} ($= 353$\,K) with surroundings at 20\,\degC{} ($= 293$\,K), $\epsilon = 0.9$, $A = 0.0025$\,m$^2$: 
-\[
-\dot{Q}_{\text{rad}} = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (353^4 - 293^4) = 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (1.55 \times 10^{10} - 7.37 \times 10^{9}) = 1.0
-\]
+\begin{align*}
+\dot{Q}_{\text{rad}} &= \epsilon \sigma A (T_h^4 - T_c^4) \\
+  &= 0.9 \times 5.67 \times 10^{-8} \times 0.0025 \times (353^4 - 293^4) = 1.0\;\text{W}
+\end{align*}
 \,W. Compared to convective loss of $\dot{Q}_{\text{conv}} = 10 \times 0.0025 \times 60 = 1.5$\,W, radiation contributes about 40\% of the total heat loss. At higher temperatures or in vacuum, radiation dominates.
 
 \section{Energy Balance}
@@ -218,7 +219,7 @@ When designing the ThermoRig PID control system, heat transfer analysis answers 
 \[
 \dot{Q}_{\text{loss}} = (h_{\text{conv}} + h_{\text{rad}}) \times A \times (200 - 15)
 \]
-. Size the heater for at least $1.5 \times \dot{Q}_{\text{loss, max}}$ to ensure the controller has authority to reach the setpoint with margin.
+Size the heater for at least $1.5 \times \dot{Q}_{\text{loss, max}}$ to ensure the controller has authority to reach the setpoint with margin.
 
 \textbf{Insulation design}: adding insulation reduces $\dot{Q}_{\text{loss}}$, reducing the required heater power and making control easier (smaller disturbance sensitivity). However, insulation also increases the thermal time constant $\tau = mC_p/(h_{\text{eff}}A)$, making the system slower to respond.
 
@@ -327,7 +328,7 @@ The multi-node model reveals internal temperature gradients. The heater surface 
 \[
 100 = 10 \times 0.005 \times (T_{ss} - 22) + \epsilon\sigma \times 0.005 \times (T_{ss}^4 - 295^4)
 \]
-. Neglecting radiation as first approximation: $100 = 0.05(T_{ss} - 22)$, $T_{ss} = 2022$\,\degC{}. This is clearly too high, the steady state would be limited by the heater surface area and the onset of higher convection at elevated temperatures. In practice, the specimen reaches the heater's surface temperature limit ($\sim$200\,\degC{} for ceramic heaters) and the energy balance includes radiation and increased natural convection ($h$ increases with $\Delta T$). A more realistic $h = 15$\,W/m$^2\cdot$K with radiation ($h_{\text{rad}} \approx 5$ at moderate temperatures): $100 = (15+5) \times 0.005 \times (T_{ss} - 22)$, $T_{ss} = 1022$\,\degC{}. The problem illustrates that 100\,W is far more power than needed for a small specimen in air.
+Neglecting radiation as first approximation: $100 = 0.05(T_{ss} - 22)$, $T_{ss} = 2022$\,\degC{}. This is clearly too high, the steady state would be limited by the heater surface area and the onset of higher convection at elevated temperatures. In practice, the specimen reaches the heater's surface temperature limit ($\sim$200\,\degC{} for ceramic heaters) and the energy balance includes radiation and increased natural convection ($h$ increases with $\Delta T$). A more realistic $h = 15$\,W/m$^2\cdot$K with radiation ($h_{\text{rad}} \approx 5$ at moderate temperatures): $100 = (15+5) \times 0.005 \times (T_{ss} - 22)$, $T_{ss} = 1022$\,\degC{}. The problem illustrates that 100\,W is far more power than needed for a small specimen in air.
 \item 
 \[
 L_c = V/A_s = (5.24 \times 10^{-10})/(3.14 \times 10^{-6}) = 1.67 \times 10^{-4}

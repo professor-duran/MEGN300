@@ -14,6 +14,7 @@ Read this chapter \textbf{before your first lab session}. The debugging methodol
 
 \begin{figure}[htbp]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     level/.style={trapezium, draw=MinesBlue, thick, fill=LightBG,
                   trapezium left angle=75, trapezium right angle=75,
@@ -31,7 +32,7 @@ Read this chapter \textbf{before your first lab session}. The debugging methodol
 \node[note] at (2.5,4.5) {Full system under\\real conditions};
 \draw[-{Stealth[length=3mm]}, thick, WarnOrange] (-6.5,0) -- (-6.5,4.5);
 \node[font=\small\sffamily\bfseries, WarnOrange, rotate=90, anchor=south] at (-7.0,2.25) {Debug bottom-up};
-\end{tikzpicture}
+\end{tikzpicture}}%
 \caption{The debugging pyramid. Always start at Level~1 (component verification) and work upward. Skipping levels is the most common cause of wasted debugging time.}
 \label{fig:debug_pyramid}
 \end{figure}

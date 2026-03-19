@@ -145,7 +145,11 @@ For the ThermoRig in open-loop: set the heater to 50\% duty cycle (step from 0\%
 
 From this step response, extract three parameters: the process gain $K_p = (T_{ss} - T_{\text{ambient}}) / (\text{duty cycle change})$, the time constant $\tau$ (time to reach 63.2\% of $T_{ss} - T_{\text{ambient}}$), and the dead time $L$ (time from the step to the first observable temperature rise). For the ThermoRig: $K_p \approx 1.1$\,\degC{}/\%, $\tau \approx 30$\,s, $L \approx 3$\,s.
 
-These three parameters ($K_p$, $\tau$, $L$) define a First-Order Plus Dead Time (FOPDT) model: $G(s) = K_p e^{-Ls} / (1 + \tau s)$, which is the most common plant model used for PID tuning in process control.
+These three parameters ($K_p$, $\tau$, $L$) define a First-Order Plus Dead Time (FOPDT) model: 
+\[
+G(s) = \frac{K_p \, e^{-Ls}}{1 + \tau s}
+\]
+This First-Order Plus Dead Time (FOPDT) model is the most common plant model used for PID tuning in process control.
 
 \section{Sensitivity Analysis}
 How much does the open-loop output change when a parameter varies?
@@ -191,7 +195,7 @@ For the ThermoRig: to ramp the temperature from 25\,\degC{} to 80\,\degC{} in ex
 \[
 P(t) = hA(T(t) - T_{\text{amb}}) + mC_p \cdot dT/dt = hA(25 + 0.917t - 22) + 30.6 \times 0.917
 \]
-. The second term is a constant 28\,W needed to maintain the ramp rate. The first term increases linearly as the temperature rises.
+The second term is a constant 28\,W needed to maintain the ramp rate. The first term increases linearly as the temperature rises.
 
 This is open-loop because no temperature measurement is used during the ramp. If the model is perfect, the actual trajectory matches the desired trajectory exactly. In practice, model uncertainty produces a tracking error of 5--15\%, which is why feedforward is almost always combined with feedback.
 

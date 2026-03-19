@@ -75,7 +75,8 @@ $y[n] = \sum_{k=0}^{M} b_k x[n-k]$\\[4pt]
 };
 \node[col] (iir) at (7,0) {
 \textbf{\color{MinesBlue}IIR (Infinite Impulse Response)}\\[4pt]
-$y[n] = \sum b_k x[n\!-\!k] - \sum a_k y[n\!-\!k]$\\[4pt]
+$y[n] = \sum b_k x[n\!-\!k] - \sum a_k y[n\!-\!k]$\\
+{\scriptsize (Feedback of past outputs is the defining IIR characteristic: it creates the potential for infinite impulse response but also for instability if poles move outside the unit circle.)}\\[4pt]
 \textcolor{AccentTeal}{\checkmark} Sharp cutoff, few coefficients\\
 \textcolor{AccentTeal}{\checkmark} Lower computational cost\\
 \textcolor{AccentTeal}{\checkmark} Matches analog prototypes\\

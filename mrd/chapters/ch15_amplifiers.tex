@@ -215,8 +215,6 @@ A systematic approach to designing the complete signal conditioning chain:
 \[
 G = V_{\text{ADC,range}} / V_{\text{sensor,range}} = 5000\,\text{mV}/50\,\text{mV} = 100
 \]
-.
-
 \textbf{Step 3: Add offset to shift the signal.} The sensor output includes negative values ($-10$\,mV at 0\,\degC{}). After $100\times$ gain: $-1$\,V (cannot be measured by a 0--5\,V ADC). Add an offset of $+1$\,V after amplification, or bias the INA's REF pin to $+1$\,V.
 
 \textbf{Step 4: Design the anti-alias filter.} For 100\,S/s sample rate and 10\,Hz signal bandwidth: 2nd-order Sallen-Key Butterworth at $f_c = 40$\,Hz. This provides $-24$\,dB attenuation at $f_s/2 = 50$\,Hz, adequate for 14-bit.

@@ -113,7 +113,7 @@ When selecting a sensor for a project, evaluate these specifications against you
 \textbf{Digital temperature ICs} (DS18B20, TMP36): integrated sensor with built-in ADC and digital output. Convenient (one-wire or analog voltage output, no bridge or amplifier needed). Limited accuracy ($\pm 0.5$\,\degC{} typical) and range. Best for: simple projects where convenience outweighs precision.
 
 \subsection{Strain and Force Sensors}
-\textbf{Foil strain gauges}: resistive (gauge factor $\sim$2 for metal foil), bonded to the structure under test. Output is $\sim$2\,mV/V at full scale, requiring a Wheatstone bridge and instrumentation amplifier. Resolution: sub-microstrain with proper amplification. Best for: structural analysis, load measurement via calibrated members.
+\textbf{Foil strain gauges}: resistive (gauge factor $\sim$2 for metal foil), bonded to the structure under test. Output is ${\sim}2$\,mV/V at full scale (e.g., 20\,mV with 10\,V excitation), requiring a Wheatstone bridge and instrumentation amplifier to bring the signal into the ADC range. Resolution: sub-microstrain with proper amplification. Best for: structural analysis, load measurement via calibrated members.
 
 \textbf{Load cells}: strain gauges bonded to a precision machined element (bending beam, S-type, or compression). Factory-calibrated with a known sensitivity (mV/V). Best for: direct force or weight measurement.
 
@@ -189,7 +189,7 @@ No actuator connects directly to a microcontroller GPIO pin. Every motor needs a
 \[
 = 400\,\text{pulses/s} \div 200\,\text{steps/rev} = 2\,\text{rev/s} = 120\,\text{RPM}
 \]
-. Since 120\,RPM $<$ 600\,RPM stall threshold, yes, this speed is achievable.
+Since 120\,RPM $<$ 600\,RPM stall threshold, yes, this speed is achievable.
 \end{enumerate}
 
 

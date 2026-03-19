@@ -30,6 +30,7 @@ Every measurement system, from a mercury thermometer to a satellite telemetry ch
 
 \begin{figure}[htbp]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     block/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
                   minimum width=2.6cm, minimum height=1.6cm, align=center,
@@ -60,7 +61,7 @@ Every measurement system, from a mercury thermometer to a satellite telemetry ch
 \draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (5.1,-1.0) -- (5.1,-0.2);
 \draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (8.5,-1.0) -- (8.5,-0.2);
 \draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (11.9,-1.0) -- (11.9,-0.2);
-\end{tikzpicture}
+\end{tikzpicture}}%
 \caption{The five-block generalized measurement system with error sources (orange, dashed) entering at each interface. The total system uncertainty is the RSS combination of all contributions.}
 \label{fig:meas_system}
 \end{figure}

@@ -224,7 +224,7 @@ You need a low-pass filter with $f_c = 1$\,kHz to prevent aliasing before a 10\,
 \[
 R = 1/(2\pi f_c C) = 1/(2\pi \times 1000 \times 10 \times 10^{-9}) = 15.9\,\text{k}\Omega
 \]
-. Use a standard 16\,k$\Omega$ resistor ($f_c = 995$\,Hz, close enough). This is a single-pole, $-20$\,dB/decade rolloff. For steeper attenuation, use higher-order filters (Chapter~11).
+Use a standard 16\,k$\Omega$ resistor ($f_c = 995$\,Hz, close enough). This is a single-pole, $-20$\,dB/decade rolloff. For steeper attenuation, use higher-order filters (Chapter~11).
 \end{examplebox}
 
 \subsection{RL Circuit}
@@ -354,7 +354,7 @@ pico  & p  & $10^{-12}$ & Capacitance (pF), charge \\
 nano  & n  & $10^{-9}$  & Capacitance (nF), time (ns) \\
 micro & $\mu$ & $10^{-6}$ & Voltage ($\mu$V), current ($\mu$A), time ($\mu$s) \\
 milli & m  & $10^{-3}$  & Voltage (mV), current (mA), time (ms) \\
----   & ---  & $10^{0}$ & Base unit (V, A, $\Omega$, s, Hz) \\
+---   & ---  & $1$      & Base unit (V, A, $\Omega$, s, Hz) \\
 kilo  & k  & $10^{3}$   & Resistance (k$\Omega$), frequency (kHz) \\
 mega  & M  & $10^{6}$   & Resistance (M$\Omega$), frequency (MHz) \\
 giga  & G  & $10^{9}$   & Frequency (GHz) \\

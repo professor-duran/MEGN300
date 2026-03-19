@@ -62,7 +62,7 @@ A 20\,dB SNR means the signal is 10$\times$ the noise voltage. A 40\,dB SNR mean
 \draw[-{Stealth[length=2mm]}, MinesSilver] (n4) -- (f4);
 \draw[-{Stealth[length=2mm]}, MinesSilver] (n5) -- (f5);
 % Key insight box
-\node[draw=MinesBlue, thick, fill=MinesBlue!5, rounded corners=3pt, text width=12cm,
+\node[draw=MinesBlue, thick, fill=MinesBlue!5, rounded corners=3pt, text width=10cm,
       align=center, font=\small\sffamily\itshape, text=MinesBlue] at (6,-1.8)
     {Key insight: amplify the signal \textbf{before} noise enters the chain. Noise added after amplification is divided by the gain, improving SNR.};
 \end{tikzpicture}
@@ -186,7 +186,7 @@ For a two-stage system with gains $G_1$ and $G_2$ and stage noise $V_{n,1}$, $V_
 \[
 V_{n,\text{out}} = \sqrt{(G_1 G_2 V_{n,\text{src}})^2 + (G_2 V_{n,1})^2 + V_{n,2}^2}
 \]
-. The first stage's noise is amplified by $G_2$; the second stage's noise appears directly.
+The first stage's noise is amplified by $G_2$; the second stage's noise appears directly.
 
 \section{SNR Improvement Techniques}
 \textbf{Averaging}: $N$ averages reduces random noise by $\sqrt{N}$, improving SNR by $10\log_{10}(N)$\,dB. 100 averages $= +$20\,dB. Does not help with systematic errors or correlated noise.

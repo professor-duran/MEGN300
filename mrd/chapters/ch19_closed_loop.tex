@@ -216,7 +216,7 @@ As the proportional gain $K_p$ increases from 0 to infinity, the closed-loop pol
 These four specifications are mutually constrained: reducing rise time increases overshoot (for a given plant and controller structure). Achieving zero steady-state error (integral action) increases overshoot and settling time. The controller gains represent a tradeoff among these competing objectives.
 
 \section{Practical Closed-Loop Design Steps}
-(1) Characterize the plant: apply a step input in open loop and measure the output response. Fit a first or second-order model. For the ThermoRig: $G_p(s) \approx K/(1+\tau s) = 1/(1+30s)$ (first-order with $\tau = 30$\,s).
+(1) Characterize the plant: apply a step input in open loop and measure the output response. Fit a first or second-order model. For the ThermoRig: $G_p(s) \approx K/(1+\tau s) = 1/(1+30s)$ (first-order with DC gain $K \approx 1$ and time constant $\tau = 30$\,s).
 
 (2) Choose a controller structure: P, PI, or PID. For systems requiring zero steady-state error: PI minimum. For systems with significant overshoot: add D.
 
