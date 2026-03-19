@@ -333,7 +333,7 @@ The dynamic range of a sensor is the ratio between its maximum measurable input 
 
 \textbf{Lower limit}: determined by the noise floor. For the same accelerometer with a noise floor of 100\,$\mu$g/$\sqrt{\text{Hz}}$ and a 1\,kHz bandwidth: the minimum resolvable acceleration is $100 \times \sqrt{1000} = 3.16$\,mg $\approx 3$\,mg.
 
-\textbf{Dynamic range}: $20\log_{10}(50/0.003) = 84$\,dB ($\sim$14 bits equivalent). The DAQ must have at least this dynamic range to utilize the sensor's full capability. A 12-bit ADC (72\,dB) would limit the usable range; a 16-bit ADC (96\,dB) provides headroom.
+\textbf{Dynamic range}: $20\log_{10}(50/0.003) = 84$\,dB ($\sim$14 bits equivalent). The DAQ must have at least this dynamic range to use the sensor's full capability. A 12-bit ADC (72\,dB) would limit the usable range; a 16-bit ADC (96\,dB) provides headroom.
 
 \section{Anti-Resonance and Its Effects}
 Some measurement systems exhibit \textbf{anti-resonance}: a frequency at which the sensor output drops to near zero, even though the input is non-zero. Anti-resonance occurs when two parallel signal paths with different phase produce destructive interference. In vibration measurement, a mounting structure with internal resonances can create anti-resonances in the accelerometer's frequency response, producing ``blind spots'' where vibration at specific frequencies is invisible. The cure: verify the complete frequency response of the installed sensor (not just the sensor alone) and avoid measurements at anti-resonance frequencies.

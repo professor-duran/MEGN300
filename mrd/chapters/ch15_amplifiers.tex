@@ -142,7 +142,7 @@ A 350\,$\Omega$ strain gauge in a quarter-bridge (\textbf{ThermoRig Variant: Str
 
 
 \section{Why Amplification Is Necessary}
-Sensor outputs are often too small for the ADC. A Type K thermocouple at 100\,\degC{} produces only 4.1\,mV. An NI USB-6001 on $\pm$10\,V has 1.22\,mV LSB, meaning the TC signal spans only 3--4 bits. Amplification by 500--1000$\times$ utilizes the full 14-bit range.
+Sensor outputs are often too small for the ADC. A Type K thermocouple at 100\,\degC{} produces only 4.1\,mV. An NI USB-6001 on $\pm$10\,V has 1.22\,mV LSB, meaning the TC signal spans only 3--4 bits. Amplification by 500--1000$\times$ uses the full 14-bit range.
 
 \section{Op-Amp Fundamentals}
 Key real-world limitations: \textbf{Input offset voltage ($V_{os}$)}: 0.1--5\,mV. At gain 1000, a 1\,mV offset becomes 1\,V. Use precision or auto-zero op-amps. \textbf{Input bias current ($I_b$)}: nA to pA. Creates voltage offsets across high-impedance sources. Match impedances or use FET-input. \textbf{GBW}: gain $\times$ bandwidth is constant. 1\,MHz GBW gives 1000$\times$ gain only to 1\,kHz. \textbf{Slew rate}: max output change rate (V/$\mu$s). For 5\,V at 10\,kHz: need $\geq$0.31\,V/$\mu$s.

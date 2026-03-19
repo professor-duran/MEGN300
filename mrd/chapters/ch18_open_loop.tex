@@ -132,7 +132,13 @@ Before designing a controller (open or closed-loop), you must know how the plant
 
 For the ThermoRig in open-loop: set the heater to 50\% duty cycle (step from 0\%) and record the temperature vs.\ time. The response curve shows: (1) a transport delay $L$ (dead time\index{dead time}) before the temperature begins rising (heat propagating from the heater to the thermocouple), (2) an exponential-like rise toward the steady-state temperature, and (3) a final steady-state temperature $T_{ss}$.
 
-From this step response, extract three parameters: the process gain $K_p = (T_{ss} - T_{\text{ambient}}) / (\text{duty cycle change})$, the time constant $\tau$ (time to reach 63.2\% of $T_{ss} - T_{\text{ambient}}$), and the dead time $L$ (time from the step to the first observable temperature rise). For the ThermoRig: $K_p \approx 1.1$\,\degC{}/\%, $\tau \approx 30$\,s, $L \approx 3$\,s.
+From this step response, extract three parameters:
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Process gain}: $K_p = (T_{ss} - T_{\text{ambient}}) / (\text{duty cycle change})$
+\item \textbf{Time constant}: $\tau$ (time to reach 63.2\% of $T_{ss} - T_{\text{ambient}}$)
+\item \textbf{Dead time}: $L$ (time from step to first observable temperature rise)
+\end{itemize}
+For the ThermoRig: $K_p \approx 1.1$\,\degC{}/\%, $\tau \approx 30$\,s, $L \approx 3$\,s.
 
 These three parameters ($K_p$, $\tau$, $L$) define a First-Order Plus Dead Time (FOPDT\index{FOPDT model}) model: 
 \[
