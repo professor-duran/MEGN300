@@ -203,7 +203,7 @@ Higher-order filters introduce more phase lag. A 4th-order Butterworth at 100\,H
 A notch (band-reject) filter removes a specific frequency (e.g., 60\,Hz) while passing all others. Twin-T passive topology achieves $-40$ to $-60$\,dB rejection. However, if interference has harmonics, each needs its own notch. Fixing grounding and shielding is often a better solution.
 
 \section{Design Workflow}
-(1) Determine $f_{\max}$ and $f_s$. (2) Set $f_c$ between $f_{\max}$ and $f_s/2$ (common: $f_c = f_s/4$). (3) Required stopband attenuation at $f_s/2$: $\geq 6n$\,dB for $n$-bit ADC. (4) Choose filter type. (5) Calculate order: $n \geq \text{attenuation}/(20\log_{10}(f_s/(2f_c)))$ for Butterworth. (6) Implement with cascaded Sallen-Key stages. (7) Measure actual response.
+(1) Determine $f_{\max}$ and $f_s$. (2) Set $f_c$ between $f_{\max}$ and $f_s/2$ (common: $f_c = f_s/4$). (3) Required stopband attenuation at $f_s/2$: $\geq 6.02n + 1.76$\,dB for $n$-bit ADC. (4) Choose filter type. (5) Calculate order: $n \geq \text{attenuation}/(20\log_{10}(f_s/(2f_c)))$ for Butterworth. (6) Implement with cascaded Sallen-Key stages. (7) Measure actual response.
 
 
 \section{Component Selection for Filters}
@@ -271,9 +271,9 @@ This section walks through a complete anti-alias filter design for a strain gaug
 
 \textbf{Step 3: Choose cutoff frequency and filter type.} Set $f_c = 400$\,Hz (double the signal bandwidth, providing a guard band for the filter's transition region). Choose Butterworth (maximally flat passband, default for anti-aliasing).
 
-\textbf{Step 4: Calculate required order.} The Butterworth magnitude response at frequency $f$: $|H(f)| = 1/\sqrt{1 + (f/f_c)^{2n}}$. Attenuation at $f_N = 1000$\,Hz: $A = 20n\log_{10}(1000/400) = 20n \times 0.398 = 7.96n$\,dB. For 86\,dB: $n \geq 86/7.96 = 10.8$. Use $n = 12$ (6th-order $\times$ 2 for margin, implemented as six cascaded Sallen-Key stages).
+\textbf{Step 4: Calculate required order.} The Butterworth magnitude response at frequency $f$: $|H(f)| = 1/\sqrt{1 + (f/f_c)^{2n}}$. Attenuation at $f_N = 1000$\,Hz: $A = 20n\log_{10}(1000/400) = 20n \times 0.398 = 7.96n$\,dB. For 86\,dB: $n \geq 86/7.96 = 10.8$. Use $n = 12$ (next even integer, implemented as six cascaded Sallen-Key stages).
 
-\textbf{Step 5: Compute component values.} Each Sallen-Key stage has specific $Q$ values determined by the Butterworth polynomial. For a 6th-order Butterworth, the three second-order section $Q$ values are: $Q_1 = 0.518$, $Q_2 = 0.707$, $Q_3 = 1.932$. For each section with $f_c = 400$\,Hz: choose $C = 10$\,nF (convenient standard value). Then $R = 1/(2\pi f_c C) = 1/(2\pi \times 400 \times 10^{-8}) = 39.8$\,k$\Omega$. Use 39.2\,k$\Omega$ (nearest E96 value). The gain for each section: $G = 3 - 1/Q$. For $Q_3 = 1.932$: $G = 2.482$, so $R_f/R_g = 1.482$. Use $R_f = 14.7$\,k$\Omega$, $R_g = 10.0$\,k$\Omega$ (ratio $= 1.47$, close enough with 1\% resistors).
+\textbf{Step 5: Compute component values.} Each Sallen-Key stage has specific $Q$ values determined by the Butterworth polynomial. For a 12th-order Butterworth, the six second-order section $Q$ values are: $Q_1 = 0.504$, $Q_2 = 0.522$, $Q_3 = 0.566$, $Q_4 = 0.654$, $Q_5 = 0.841$, $Q_6 = 1.932$. For each section with $f_c = 400$\,Hz: choose $C = 10$\,nF (convenient standard value). Then $R = 1/(2\pi f_c C) = 1/(2\pi \times 400 \times 10^{-8}) = 39.8$\,k$\Omega$. Use 39.2\,k$\Omega$ (nearest E96 value). The gain for each section: $G = 3 - 1/Q$. For $Q_6 = 1.932$: $G = 2.482$, so $R_f/R_g = 1.482$. Use $R_f = 14.7$\,k$\Omega$, $R_g = 10.0$\,k$\Omega$ (ratio $= 1.47$, close enough with 1\% resistors).
 
 \textbf{Step 6: Select op-amps.} Each section needs GBW $> f_c \times G \times 10 = 400 \times 2.5 \times 10 = 10$\,kHz (trivial). Use TL072 (GBW $= 3$\,MHz, dual package, 3 packages for 6 sections). For low noise: substitute OPA2277 in the first two sections (closest to the sensor).
 

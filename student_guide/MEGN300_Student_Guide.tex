@@ -352,7 +352,7 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{warnbox}
 
 \begin{protip}
-\textbf{The INA128 is your best friend for bridge circuits.} It has $>$10\,G$\Omega$ balanced input impedance, $>$100\,dB CMRR, and gain set by a single resistor with $G = 1 + 50\,\text{k}\Omega/R_G$. For $G=100$: $R_G = 50\,\text{k}\Omega/99 = 505\,\Omega$ (use 510\,$\Omega$ standard). Whenever you measure a Wheatstone bridge (strain gauge, RTD, load cell), reach for an instrumentation amplifier first.
+\textbf{The INA128 is your best friend for bridge circuits.} It has $>$10\,G$\Omega$ balanced input impedance, $>$100\,dB CMRR, and gain set by a single resistor with $G = 1 + 49.4\,\text{k}\Omega/R_G$. For $G=100$: $R_G = 49.4\,\text{k}\Omega/99 = 499\,\Omega$ (use 499\,$\Omega$ standard). Whenever you measure a Wheatstone bridge (strain gauge, RTD, load cell), reach for an instrumentation amplifier first.
 \end{protip}
 
 %=============================================================================
@@ -574,7 +574,7 @@ The Quick Reference Tables in the Master Reference Document consolidate all of t
 Type K thermocouple & Sensitivity: $\sim$41\,$\mu$V/\textdegree{}C; Range: $-200$ to $1250$\,\textdegree{}C \\
 Pt100 RTD & 100\,$\Omega$ at 0\,\textdegree{}C; TCR: 0.385\,$\Omega$/\textdegree{}C \\
 NI USB-6001 & $\pm$10\,V input; 14-bit; 20\,kS/s; 8 AI (4 diff); no built-in anti-alias filter \\
-INA128 & $G = 1 + 50\text{k}\Omega/R_G$; CMRR $>$ 100\,dB; Input $Z > 10$\,G$\Omega$ \\
+INA128 & $G = 1 + 49.4\,\text{k}\Omega/R_G$; CMRR $>$ 100\,dB; Input $Z > 10$\,G$\Omega$ \\
 IRLZ44N MOSFET & Logic-level gate; $R_{DS(on)} = 0.022\,\Omega$; $I_D = 47$\,A; $V_{DS} = 55$\,V \\
 1N5819 Schottky & $V_f = 0.3$\,V; $I_{\max} = 1$\,A; fast recovery for flyback protection \\
 \bottomrule

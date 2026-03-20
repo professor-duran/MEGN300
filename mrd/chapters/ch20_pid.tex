@@ -269,7 +269,7 @@ For systems with multiple time constants (e.g., a heater heating a metal block t
 \begin{examplebox}[ThermoRig: Complete PID Implementation in LabVIEW]
 The ThermoRig PID loop runs at 10\,Hz ($T_s = 0.1$\,s). The NI DAQ reads the thermocouple (averaged over 10 readings per cycle for noise reduction). The PID VI computes the output (0--100\% duty cycle). The output drives the SSR via a digital output toggled at 1\,Hz time-proportional rate.
 
-Tuning: Ziegler-Nichols yielded $K_u = 15$, $T_u = 8$\,s. Z-N PID: $K_p = 9.0$, $K_i = 2.25$/s, $K_d = 2.25$\,s. After manual refinement (reducing overshoot): $K_p = 6.0$, $K_i = 1.5$/s, $K_d = 3.0$\,s. Anti-windup enabled with integral clamp at $\pm$50\%. Result: setpoint reached in 35\,s, overshoot 3\%, steady-state error $<$0.2\,\degC{}.
+Tuning: Ziegler-Nichols yielded $K_u = 15$, $T_u = 8$\,s. Z-N PID: $K_p = 9.0$, $K_i = 2.25$/s, $K_d = 9.0$\,s. After manual refinement (reducing overshoot): $K_p = 6.0$, $K_i = 1.5$/s, $K_d = 3.0$\,s. Anti-windup enabled with integral clamp at $\pm$50\%. Result: setpoint reached in 35\,s, overshoot 3\%, steady-state error $<$0.2\,\degC{}.
 \end{examplebox}
 
 
@@ -295,7 +295,7 @@ $u_D = K_d \cdot de/dt$: output proportional to the rate of change of error. It 
 \section{Anti-Windup}
 When the actuator saturates (e.g., heater at 100\% power), the integral term continues to accumulate error, growing very large. When the error finally changes sign, the massive accumulated integral drives the output far past the setpoint, causing enormous overshoot. This is \textbf{integral windup}.
 
-The clamping anti-windup strategy: when the output hits the actuator limit, stop accumulating the integral. Resume integration only when the output comes back within the actuator's range. The pseudocode in Section~16.4 implements this.
+The clamping anti-windup strategy: when the output hits the actuator limit, stop accumulating the integral. Resume integration only when the output comes back within the actuator's range. The pseudocode in the Practice Questions (below) implements this.
 
 \section{Discrete PID Implementation}
 In LabVIEW (or any digital controller), the continuous PID equation is discretized:
@@ -367,14 +367,14 @@ Every second of delay adds phase lag to the feedback loop. At frequency $f$:
 \phi_{\text{delay}} = -360 \times f \times \tau_{\text{total}} \quad \text{(degrees)}
 \end{equation}
 
-This phase lag directly reduces the phase margin. If the original system (without delay) has a phase margin of 60\,\degC{} at crossover frequency $f_c$, and the total latency introduces $\phi_{\text{delay}} = 25$\,\degC{} at $f_c$, the effective phase margin drops to $60 - 25 = 35$\,\degC{}. If $\phi_{\text{delay}} > 60$\,\degC{}: the phase margin becomes negative and the system oscillates.
+This phase lag directly reduces the phase margin. If the original system (without delay) has a phase margin of \ang{60} at crossover frequency $f_c$, and the total latency introduces $\phi_{\text{delay}} = \ang{25}$ at $f_c$, the effective phase margin drops to $60 - 25 = \ang{35}$. If $\phi_{\text{delay}} > \ang{60}$: the phase margin becomes negative and the system oscillates.
 
 \subsection{Worked Example: ThermoRig}
 ThermoRig latency budget: thermocouple ($\tau_s = 0.42$\,s, but this is modeled as plant dynamics, not pure delay), SSR zero-cross ($\tau_{\text{SSR}} = 4$\,ms average), LabVIEW loop ($T_{\text{comp}} = 5$\,ms), sample period ($T_s = 100$\,ms, contributes $T_s/2 = 50$\,ms of effective delay from the zero-order hold). Total pure delay: $\tau_{\text{delay}} \approx 50 + 5 + 4 = 59$\,ms $\approx 0.06$\,s.
 
-At the crossover frequency ($f_c \approx 0.05$\,Hz): $\phi_{\text{delay}} = 360 \times 0.05 \times 0.06 = 1.1$\,\degC{}. Negligible for this slow system.
+At the crossover frequency ($f_c \approx 0.05$\,Hz): $\phi_{\text{delay}} = 360 \times 0.05 \times 0.06 = \ang{1.1}$. Negligible for this slow system.
 
-For a hypothetical motor speed controller at $f_c = 50$\,Hz with $\tau_{\text{delay}} = 2$\,ms: $\phi_{\text{delay}} = 360 \times 50 \times 0.002 = 36$\,\degC{}. This is significant and must be accounted for in the controller design.
+For a hypothetical motor speed controller at $f_c = 50$\,Hz with $\tau_{\text{delay}} = 2$\,ms: $\phi_{\text{delay}} = 360 \times 50 \times 0.002 = \ang{36}$. This is significant and must be accounted for in the controller design.
 
 \subsection{Reducing Latency}
 (1) \textbf{Increase the sample rate}: the zero-order hold contributes $T_s/2$ of effective delay. Doubling $f_s$ halves this contribution.
@@ -386,7 +386,7 @@ For a hypothetical motor speed controller at $f_c = 50$\,Hz with $\tau_{\text{de
 (4) \textbf{Use faster actuators}: if the SSR zero-cross delay ($\leq 8.3$\,ms) is significant, switch to a random-fire SSR ($< 0.1$\,ms delay, but generates more EMI) or a MOSFET-based DC switch ($< 0.001$\,ms).
 
 \begin{tipbox}[The Rule of 20]
-For stable, well-damped control: the sample rate should be at least 20$\times$ the closed-loop bandwidth. This ensures the total delay from sampling ($T_s/2$) contributes less than $360/(2 \times 20) = 9$\,\degC{} of phase lag, which is comfortably within most stability margins. For the ThermoRig ($f_c = 0.05$\,Hz): $f_s \geq 1$\,Hz. We use 10\,Hz, giving a factor of 200 (massive margin). For a 50\,Hz motor controller: $f_s \geq 1$\,kHz.
+For stable, well-damped control: the sample rate should be at least 20$\times$ the closed-loop bandwidth. This ensures the total delay from sampling ($T_s/2$) contributes less than $360/(2 \times 20) = \ang{9}$ of phase lag, which is comfortably within most stability margins. For the ThermoRig ($f_c = 0.05$\,Hz): $f_s \geq 1$\,Hz. We use 10\,Hz, giving a factor of 200 (massive margin). For a 50\,Hz motor controller: $f_s \geq 1$\,kHz.
 \end{tipbox}
 \section{Practice Questions}
 \begin{enumerate}[leftmargin=1.5em]

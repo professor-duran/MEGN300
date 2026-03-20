@@ -223,10 +223,10 @@ When a computer processes sampled data, the continuous integrals of the Fourier 
 \begin{equation}
 c_k = \frac{1}{N}\sum_{n=0}^{N-1} x[n]\,e^{-j2\pi kn/N}
 \end{equation}
-This is the Discrete Fourier Transform (DFT), covered in full in Chapter~8. The key insight: $N$ samples produce $N$ frequency coefficients, but only $N/2$ are unique (the other half are complex conjugates). The frequency spacing is $\Delta f = f_s/N$, and the maximum frequency is $f_s/2$.
+This is the Discrete Fourier Transform (DFT), covered in full in Chapter~\ref{ch:fft}. The key insight: $N$ samples produce $N$ frequency coefficients, but only $N/2$ are unique (the other half are complex conjugates). The frequency spacing is $\Delta f = f_s/N$, and the maximum frequency is $f_s/2$.
 
 \section{Windowing Preview}
-The DFT assumes the $N$-point data block is one period of a periodic signal. If the signal is not exactly periodic in $N$ samples (which it almost never is in practice), the assumption is violated, and spectral leakage occurs. Chapter~8 discusses windowing functions that mitigate this problem. The Fourier series context here helps explain why: the discontinuity at the block boundary is a sharp transient, which the Fourier series represents as a superposition of many harmonics. The window eliminates the discontinuity.
+The DFT assumes the $N$-point data block is one period of a periodic signal. If the signal is not exactly periodic in $N$ samples (which it almost never is in practice), the assumption is violated, and spectral leakage occurs. Chapter~\ref{ch:fft} discusses windowing functions that mitigate this problem. The Fourier series context here helps explain why: the discontinuity at the block boundary is a sharp transient, which the Fourier series represents as a superposition of many harmonics. The window eliminates the discontinuity.
 \section{Fourier Transform of Common Signals}
 While the Fourier series handles periodic signals, many instrumentation signals are non-periodic. The Fourier transform extends the analysis:
 

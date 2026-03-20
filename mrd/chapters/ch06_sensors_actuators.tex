@@ -100,11 +100,11 @@ When selecting a sensor for a project, evaluate these specifications against you
 \section{Common Sensor Types for MEGN 300}
 
 \subsection{Temperature Sensors}
-\textbf{Thermocouples} (Type K, J, T): self-generating, wide range ($-200$ to $1250$\,\degC{} for Type K), fast response (small bead: $\tau < 0.5$\,s in water), rugged. Output is $\mu$V-level and requires amplification and cold-junction compensation. Best for: wide temperature ranges, fast measurements, harsh environments.
+\textbf{Thermocouples} (Type K, J, T): self-generating, wide range ($-200$ to $1260$\,\degC{} for Type K), fast response (small bead: $\tau < 0.5$\,s in water), rugged. Output is $\mu$V-level and requires amplification and cold-junction compensation. Best for: wide temperature ranges, fast measurements, harsh environments.
 
 \textbf{RTDs} (Pt100, Pt1000): resistive, excellent accuracy ($\pm 0.1$\,\degC{} with calibration), highly linear, stable over years. Slower response than thermocouples (wire-wound elements have higher thermal mass). Require bridge excitation with controlled current (self-heating error if current too high). Best for: precision measurements, stable long-term monitoring.
 
-\textbf{Thermistors} (NTC): resistive, very high sensitivity (10$\times$ thermocouples), small size. Highly nonlinear (require Steinhart-Hart equation or lookup table). Limited range ($-40$ to $125$\,\degC{}). Best for: high-resolution measurements over narrow ranges, fast response.
+\textbf{Thermistors} (NTC): resistive, very high sensitivity (10$\times$ thermocouples), small size. Highly nonlinear (require Steinhart-Hart equation or lookup table). Limited range ($-40$ to $300$\,\degC{}). Best for: high-resolution measurements over narrow ranges, fast response.
 
 \textbf{Digital temperature ICs} (DS18B20, TMP36): integrated sensor with built-in ADC and digital output. Convenient (one-wire or analog voltage output, no bridge or amplifier needed). Limited accuracy ($\pm 0.5$\,\degC{} typical) and range. Best for: simple projects where convenience outweighs precision.
 

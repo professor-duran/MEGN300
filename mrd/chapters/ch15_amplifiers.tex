@@ -80,7 +80,7 @@ Common ICs: INA128, AD620, INA333. CMRR typically $>$100\,dB.
 \node[amp] (inv) at (0,0) {\textbf{Inverting}\\$G = -R_f/R_i$\\Phase: $180^{\circ}$\\Input $Z$: $R_i$};
 \node[amp] (noninv) at (4,0) {\textbf{Non-Inverting}\\$G = 1 + R_f/R_g$\\Phase: $0^{\circ}$\\Input $Z$: very high};
 \node[amp] (diff) at (8,0) {\textbf{Differential}\\$G = R_f/R_i$\\Rejects CM noise\\Input $Z$: $R_i$};
-\node[amp, draw=AccentTeal, fill=AccentTeal!8] (ina) at (12,0) {\textbf{INA}\\$G = 1 + 50\text{k}/R_G$\\Highest CMRR\\Input $Z$: $>$G$\Omega$};
+\node[amp, draw=AccentTeal, fill=AccentTeal!8] (ina) at (12,0) {\textbf{INA}\\$G = 1 + 49.4\text{k}/R_G$\\Highest CMRR\\Input $Z$: $>$G$\Omega$};
 % Best for labels
 \node[font=\tiny\sffamily\itshape, MinesSilver] at (0,-1.5) {Summing circuits};
 \node[font=\tiny\sffamily\itshape, MinesSilver] at (4,-1.5) {General-purpose};
@@ -217,7 +217,7 @@ G = V_{\text{ADC,range}} / V_{\text{sensor,range}} = 5000\,\text{mV}/50\,\text{m
 \]
 \textbf{Step 3: Add offset to shift the signal.} The sensor output includes negative values ($-10$\,mV at 0\,\degC{}). After $100\times$ gain: $-1$\,V (cannot be measured by a 0--5\,V ADC). Add an offset of $+1$\,V after amplification, or bias the INA's REF pin to $+1$\,V.
 
-\textbf{Step 4: Design the anti-alias filter.} For 100\,S/s sample rate and 10\,Hz signal bandwidth: 2nd-order Sallen-Key Butterworth at $f_c = 40$\,Hz. This provides $-24$\,dB attenuation at $f_s/2 = 50$\,Hz, adequate for 14-bit.
+\textbf{Step 4: Design the anti-alias filter.} For 100\,S/s sample rate and 10\,Hz signal bandwidth: 2nd-order Sallen-Key Butterworth at $f_c = 40$\,Hz. This provides $-5.4$\,dB attenuation at $f_s/2 = 50$\,Hz, adequate for 14-bit.
 
 \textbf{Step 5: Verify the noise budget.} Compute the total output noise and compare to the ADC's LSB. If the noise exceeds 0.5\,LSB, reduce the bandwidth, increase the gain (to use more of the ADC range), or select a lower-noise amplifier.
 

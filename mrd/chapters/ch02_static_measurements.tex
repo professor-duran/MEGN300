@@ -48,7 +48,7 @@ Static calibration determines the relationship between the sensor input (measura
 
 \subsection{The Calibration Process}
 \begin{enumerate}[leftmargin=1.5em]
-\item Apply a series of known, stable input values spanning the sensor's range, using a \textbf{calibration standard} with accuracy $\geq 4\times$ better than the sensor under test (4:1 Test Accuracy Ratio, per ANSI/NCSL Z540.3).
+\item Apply a series of known, stable input values spanning the sensor's range, using a \textbf{calibration standard} with accuracy $\geq 4\times$ better than the sensor under test (4:1 Test Accuracy Ratio, per MIL-STD-45662A; note that ANSI/NCSL Z540.3 replaced the fixed 4:1 rule with a probability-based approach requiring $\leq 2\%$ false accept risk).
 \item Record the sensor output at each input value. Allow sufficient settling time at each point.
 \item Apply inputs in both increasing and decreasing order to detect hysteresis.
 \item Repeat the entire sequence at least 3 times to assess repeatability.
@@ -173,7 +173,7 @@ V_o = 5.0 \times (109.6/(109.6+100) - 100/(100+100)) = 5.0 \times (0.5229 - 0.50
 \]
 \,mV. Sensitivity: 114.5\,mV / 25\,\degC{} = 4.58\,mV/\degC{}.
 
-Self-heating check: bridge current through RTD $= V_{ex}/(2R) \approx 25$\,mA. Power dissipated in RTD $= I^2 R = 0.025^2 \times 110 = 0.069$\,W. Self-heating coefficient for a Pt100 in still air $\approx$ 0.5\,\degC{}/mW $\to$ self-heating error $= 0.069 \times 0.5 = 0.035$\,\degC{}. Acceptable for $\pm$0.5\,\degC{} accuracy, but reduce $V_{ex}$ to 1\,V for higher precision.
+Self-heating check: bridge current through RTD $= V_{ex}/(2R) \approx 25$\,mA. Power dissipated in RTD $= I^2 R = 0.025^2 \times 110 = 69$\,mW. Self-heating coefficient for a Pt100 in still air $\approx$ 0.5\,\degC{}/mW $\to$ self-heating error $= 69 \times 0.5 = 34.5$\,\degC{}. This is unacceptable; reduce $V_{ex}$ to 1\,V for higher precision.
 \end{examplebox}
 
 \section{Calibration Standards and Traceability}
@@ -281,7 +281,7 @@ For a typical strain of 1000\,$\mu\epsilon$ ($= 0.1\%$): $\Delta R/R = 2.0 \time
 The quality of the gauge bond determines measurement accuracy. Clean the surface with solvent (acetone, then isopropanol). Abrade lightly with 320-grit sandpaper. Apply a thin, uniform layer of cyanoacrylate (strain gauge cement). Position the gauge and clamp for 60 seconds. Verify electrical continuity ($R = 120 \pm 0.5\,\Omega$ for a 120\,$\Omega$ gauge). Any air bubble, misalignment, or excess adhesive degrades the measurement.
 
 \subsection{Temperature Compensation}
-Thermal expansion of the structure and the gauge causes apparent strain that is not due to mechanical loading. A quarter-bridge on a steel beam sees approximately $23\,\mu\epsilon$/\degC{} from thermal effects alone. The half-bridge compensates: mount two gauges on the same material; one active (in the strain field), one passive (nearby but unstrained). Temperature affects both equally, canceling in the bridge output. Note that compensation is effective only if both gauges are at the same temperature; a temperature gradient across the structure (e.g., near a heat source) will produce a differential thermal signal that the bridge cannot distinguish from mechanical strain.
+Thermal expansion of the structure and the gauge causes apparent strain that is not due to mechanical loading. A quarter-bridge on a steel beam sees approximately $11.7\,\mu\epsilon$/\degC{} from thermal effects alone. The half-bridge compensates: mount two gauges on the same material; one active (in the strain field), one passive (nearby but unstrained). Temperature affects both equally, canceling in the bridge output. Note that compensation is effective only if both gauges are at the same temperature; a temperature gradient across the structure (e.g., near a heat source) will produce a differential thermal signal that the bridge cannot distinguish from mechanical strain.
 \section{Sensor Fusion and Redundancy}
 When a single sensor cannot meet the accuracy or reliability requirement, combining multiple sensors improves performance. \textbf{Homogeneous redundancy}: multiple identical sensors measuring the same quantity, with outputs averaged to reduce random noise by $\sqrt{N}$. Also provides fault detection: if one sensor deviates significantly from the others, it is likely faulty. \textbf{Heterogeneous fusion}: combining different sensor types (e.g., thermocouple for fast response + RTD for accuracy). A Kalman filter or complementary filter can combine them optimally, using each sensor's strengths.
 

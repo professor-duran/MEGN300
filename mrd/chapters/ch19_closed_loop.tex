@@ -241,7 +241,7 @@ When integral action is added ($K_i > 0$), the steady-state error for step input
 
 (1) \textbf{Reduced stability}: the integrator adds $-$\ang{90} of phase lag at all frequencies, reducing the phase margin. If the original P-only system had \ang{60} phase margin, adding integral action might reduce it to \ang{30} or less, producing oscillatory behavior. The solution: reduce $K_i$ (longer integral time $T_i$) to push the integral action to lower frequencies where its phase contribution at the crossover frequency is minimized.
 
-(2) \textbf{Integral windup}: when the actuator saturates, the integral continues to accumulate, causing massive overshoot when the error changes sign. This is addressed in Chapter~16.
+(2) \textbf{Integral windup}: when the actuator saturates, the integral continues to accumulate, causing massive overshoot when the error changes sign. This is addressed in Chapter~\ref{ch:pid}.
 \section{Root Locus: Physical Interpretation}
 The root locus is a graphical tool showing how the closed-loop pole locations change as the proportional gain $K_p$ varies from 0 to infinity. Each pole traces a path (locus) in the complex plane. The pole locations determine the dynamic behavior:
 
@@ -271,7 +271,7 @@ Type 1 (PI): finite ramp error $e_{ss} = R/K_v$ where $K_v = \lim_{s \to 0} sL(s
 
 Type 2 (PID with double integrator): zero ramp error. However, double integrators are difficult to stabilize and are rarely needed in thermal or mechanical systems.
 
-For the ThermoRig ramping at 1\,\degC{}/s with PI control ($K_v = K_p K_i K_{\text{plant}} = 10 \times 0.5 \times 1.1 = 5.5$\,s$^{-1}$): $e_{ss} = 1.0/5.5 = 0.18$\,\degC{}. The temperature always lags the ramp by 0.18\,\degC{}. Increasing $K_i$ reduces this lag but increases overshoot at the end of the ramp.
+For the ThermoRig ramping at 1\,\degC{}/s with PI control ($K_v = K_i K_{\text{plant}} = 0.5 \times 1.1 = 0.55$\,s$^{-1}$): $e_{ss} = 1.0/0.55 = 1.82$\,\degC{}. The temperature always lags the ramp by 1.82\,\degC{}. Increasing $K_i$ reduces this lag but increases overshoot at the end of the ramp.
 
 \section{Implementation Considerations}
 \textbf{Sampling rate selection}: the control loop update rate should be $\geq 10\times$ the closed-loop bandwidth. For the ThermoRig ($f_{BW} \approx 0.05$\,Hz): $f_s \geq 0.5$\,Hz ($T_s \leq 2$\,s). We use $T_s = 100$\,ms ($f_s = 10$\,Hz) for margin. For motor speed control ($f_{BW} = 100$\,Hz): $f_s \geq 1$\,kHz.

@@ -75,7 +75,7 @@ Heat energy transfers by three mechanisms: conduction (through solid or stationa
 \textbf{\large\color{MinesBlue}Conduction}\\[3pt]
 $q = -kA\frac{dT}{dx}$\\[3pt]
 Through solid material\\
-$k$: 0.03 (insulation)\\to 400 (copper) W/m$\cdot$K
+$k$: 0.03 (insulation)\\to 385 (copper) W/m$\cdot$K
 };
 \node[mode] (conv) at (5.2,0) {
 \textbf{\large\color{MinesBlue}Convection}\\[3pt]
@@ -234,7 +234,7 @@ The fin effectiveness depends on the fin parameter $m = \sqrt{hP/(kA_c)}$ where 
 \end{equation}
 where $L$ is the fin length. For $mL < 1$: $\eta_f > 0.76$ (efficient). For $mL > 3$: $\eta_f < 0.33$ (the fin tip is near ambient temperature; the outer portion contributes little). Making fins longer beyond $mL \approx 2.5$ has diminishing returns.
 
-Practical rule for MEGN~300: an aluminum heatsink ($k = 205$\,W/m$\cdot$K) with fins 20\,mm long, 1\,mm thick, in still air ($h = 10$\,W/m$^2\cdot$K): $m = \sqrt{10 \times 0.042/(205 \times 0.001 \times 0.020)} = 3.2$\,m$^{-1}$, $mL = 3.2 \times 0.02 = 0.064$. $\eta_f = 0.9987 \approx 1.0$. The aluminum fin is so conductive that it is essentially isothermal. Fin efficiency only becomes a concern for long fins in high-$h$ environments (forced water cooling) or for low-conductivity fin materials (steel, plastic).
+Practical rule for MEGN~300: an aluminum heatsink ($k = 205$\,W/m$\cdot$K) with fins 20\,mm long, 1\,mm thick, in still air ($h = 10$\,W/m$^2\cdot$K): $m = \sqrt{10 \times 0.042/(205 \times 0.001 \times 0.020)} = 10.1$\,m$^{-1}$, $mL = 10.1 \times 0.02 = 0.202$. $\eta_f = 0.9987 \approx 1.0$. The aluminum fin is so conductive that it is essentially isothermal. Fin efficiency only becomes a concern for long fins in high-$h$ environments (forced water cooling) or for low-conductivity fin materials (steel, plastic).
 
 \section{Thermal Time Constants and Sensor Response}
 The lumped capacitance time constant $\tau = mC_p/(hA_s)$ directly connects heat transfer to sensor dynamics (Chapter~3). Reducing $\tau$ (faster sensor) requires:

@@ -243,7 +243,7 @@ NF = 10\log_{10}\left(\frac{\text{SNR}_{\text{in}}}{\text{SNR}_{\text{out}}}\rig
 \end{equation}
 An ideal amplifier has $NF = 0$\,dB (adds no noise). Real amplifiers have $NF = 1$--$10$\,dB. The system noise figure is dominated by the first stage (Friis formula):
 \begin{equation}
-NF_{\text{total}} \approx NF_1 + \frac{NF_2 - 1}{G_1} + \frac{NF_3 - 1}{G_1 G_2} + \cdots
+F_{\text{total}} = F_1 + \frac{F_2 - 1}{G_1} + \frac{F_3 - 1}{G_1 G_2} + \cdots
 \end{equation}
 With $G_1 = 100$: even if the second stage has $NF_2 = 10$\,dB ($F_2 = 10$), its contribution is $(10-1)/100 = 0.09$, adding only 0.04\,dB to the system noise figure. This mathematically confirms the golden rule: the first amplifier determines the system noise performance.
 
