@@ -169,9 +169,9 @@ When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\D
 \begin{examplebox}[ThermoRig: RTD in a Wheatstone Bridge]
 A Pt100 RTD ($R_0 = 100.0\,\Omega$ at 0\,\degC{}, $\alpha = 0.00385$\,\degC{}$^{-1}$) is placed in a quarter-bridge with $V_{ex} = 5.0$\,V and three 100.0\,$\Omega$ precision resistors. At 25\,\degC{}: $R_{RTD} = 100(1 + 0.00385 \times 25) = 109.6\,\Omega$. Bridge output: 
 \[
-V_o = 5.0 \times (109.6/(109.6+100) - 100/(100+100)) = 5.0 \times (0.5229 - 0.5000) = 114.5
+V_o = 5.0 \times (109.6/(109.6+100) - 100/(100+100)) = 5.0 \times (0.5229 - 0.5000) = 114.5\,\text{mV}
 \]
-\,mV. Sensitivity: 114.5\,mV / 25\,\degC{} = 4.58\,mV/\degC{}.
+Sensitivity: 114.5\,mV / 25\,\degC{} = 4.58\,mV/\degC{}.
 
 Self-heating check: bridge current through RTD $= V_{ex}/(2R) \approx 25$\,mA. Power dissipated in RTD $= I^2 R = 0.025^2 \times 110 = 69$\,mW. Self-heating coefficient for a Pt100 in still air $\approx$ 0.5\,\degC{}/mW $\to$ self-heating error $= 69 \times 0.5 = 34.5$\,\degC{}. This is unacceptable; reduce $V_{ex}$ to 1\,V for higher precision.
 \end{examplebox}
@@ -183,7 +183,7 @@ A calibration is only as good as the reference standard. \textbf{Traceability} m
 \item \textbf{Primary standards}: defined by fundamental physics (triple point of water = 273.16\,K exactly; NIST maintains primary standards for all SI units).
 \item \textbf{Secondary/transfer standards}: calibrated against primary standards. Used by calibration laboratories.
 \item \textbf{Working standards}: calibrated against secondary standards. Used in the lab to calibrate sensors.
-\item \textbf{Test Accuracy Ratio (TAR)}: the standard should be $\geq$4$\times$ more accurate than the device under test (4:1 TAR per ANSI/NCSL Z540.3).
+\item \textbf{Test Accuracy Ratio (TAR)}: the standard should be $\geq$4$\times$ more accurate than the device under test (4:1 TAR per MIL-STD-45662A).
 \end{itemize}
 
 
@@ -313,7 +313,7 @@ For temperature measurement, the choice among thermocouple, RTD, thermistor, and
 \toprule
 \textbf{Property} & \textbf{Thermocouple} & \textbf{RTD (Pt100)} & \textbf{Thermistor} & \textbf{IC (LM35)} \\
 \midrule
-Range & $-200$ to $+1260$\,\degC{} & $-200$ to $+850$ & $-40$ to $+300$ & $-55$ to $+150$ \\
+Range & $-200$ to $+1260$\,\degC{} & $-200$ to $+850$\,\degC{} & $-40$ to $+300$\,\degC{} & $-55$ to $+150$ \\
 Accuracy (uncal.) & $\pm$2.2\,\degC{} & $\pm$0.3\,\degC{} & $\pm$0.2\,\degC{} & $\pm$0.5\,\degC{} \\
 Sensitivity & 41\,$\mu$V/\degC{} & 0.385\,$\Omega$/\degC{} & $-$4\%/\degC{} & 10\,mV/\degC{} \\
 Linearity & Fair & Excellent & Poor & Excellent \\

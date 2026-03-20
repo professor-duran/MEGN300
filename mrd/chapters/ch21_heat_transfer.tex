@@ -198,9 +198,8 @@ This is a first-order response with time constant $\tau$. This equation directly
 \begin{examplebox}[ThermoRig: Thermocouple Time Constant from Heat Transfer]
 A Type~K thermocouple bead (diameter $d = 1$\,mm, $\rho = 8600$\,kg/m$^3$, $C_p = 500$\,J/kg$\cdot$K) in stirred water ($h = 500$\,W/m$^2\cdot$K). Volume $V = \pi d^3/6 = 5.24 \times 10^{-10}$\,m$^3$. Surface area $A_s = \pi d^2 = 3.14 \times 10^{-6}$\,m$^2$. Mass $m = \rho V = 4.5 \times 10^{-6}$\,kg. Time constant: 
 \[
-\tau = 4.5 \times 10^{-6} \times 500 / (500 \times 3.14 \times 10^{-6}) = 1.43
-\]
-\,s. In still air ($h = 10$): $\tau = 71.7$\,s. This explains why thermocouples respond much faster in liquids than in air: the convective resistance dominates and is 50$\times$ lower in stirred water.
+\tau = 4.5 \times 10^{-6} \times 500 / (500 \times 3.14 \times 10^{-6}) = 1.43\,\text{s}
+\] In still air ($h = 10$): $\tau = 71.7$\,s. This explains why thermocouples respond much faster in liquids than in air: the convective resistance dominates and is 50$\times$ lower in stirred water.
 \end{examplebox}
 
 \section{Heat Transfer and Sensor Placement}
@@ -263,7 +262,7 @@ In high-temperature applications or vacuum environments, radiation becomes the d
 
 The \textbf{view factor} $F_{12}$ describes the fraction of radiation leaving surface~1 that reaches surface~2. For two parallel plates: $F_{12} \approx 1$. For a small surface facing a large enclosure: $F_{12} = 1$. For a sensor mounted on a surface facing a room: $F_{12}$ depends on the geometry but is typically 0.5--0.8. The radiation exchange between surfaces 1 and 2:
 \begin{equation}
-\dot{Q}_{12} = \sigma A_1 F_{12} \frac{T_1^4 - T_2^4}{1/\epsilon_1 + A_1/A_2(1/\epsilon_2 - 1)}
+\dot{Q}_{12} = \frac{\sigma\!\left(T_1^4 - T_2^4\right)}{\dfrac{1-\epsilon_1}{\epsilon_1 A_1} + \dfrac{1}{A_1 F_{12}} + \dfrac{1-\epsilon_2}{\epsilon_2 A_2}}
 \end{equation}
 
 For MEGN~300 applications at moderate temperatures ($< 200$\,\degC{}), the simplified form $\dot{Q}_{\text{rad}} = \epsilon\sigma A(T_s^4 - T_{\text{surr}}^4)$ with $\epsilon$ as the surface emissivity is usually sufficient.
@@ -315,7 +314,7 @@ The multi-node model reveals internal temperature gradients. The heater surface 
 \section{Practice Questions}
 \begin{enumerate}[leftmargin=1.5em]
 \item A steel plate ($k = 50$\,W/m$\cdot$K) is 5\,mm thick with area 100\,cm$^2$. If one face is at 120\,\degC{} and the other at 80\,\degC{}, what is the heat transfer rate?
-\item The ThermoRig specimen (aluminum, $m = 34$\,g, $C_p = 900$\,J/kg$\cdot$K) is heated by a 100\,W heater in still air ($h = 10$\,W/m$^2\cdot$K, $A = 50$\,cm$^2$). Write the energy balance and find the steady-state temperature (ambient: 22\,\degC{}).
+\item The ThermoRig specimen (aluminum, $m = 34$\,g, $C_p = 900$\,J/kg$\cdot$K) is heated by a 100\,W heater in still air ($h = 10$\,W/m$^2\cdot$K, $A = 25$\,cm$^2$). Write the energy balance and find the steady-state temperature (ambient: 22\,\degC{}).
 \item Calculate the Biot number for the thermocouple bead in the worked example. Is the lumped capacitance assumption valid?
 \item A copper block ($k = 385$\,W/m$\cdot$K, $\rho = 8960$\,kg/m$^3$, $C_p = 385$\,J/kg$\cdot$K) is a 20\,mm cube cooled by forced air ($h = 100$\,W/m$^2\cdot$K). Calculate the time constant and the time to cool from 100\,\degC{} to within 1\,\degC{} of ambient (25\,\degC{}).
 \item Explain why a thermocouple in still air has a time constant 50$\times$ longer than the same thermocouple in stirred water. Which physical parameter changes, and by how much?

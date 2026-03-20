@@ -141,7 +141,7 @@ After sampling, the continuous-amplitude signal is quantized to $2^n$ discrete l
 \section{Practical Anti-Aliasing: A Complete Design Example}
 Design an anti-aliasing system for measuring vibration from 0 to 500\,Hz:
 
-\textbf{Step 1}: signal bandwidth $f_{\max} = 500$\,Hz. Choose $f_s = 2560$\,S/s (standard vibration analysis: $2.56 \times f_{\max}$, which gives 56\% oversampling above Nyquist minimum).
+\textbf{Step 1}: signal bandwidth $f_{\max} = 500$\,Hz. Choose $f_s = 2560$\,S/s (standard vibration analysis: $2.56 \times f_{\max}$, which gives 28\% oversampling above Nyquist minimum).
 
 \textbf{Step 2}: Nyquist frequency $f_N = f_s/2 = 1280$\,Hz. The anti-alias filter must attenuate all content above 1280\,Hz below the ADC noise floor.
 

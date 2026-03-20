@@ -136,7 +136,7 @@ Most DAQ devices share one ADC among channels via a multiplexer, introducing int
 
 \textbf{NRSE}: measures relative to a shared analog return. Useful for floating sources.
 
-Always select the smallest input range that encompasses the signal. Using $\pm$10\,V for a 0--2\,V signal wastes 80\% of dynamic range, losing 2.3 bits of effective resolution.
+Always select the smallest input range that encompasses the signal. Using $\pm$10\,V for a 0--2\,V signal wastes 90\% of dynamic range, losing 3.3 bits of effective resolution.
 
 \begin{examplebox}[ThermoRig: DAQ Configuration]
 NI USB-6001: thermocouple signal (amplified to 0--4\,V by INA) on AI0+/AI0$-$ in Differential mode. Range: 0--5\,V. Rate: 100\,S/s ($10\times$ the 10\,Hz signal bandwidth). 14-bit resolution gives LSB $= 0.305$\,mV $\approx 0.007$\,\degC{} (well below sensor uncertainty). Anti-alias: 2nd-order Sallen-Key LP at 40\,Hz before the DAQ.

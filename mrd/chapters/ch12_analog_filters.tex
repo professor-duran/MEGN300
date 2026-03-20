@@ -39,7 +39,7 @@
 ]
 \addplot[domain=0.1:100, samples=200, thick, MinesBlue] {-10*log10(1+x^2)};
 \addlegendentry{1st order}
-\addplot[domain=0.1:100, samples=200, thick, AccentTeal] {-20*log10(1+x^2)};
+\addplot[domain=0.1:100, samples=200, thick, AccentTeal] {-10*log10(1+x^4)};
 \addlegendentry{2nd order}
 \addplot[dashed, MinesSilver, thin] coordinates {(0.1,-3) (100,-3)};
 \end{axis}
@@ -180,7 +180,7 @@ Do not calculate high-order filter components by hand. Use Texas Instruments Fil
 
 
 \section{Why Analog Filters Are Essential}
-Digital filters (Chapter 11) operate on digitized signals only. Before the ADC, the only noise removal tool is an analog filter. The anti-alias filter (analog LP before ADC) is mandatory; without it, aliasing permanently corrupts digital data.
+Digital filters (Chapter~\ref{ch:digital_filters}) operate on digitized signals only. Before the ADC, the only noise removal tool is an analog filter. The anti-alias filter (analog LP before ADC) is mandatory; without it, aliasing permanently corrupts digital data.
 
 \section{First-Order RC Low-Pass Filter}
 $f_c = 1/(2\pi RC)$. At $f_c$: $-3$\,dB. Above: $-20$\,dB/decade. Rarely adequate for anti-aliasing; at $10\times f_c$, only $-20$\,dB attenuation passes through. Choose $R$ in 1--100\,k$\Omega$ range (balance current draw vs.\ thermal noise).

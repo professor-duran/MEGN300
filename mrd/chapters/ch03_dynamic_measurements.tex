@@ -150,7 +150,7 @@ M(\omega) = \frac{K}{\sqrt{[1 - (\omega/\omega_n)^2]^2 + [2\zeta\omega/\omega_n]
 \addlegendentry{$\zeta = 1.0$ (critical)}
 % zeta=2.0 (overdamped)
 \addplot[domain=0:15, samples=300, thick, MinesSilver!70!black]
-    {1 - 1.333*exp(-0.382*x) + 0.333*exp(-2.618*x)};
+    {1 - 1.077*exp(-0.268*x) + 0.077*exp(-3.732*x)};
 \addlegendentry{$\zeta = 2.0$}
 \end{axis}
 \end{tikzpicture}
@@ -307,7 +307,7 @@ For phase angle: measure the time delay $\Delta t$ between the input and output 
 \section{Practical Impact of Sensor Dynamics: Worked Examples}
 \textbf{Example 1: Temperature measurement during soldering.} A solder joint reaches peak temperature in approximately 2\,s. A thermocouple with $\tau = 0.5$\,s reads only 86\% of the peak temperature at $t = 2$\,s (missing $\sim$40\,\degC{} if the peak is 280\,\degC{}). A thermocouple with $\tau = 0.05$\,s (exposed junction, 0.25\,mm wire) reads 99.95\% of the peak. For process control where the peak temperature must not exceed 290\,\degC{}, the slow thermocouple could allow a 40\,\degC{} overshoot without detection.
 
-\textbf{Example 2: Pressure measurement in a hydraulic actuator.} The pressure oscillates at 50\,Hz due to pump ripple. A pressure transducer with $f_n = 500$\,Hz ($\zeta = 0.7$) has an amplitude ratio of $M = 1/\sqrt{(1-0.01)^2 + (0.14)^2} = 1.005$ at 50\,Hz, practically perfect. A cheaper transducer with $f_n = 100$\,Hz ($\zeta = 0.4$) has $M = 1/\sqrt{(1-0.25)^2 + (2 \times 0.4 \times 0.5)^2} = 1.18$ at 50\,Hz, overstating the pressure by 18\%. At 80\,Hz, the resonance amplification makes the reading meaningless.
+\textbf{Example 2: Pressure measurement in a hydraulic actuator.} The pressure oscillates at 50\,Hz due to pump ripple. A pressure transducer with $f_n = 500$\,Hz ($\zeta = 0.7$) has an amplitude ratio of $M = 1/\sqrt{(1-0.01)^2 + (0.14)^2} = 1.0002$ at 50\,Hz, practically perfect (0.02\% error). A cheaper transducer with $f_n = 100$\,Hz ($\zeta = 0.4$) has $M = 1/\sqrt{(1-0.25)^2 + (2 \times 0.4 \times 0.5)^2} = 1.18$ at 50\,Hz, overstating the pressure by 18\%. At 80\,Hz, the resonance amplification makes the reading meaningless.
 
 \textbf{Example 3: Vibration measurement on a rotating shaft.} An accelerometer with $f_n = 25$\,kHz ($\zeta = 0.7$) has a flat response ($\pm$5\%) up to approximately $0.2 \times 25000 = 5000$\,Hz. If the shaft rotates at 3600\,RPM (60\,Hz), harmonics up to the 80th (4800\,Hz) are measured accurately. A cheaper accelerometer with $f_n = 5$\,kHz is flat only to 1000\,Hz, measuring only the first 16 harmonics.
 

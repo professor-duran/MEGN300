@@ -166,7 +166,7 @@ The FFT produces output from $f = 0$ (DC) to $f = f_s/2$ (Nyquist). Only the fir
 \section{Power Spectral Density (PSD)}
 For random or broadband signals, the magnitude spectrum depends on the FFT length $N$ (longer records produce taller peaks because more energy is captured). The \textbf{Power Spectral Density (PSD)} normalizes by the frequency resolution:
 \begin{equation}
-\text{PSD}[k] = \frac{|X[k]|^2}{N \cdot \Delta f} \quad \text{(units: V$^2$/Hz)}
+\text{PSD}[k] = \frac{|X[k]|^2}{N^2 \cdot \Delta f} \quad \text{(units: V$^2$/Hz)}
 \end{equation}
 The PSD is independent of record length, making it the correct representation for comparing noise floors, characterizing random vibration, and specifying sensor noise performance. Use PSD for broadband (continuous) signals like vibration and noise. Use amplitude spectrum for discrete tones (known frequencies).
 
@@ -219,7 +219,7 @@ When setting up an FFT measurement in LabVIEW, four parameters must be chosen co
 \textbf{Number of averages}: for random/noisy signals, average 10--100 spectra to reduce variance. For deterministic signals (sine waves, harmonics), a single FFT is sufficient.
 
 \subsection{Acquisition Time Tradeoff}
-The total acquisition time is $T = N \times M / f_s$ where $M$ is the number of averages. For $f_s = 4096$\,S/s, $N = 4096$, $M = 50$ averages with 50\% overlap: $T \approx 25.6$\,s. Finer frequency resolution or more averaging requires longer acquisition. Plan accordingly for time-limited measurements.
+The total acquisition time for non-overlapping blocks is $T = N \times M / f_s$ where $M$ is the number of averages. With 50\% overlap, successive blocks share half their data, so $T \approx N(M+1)/(2f_s)$. For $f_s = 4096$\,S/s, $N = 4096$, $M = 50$ averages with 50\% overlap: $T \approx 4096 \times 51 / (2 \times 4096) = 25.5$\,s. Finer frequency resolution or more averaging requires longer acquisition. Plan accordingly for time-limited measurements.
 
 \section{Interpreting FFT Results}
 \subsection{Identifying Signal Components}

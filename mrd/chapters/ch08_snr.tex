@@ -130,26 +130,20 @@ The most common noise source in lab measurements is 60\,Hz pickup from AC power 
 \end{warningbox}
 
 
-\section{Dynamic Range}
-The \textbf{dynamic range\index{dynamic range}} of a measurement system is the ratio of the largest measurable signal to the smallest detectable signal (noise floor\index{noise floor}):
-\begin{equation}
-\text{DR}_{\text{dB}} = 20 \log_{10}\left(\frac{V_{\text{max}}}{V_{\text{noise floor}}}\right)
-\end{equation}
-For an ideal $n$-bit ADC: $\text{DR} = 6.02n + 1.76$\,dB. A 16-bit ADC has a theoretical dynamic range of 98\,dB, meaning it can resolve signals spanning a 79,000:1 voltage ratio.
-
 \section{Grounding Best Practices for Low-Noise Measurements}
 \begin{enumerate}[leftmargin=1.5em]
 \item \textbf{Single-point (star) ground}: all ground returns meet at one physical point near the power supply. Prevents ground loop\index{ground loop}s.
+\item \textbf{Separate analog/digital grounds}: digital switching noise must not contaminate analog signal paths. Connect grounds only at the star point.
 \item \textbf{Differential inputs}: measure the voltage difference between two wires, rejecting common-mode noise (60\,Hz hum, ground offsets). Always use differential mode on NI DAQs when measuring bridge circuits, thermocouples, or any sensor in a noisy environment.
 \item \textbf{Shielded cables}: the shield connects to ground at \emph{one end only} (typically the DAQ end). Grounding at both ends creates a ground loop that couples noise.
 \item \textbf{Twisted pairs}: twisting the signal and return wires reduces magnetic pickup because induced voltages cancel in adjacent twists.
 \item \textbf{Physical separation}: route signal cables at least 30\,cm from power cables. Cross at right angles if they must cross.
+\item \textbf{Decoupling}: 100\,nF ceramic at every IC power pin, 10\,$\mu$F electrolytic at each rail entry point.
 \end{enumerate}
 
 \begin{examplebox}[ThermoRig: Diagnosing 60\,Hz Noise]
-The ThermoRig thermocouple signal shows a clean 25\,\degC{} reading on the benchtop but develops $\pm$0.3\,\degC{} oscillation when the heater is powered on. FFT reveals a dominant 60\,Hz peak. Root cause: the heater power cable runs parallel to the thermocouple extension wire for 50\,cm. Fix: (1) reroute the thermocouple wire away from the heater cable, (2) switch the DAQ to differential input mode, (3) add a 50-point moving average in LabVIEW (effective cutoff well below 60\,Hz given the slow thermal process). Result: noise drops to $\pm$0.02\,\degC{}.
+The ThermoRig thermocouple signal shows a clean 25\,\degC{} reading on the benchtop but develops $\pm$0.3\,\degC{} oscillation when the heater is powered on. FFT reveals a dominant 60\,Hz peak with harmonics at 120, 180, 240\,Hz. Root cause: the heater power cable runs parallel to the thermocouple extension wire for 50\,cm, coupling 60\,Hz capacitively. Fix: (1) reroute the thermocouple wire away from the heater cable, (2) switch the DAQ to differential input mode, (3) add a 50-point moving average in LabVIEW (effective cutoff well below 60\,Hz given the slow thermal process). Result: noise drops to $\pm$0.02\,\degC{}. Cost: \$0 and 10 minutes.
 \end{examplebox}
-
 
 \section{Defining Signal and Noise}
 The signal carries information about the measurand; noise is everything else. Noise is present at every stage and can never be eliminated completely. The goal is to make the signal large relative to the noise.
@@ -158,26 +152,13 @@ The signal carries information about the measurand; noise is everything else. No
 SNR in decibels: $\text{SNR} = 20\log_{10}(V_s/V_n)$\,dB. Reference: 0\,dB means signal equals noise. 20\,dB means $10\times$. 40\,dB means $100\times$. 60\,dB means $1000\times$. Maximum theoretical ADC SNR: $6.02n + 1.76$\,dB. Doubling signal power adds 3\,dB; doubling voltage adds 6\,dB; $10\times$ voltage adds 20\,dB.
 
 \section{Noise Classification}
-\textbf{Thermal noise}: $V_n = \sqrt{4k_BTR B}$. At 300\,K, a 10\,k$\Omega$ resistor over 10\,kHz: $V_n = 1.28$\,$\mu$V. This is the fundamental noise floor.
+\textbf{Thermal noise}: $V_n = \sqrt{4k_B T R B}$. At 300\,K, a 10\,k$\Omega$ resistor over 10\,kHz: $V_n = 1.28$\,$\mu$V. This is the fundamental noise floor.
 
 \textbf{Shot noise}: $I_n = \sqrt{2qI_{DC}B}$. Appears in semiconductor junctions.
 
 \textbf{Flicker (1/f) noise}: increases at low frequencies. Dominant below $\sim$1\,kHz in semiconductors. Makes precision DC measurements harder than AC.
 
 \textbf{EMI}: 60\,Hz from power lines (capacitive and inductive coupling), switching supply harmonics (100\,kHz--1\,MHz), motor commutation, fluorescent lighting. EMI has specific frequencies visible as FFT spikes.
-
-\section{Grounding Best Practices}
-\textbf{Single-point (star) ground}: all grounds connect at one point. Prevents ground loops.
-
-\textbf{Separate analog/digital grounds}: digital switching noise must not contaminate analog signal paths. Connect grounds only at the star point.
-
-\textbf{Shield grounding}: connect cable shields at one end only (DAQ end). Both-end grounding creates a ground loop.
-
-\textbf{Decoupling}: 100\,nF ceramic at every IC power pin, 10\,$\mu$F electrolytic at each rail entry point.
-
-\begin{examplebox}[ThermoRig: Diagnosing 60 Hz Noise]
-Initial testing showed $\pm$2\,\degC{} oscillation at 60\,Hz (visible in FFT with harmonics at 120, 180, 240\,Hz). Root cause: heater cable ran parallel to thermocouple cable, coupling 60\,Hz capacitively. Fix: separated cables by 15\,cm, used shielded TC wire (shield grounded at DAQ), switched to Differential mode. Result: 60\,Hz spike dropped from 2\,\degC{} to 0.01\,\degC{}. Cost: \$0 and 10 minutes.
-\end{examplebox}
 
 \section{Noise in the Signal Chain}
 Noise at the sensor end is amplified by the full system gain and dominates the output. Noise at the DAQ end is not amplified. \textbf{Golden rule}: amplify as early as possible, as close to the sensor as possible.
