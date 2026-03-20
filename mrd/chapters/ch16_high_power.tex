@@ -2,7 +2,7 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{High-Power Devices and Switches}
-\label{ch:highpower}\index{MOSFET}\index{relay}\index{SSR}\index{flyback diode\index{flyback diode} (Figure~\ref{fig:mosfet_flyback})}\index{PWM\index{PWM (pulse width modulation)}}\index{H-bridge}
+\label{ch:highpower}\index{MOSFET}\index{relay}\index{SSR}\index{flyback diode}\index{PWM (pulse width modulation)}\index{H-bridge}
 
 \begin{tipbox}[When to Read This Chapter]
 \textbf{Module~8 (Weeks 11--12)}: Read before the high-power switching lab. Focus on MOSFET gate drive, flyback diodes, PWM, and the relay vs.\ MOSFET vs.\ SSR comparison. The safety warnings in this chapter are critical. \textbf{Related}: Circuit fundamentals in Chapter~\ref{ch:circuits} (p.\,\pageref{ch:circuits}); PID output stages in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}).
@@ -52,7 +52,7 @@
 \node[font=\tiny\sffamily, WarnOrange] at (axis cs:3.5,0.95) {$\bar{V}$};
 \end{axis}
 \end{tikzpicture}
-\caption{Pulse Width Modulation (Figure~\ref{fig:pwm}) (PWM) at three duty cycles. The MOSFET switches rapidly between fully on ($V_s$) and fully off (0\,V). The average voltage $\bar{V} = D \times V_s$ (orange dashed) is proportional to the duty cycle $D$. An inductive load (motor coil) smooths the pulsed current into a nearly DC value proportional to $D$. The ThermoRig heater uses time-proportional PWM through an SSR.}
+\caption{Pulse Width Modulation (PWM) at three duty cycles. The MOSFET switches rapidly between fully on ($V_s$) and fully off (0\,V). The average voltage $\bar{V} = D \times V_s$ (orange dashed) is proportional to the duty cycle $D$. An inductive load (motor coil) smooths the pulsed current into a nearly DC value proportional to $D$. The ThermoRig heater uses time-proportional PWM through an SSR.}
 \label{fig:pwm}
 \end{figure}
 
@@ -235,7 +235,7 @@ For AC loads (heaters, lamps, fans powered from mains): the SSR is the standard 
 
 \textbf{Brushless DC (BLDC) motor control}: requires electronic commutation (switching the correct phase winding at the right time). Use a dedicated BLDC driver IC (e.g., DRV8313) or an ESC (Electronic Speed Controller) module. Not practical to implement from discrete components in MEGN~300.
 
-\textbf{Stepper motor control}: moves in discrete angular steps (1.8\degC{}/step typical for a 200-step/revolution motor). Driven by a stepper driver IC (A4988, DRV8825) that converts step and direction signals into the correct coil energization sequence. Interface to MCU: one GPIO for step pulse, one for direction, one for enable.
+\textbf{Stepper motor control}: moves in discrete angular steps (\ang{1.8}/step typical for a 200-step/revolution motor). Driven by a stepper driver IC (A4988, DRV8825) that converts step and direction signals into the correct coil energization sequence. Interface to MCU: one GPIO for step pulse, one for direction, one for enable.
 
 \section{Protection Circuits}
 \textbf{Overcurrent protection}: a fuse or resettable polyfuse in series with the load. For electronic protection: measure current through a shunt resistor and compare to a threshold; if exceeded, disable the MOSFET gate via a comparator circuit. Response time: $<$1\,ms for electronic, 10--100\,ms for fuses.
@@ -272,7 +272,7 @@ Motors, incandescent lamps, and capacitive loads draw much higher current at tur
 
 \textbf{DC brushless (BLDC)}: higher efficiency, longer life, less EMI. Require electronic commutation (ESC or motor driver IC). Cannot be driven by a simple MOSFET. Use for: high-performance drives, drones, precision positioning.
 
-\textbf{Stepper motors}: precise angular positioning without feedback (open-loop). 200 steps/revolution (1.8\degC{}/step) standard. Driven by dedicated stepper driver (A4988, DRV8825). Low cost, high torque at low speed, easy position control. Use for: 3D printers, CNC motion, laboratory positioning stages.
+\textbf{Stepper motors}: precise angular positioning without feedback (open-loop). 200 steps/revolution (\ang{1.8}/step) standard. Driven by dedicated stepper driver (A4988, DRV8825). Low cost, high torque at low speed, easy position control. Use for: 3D printers, CNC motion, laboratory positioning stages.
 
 \textbf{Servo motors}: DC motor + encoder + PID controller in a closed-loop package. Precise position and speed control. Standard hobby servos accept a PWM signal (1--2\,ms pulse width at 50\,Hz). Industrial servos use CAN, EtherCAT, or analog $\pm$10\,V command. Use for: robotic joints, valve actuators, camera gimbals.
 

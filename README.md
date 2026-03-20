@@ -8,25 +8,46 @@
 
 | Document | Download |
 |----------|----------|
-| **Master Reference Document** | [📥 Download PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/megn300_master_reference.pdf) |
-| **Student Guide** | [📥 Download PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/MEGN300_Student_Guide.pdf) |
+| **Master Reference Document** | [Download PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/megn300_master_reference.pdf) |
+| **Student Guide** | [Download PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/MEGN300_Student_Guide.pdf) |
 
 > PDFs are automatically rebuilt on every push to `main` via GitHub Actions.
 
 ## Repository Structure
-```
-megn300_master_reference.tex         Master Reference Document (monolithic LaTeX)
-MEGN300_Student_Guide.tex            Student Guide
 
-figs/                                Pre-rendered figures (22 PNGs)
-├── fig_accuracy_precision.png
-├── fig_adc_process.png
-├── fig_aliasing.png
-├── ...
-└── fig_wheatstone_bridge.png
+```
+MEGN300/
+├── megn300_master_reference.pdf        Pre-built MRD (committed by CI)
+├── MEGN300_Student_Guide.pdf           Pre-built Student Guide (committed by CI)
+├── README.md
+├── .github/
+│   └── workflows/
+│       └── build-pdfs.yml              GitHub Actions CI workflow
+├── mrd/                                Master Reference Document source
+│   ├── main.tex                        Top-level document
+│   ├── preamble.tex                    Shared preamble / packages
+│   ├── frontmatter/                    (6 files)
+│   │   ├── titlepage.tex
+│   │   ├── preface.tex
+│   │   ├── ai_policy.tex
+│   │   ├── safety.tex
+│   │   ├── survival_guide.tex
+│   │   └── triage.tex
+│   ├── chapters/                       ch01 – ch22 (see below)
+│   └── appendices/                     (6 files)
+│       ├── glossary.tex
+│       ├── quick_reference.tex
+│       ├── projects_fail.tex
+│       ├── abet.tex
+│       ├── labview.tex
+│       └── references.tex
+└── student_guide/
+    └── MEGN300_Student_Guide.tex       Standalone student guide
 ```
 
-## Document Structure
+All figures are generated inline with TikZ / pgfplots — there is no separate figures directory.
+
+## Document Structure (22 Chapters)
 
 ### Laboratory Safety and Equipment Care
 
@@ -38,35 +59,40 @@ figs/                                Pre-rendered figures (22 PNGs)
 5. Statistics and Experimental Data Analysis
 
 ### Part II: Signals and Signal Processing
-6. Analog vs. Digital Systems
-7. Signal-to-Noise Ratio
-8. Fourier Series and Complex Signal Construction
-9. FFT and Complex Signal Decomposition
-10. Fundamentals of Digital Signal Processing
-11. Analog Filter Design
-12. Digital Filter Design
+6. Sensors & Actuators
+7. Analog vs. Digital Systems
+8. Signal-to-Noise Ratio
+9. Fourier Series and Complex Signal Construction
+10. FFT and Complex Signal Decomposition
+11. Fundamentals of Digital Signal Processing
+12. Analog Filter Design
+13. Digital Filter Design
 
 ### Part III: Electronics for Instrumentation
-13. Amplifiers
-14. High-Power Devices and Switches
+14. Circuit Fundamentals
+15. Amplifiers
+16. High-Power Devices and Switches
+17. Debugging
 
 ### Part IV: Control Systems
-15. Open-Loop Control
-16. Closed-Loop Control
-17. PID Control
+18. Open-Loop Control
+19. Closed-Loop Control
+20. PID Control
 
 ### Part V: Engineering Science Reference
-18. Fundamentals of Heat Transfer
+21. Fundamentals of Heat Transfer
+22. Fluid Power
 
 ## Building Locally
-```bash
-# Master Reference Document (2-pass for TOC)
-pdflatex megn300_master_reference.tex && pdflatex megn300_master_reference.tex
 
-# Student Guide (2-pass)
-pdflatex MEGN300_Student_Guide.tex && pdflatex MEGN300_Student_Guide.tex
+```bash
+# Master Reference Document
+cd mrd && latexmk -pdf main.tex
+
+# Student Guide (run twice for TOC / cross-references)
+cd student_guide && pdflatex MEGN300_Student_Guide.tex && pdflatex MEGN300_Student_Guide.tex
 ```
 
 ## Author
 
-**Adam Duran** · Assistant Teaching Professor · PE, PMP · March 2026
+**Adam Duran** · Assistant Teaching Professor · Colorado School of Mines

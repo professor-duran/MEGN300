@@ -62,7 +62,7 @@ The oscilloscope's ground clip is connected directly to earth ground through the
 \subsection*{Working with NI DAQ Equipment}
 \textbf{Input voltage limits}: the NI~USB-6001 analog inputs are rated for $\pm$10\,V with respect to the AI ground. Exceeding this range (applying 15\,V to an AI pin) can damage the ADC permanently. Before connecting any signal, measure it with a DMM and verify it is within the DAQ's input range.
 
-\textbf{Output current limits}: the digital outputs can provide approximately 3--5\,mA per pin. Do not drive LEDs, relays, or motors directly from the digital outputs; use a transistor or MOSFET driver (Chapter~13).
+\textbf{Output current limits}: the digital outputs can provide approximately 3--5\,mA per pin. Do not drive LEDs, relays, or motors directly from the digital outputs; use a transistor or MOSFET driver (Chapter~\ref{ch:highpower}).
 
 \textbf{USB ground}: the DAQ's ground is connected to the computer's USB ground, which is connected to earth ground through the computer's power supply. Be aware of this ground path when connecting to external circuits, especially those with their own ground reference.
 

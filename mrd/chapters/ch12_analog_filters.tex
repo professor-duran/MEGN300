@@ -2,7 +2,7 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{Analog Filter Design}
-\label{ch:analog_filters}\index{filter!low-pass}\index{filter!Butterworth}\index{filter!Chebyshev}\index{filter!Bessel}\index{cutoff frequency}\index{Sallen-Key\index{Sallen-Key topology}}
+\label{ch:analog_filters}\index{filter!low-pass}\index{filter!Butterworth}\index{filter!Chebyshev}\index{filter!Bessel}\index{cutoff frequency}\index{Sallen-Key topology}
 
 \begin{tipbox}[When to Read This Chapter]
 \textbf{Module~6 (Weeks 9--10)}: Read before the filter design lab. Focus on the Butterworth vs.\ Chebyshev comparison, the Sallen-Key topology, and the component calculation procedure. The Bode plot\index{Bode plot} interpretation section is used repeatedly in the control systems module. \textbf{Related}: DSP fundamentals in Chapter~\ref{ch:dsp} (p.\,\pageref{ch:dsp}); digital filters in Chapter~\ref{ch:digital_filters} (p.\,\pageref{ch:digital_filters}).
@@ -45,7 +45,7 @@
 \end{axis}
 \end{scope}
 \end{tikzpicture}
-\caption{Left: first-order passive RC low-pass filter (Figure~\ref{fig:rc_bode}). Right: Bode magnitude response comparing 1st order ($-20$\,dB/dec) and 2nd order ($-40$\,dB/dec). A first-order filter is often insufficient for anti-aliasing.}
+\caption{Left: first-order passive RC low-pass filter. Right: Bode magnitude response comparing 1st order ($-20$\,dB/dec) and 2nd order ($-40$\,dB/dec). A first-order filter is often insufficient for anti-aliasing.}
 \label{fig:rc_bode}
 \end{figure}
 
@@ -141,7 +141,7 @@ Active filters use operational amplifiers to provide gain, buffering, and steepe
 \node[font=\tiny\sffamily, MinesSilver] at (axis cs:0.15,-5) {$-3$\,dB};
 \end{axis}
 \end{tikzpicture}
-\caption{Bode magnitude comparison of 4th-order Butterworth, Chebyshev, and Bessel responses (Figure~\ref{fig:filter_compare}) low-pass filters. Chebyshev has the steepest rolloff but passband ripple. Bessel has the gentlest rolloff but preserves pulse shape (linear phase). Butterworth is the default.}
+\caption{Bode magnitude comparison of 4th-order Butterworth, Chebyshev, and Bessel low-pass filters. Chebyshev has the steepest rolloff but passband ripple. Bessel has the gentlest rolloff but preserves pulse shape (linear phase). Butterworth is the default.}
 \label{fig:filter_compare}
 \end{figure}
 

@@ -59,7 +59,7 @@ Flat spectrum
 \draw[WarnOrange, thick] (3,0) -- (4,0);
 \end{scope}
 \end{tikzpicture}
-\caption{Fourier spectra of common periodic waveforms. Square and triangle waves contain only odd harmonics (Figure~\ref{fig:common_spectra}); sawtooth contains all harmonics. The roll-off rate determines how many harmonics carry significant energy, which in turn determines the bandwidth required to faithfully measure the signal.}
+\caption{Fourier spectra of common periodic waveforms. Square and triangle waves contain only odd harmonics; sawtooth contains all harmonics. The roll-off rate determines how many harmonics carry significant energy, which in turn determines the bandwidth required to faithfully measure the signal.}
 \label{fig:common_spectra}
 \end{figure}
 
@@ -135,7 +135,7 @@ Contains only odd harmonics. The amplitude of each harmonic decreases as $1/n$.
 \end{figure}
 
 \begin{tipbox}[Why Fourier Series Matters for Instrumentation]
-Every real signal is a superposition of sinusoids. If your measurement system attenuates or phase-shifts any frequency component differently from others, the reconstructed signal is distorted. Understanding Fourier decomposition lets you predict how your sensor's frequency response (Chapter~3) and your filters (Chapters~10--11) will affect the measured signal.
+Every real signal is a superposition of sinusoids. If your measurement system attenuates or phase-shifts any frequency component differently from others, the reconstructed signal is distorted. Understanding Fourier decomposition lets you predict how your sensor's frequency response (Chapter~3) and your filters (Chapters~\ref{ch:analog_filters}--\ref{ch:digital_filters}) will affect the measured signal.
 \end{tipbox}
 
 
@@ -167,7 +167,7 @@ A measurement system must pass all significant harmonics. A sensor measuring a 1
 Truncating the series near a discontinuity produces $\sim$9\% overshoot that narrows but never disappears with more terms. In instrumentation, this manifests as ``ringing'' when a filter truncates harmonics.
 
 \section{From Series to Transform}
-The Fourier series applies to periodic signals. The Fourier transform\index{Fourier transform} generalizes to non-periodic signals (transients, events) by letting the period approach infinity. The discrete version (DFT/FFT) is the computational tool used in digital systems (Chapter~8).
+The Fourier series applies to periodic signals. The Fourier transform\index{Fourier transform} generalizes to non-periodic signals (transients, events) by letting the period approach infinity. The discrete version (DFT/FFT) is the computational tool used in digital systems (Chapter~\ref{ch:fft}).
 
 \begin{tipbox}[Parseval\index{Parseval theorem}'s Theorem]
 Total signal energy is the same in time and frequency domains: $\sum|x[n]|^2 = (1/N)\sum|X[k]|^2$. A filter removing frequency components removes their energy. If noise is concentrated in a narrow band (e.g., 60\,Hz), a notch filter removes that energy without affecting the rest.

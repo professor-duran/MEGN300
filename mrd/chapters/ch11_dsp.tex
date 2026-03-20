@@ -2,7 +2,7 @@
 % Auto-generated from megn300_master_reference.tex
 
 \chapter{Fundamentals of Digital Signal Processing}
-\label{ch:dsp}\index{aliasing}\index{Nyquist\index{Nyquist frequency} theorem}\index{sampling}\index{oversampling}
+\label{ch:dsp}\index{aliasing}\index{Nyquist frequency}\index{Nyquist theorem}\index{sampling}\index{oversampling}
 
 \begin{tipbox}[When to Read This Chapter]
 \textbf{Module~6 (Weeks 9--10)}: Read the aliasing and anti-aliasing\index{anti-aliasing filter} sections before the filter design lab. The Nyquist theorem and its practical implications (always filter before sampling) are foundational. \textbf{Related}: ADC settings in Chapter~\ref{ch:analog_digital} (p.\,\pageref{ch:analog_digital}); analog filter design in Chapter~\ref{ch:analog_filters} (p.\,\pageref{ch:analog_filters}); digital filter design in Chapter~\ref{ch:digital_filters} (p.\,\pageref{ch:digital_filters}).
@@ -257,7 +257,7 @@ For white noise with PSD $= S_0$: $V_{n,\text{RMS}} = \sqrt{S_0 \cdot B}$. Halvi
 This section connects the z-transform to digital PID implementation. It is advanced reference material not required for MEGN~300 exams.
 \end{advancedbox}
 \section{The Z-Transform: Bridge from Continuous to Digital}
-The Laplace transform ($s$-domain) describes continuous-time systems. The \textbf{z-transform} is its discrete-time counterpart. Understanding the $s$-to-$z$ mapping is essential for analyzing digital control loops (Chapter~16) and digital filters (Chapter~12).
+The Laplace transform ($s$-domain) describes continuous-time systems. The \textbf{z-transform} is its discrete-time counterpart. Understanding the $s$-to-$z$ mapping is essential for analyzing digital control loops (Chapter~\ref{ch:pid}) and digital filters (Chapter~\ref{ch:digital_filters}).
 
 \subsection{Definition}
 For a discrete-time signal $x[n]$: $X(z) = \sum_{n=0}^{\infty} x[n] z^{-n}$. The variable $z = e^{sT_s}$ relates the $z$-domain to the $s$-domain, where $T_s = 1/f_s$ is the sample period.

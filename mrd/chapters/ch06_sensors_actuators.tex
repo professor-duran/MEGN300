@@ -47,10 +47,6 @@ A \textbf{transducer} converts energy from one domain to another. A \textbf{sens
 
 The choice of transduction mechanism determines the sensor's sensitivity, range, linearity, bandwidth, and failure modes. There is no universal sensor; every mechanism involves tradeoffs.
 
-\begin{industrybox}{From Lab Bench to Electric Vehicle Test Cell}
-The five-block measurement architecture is not an academic abstraction. In DOE vehicle energy analysis programs and NREL fleet testing, engineers instrument vehicles with hundreds of channels following exactly this architecture: CAN bus sensors feeding signal conditioning boards, high-speed DAQ systems, real-time processing pipelines, and terabyte-scale storage. The measurement system design principles you learn in MEGN~300 scale directly from the lab bench to a 400\,V EV powertrain test cell or a grid-scale battery energy storage system. The error budgets, grounding practices, and signal conditioning chains are identical in concept; only the voltage levels, channel counts, and safety requirements change.
-\end{industrybox}
-
 \section{Sensor Classification}
 
 \subsection{By Transduction Mechanism}
@@ -95,7 +91,7 @@ When selecting a sensor for a project, evaluate these specifications against you
 
 \textbf{Hysteresis}: difference in output for the same input depending on whether the input is increasing or decreasing. Common in mechanical sensors (springs, diaphragms) and magnetic sensors.
 
-\textbf{Output impedance}: affects loading when connected to a measurement circuit (Chapter~13, Thevenin equivalent). High-impedance sensors require buffer amplifiers.
+\textbf{Output impedance}: affects loading when connected to a measurement circuit (Chapter~\ref{ch:circuits}, Thevenin equivalent). High-impedance sensors require buffer amplifiers.
 
 \begin{keyconceptbox}[Sensor Selection Decision Framework]
 (1) What physical quantity are you measuring? (2) What range and accuracy does your requirement specify? (3) What is the fastest change you need to capture (bandwidth)? (4) What output type does your DAQ accept (analog voltage, digital, resistance)? (5) What is the operating environment (temperature, moisture, vibration, corrosive chemicals)? (6) What is the budget? Match these six criteria to the sensor specification table in the Quick Reference appendix. If multiple sensors qualify, prefer the one with the simplest signal conditioning path.
@@ -145,21 +141,21 @@ When selecting a sensor for a project, evaluate these specifications against you
 Actuators convert electrical energy into mechanical work. The choice of actuator depends on the required force/torque, speed, precision, and duty cycle.
 
 \subsection{Electromagnetic Actuators}
-\textbf{DC motors} (brushed and brushless): convert electrical current into rotational torque via Lorentz force on current-carrying conductors in a magnetic field. Torque is proportional to current; speed is proportional to voltage (minus back-EMF). Controlled via PWM for speed and H-bridge for direction. Chapter~15 covers MOSFET switching and flyback protection.
+\textbf{DC motors} (brushed and brushless): convert electrical current into rotational torque via Lorentz force on current-carrying conductors in a magnetic field. Torque is proportional to current; speed is proportional to voltage (minus back-EMF). Controlled via PWM for speed and H-bridge for direction. Chapter~\ref{ch:highpower} covers MOSFET switching and flyback protection.
 
-\textbf{Stepper motors}: divide a full rotation into discrete steps (typically 1.8\degC{}/step = 200 steps/revolution). Controlled by sequencing current through coil pairs. Open-loop position control (no encoder needed). Precise positioning but limited speed and torque at high speeds.
+\textbf{Stepper motors}: divide a full rotation into discrete steps (typically \ang{1.8}/step = 200 steps/revolution). Controlled by sequencing current through coil pairs. Open-loop position control (no encoder needed). Precise positioning but limited speed and torque at high speeds.
 
 \textbf{Servo motors}: a DC or brushless motor with an integrated feedback sensor (encoder or potentiometer) and controller. Accept a position or velocity command and use internal closed-loop control to achieve it. Hobby servos accept a 1--2\,ms PWM signal for angular position. Industrial servos use encoder feedback for high-precision motion.
 
 \textbf{Solenoids}: a coil around a ferromagnetic plunger produces linear force when energized. Binary actuator (on/off), fast response ($<$10\,ms). Used for valves, latches, and relays. Inductive load; requires flyback diode protection.
 
 \subsection{Thermal Actuators}
-\textbf{Resistive heaters}: convert electrical energy to heat via $P = I^2R$. Cartridge heaters, silicone pad heaters, and nichrome wire elements. Controlled via PWM through an SSR (AC loads) or MOSFET (DC loads). Chapter~15 covers the ThermoRig heater control example.
+\textbf{Resistive heaters}: convert electrical energy to heat via $P = I^2R$. Cartridge heaters, silicone pad heaters, and nichrome wire elements. Controlled via PWM through an SSR (AC loads) or MOSFET (DC loads). Chapter~\ref{ch:highpower} covers the ThermoRig heater control example.
 
 \textbf{Peltier devices} (thermoelectric coolers): semiconductor junctions that pump heat from one face to the other when current flows. Can heat or cool depending on current direction. Used for precise temperature control of small components (laser diodes, sample chambers). Efficiency is low; most electrical energy becomes waste heat.
 
 \subsection{Fluid Actuators}
-\textbf{Pumps}: convert rotational energy (from a motor) into fluid flow. Positive-displacement (gear, peristaltic, diaphragm) for precise metering; centrifugal for high-flow applications. Chapter~20 (Fluid Power) covers pump selection in detail.
+\textbf{Pumps}: convert rotational energy (from a motor) into fluid flow. Positive-displacement (gear, peristaltic, diaphragm) for precise metering; centrifugal for high-flow applications. Chapter~\ref{ch:fluid} (Fluid Power) covers pump selection in detail.
 
 \textbf{Valves}: control fluid flow by opening, closing, or partially obstructing a passage. Solenoid valves for on/off control; proportional valves for variable flow. Pneumatic and hydraulic cylinders convert pressurized fluid into linear force and motion.
 

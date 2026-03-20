@@ -85,7 +85,7 @@ $u_D = K_d \cdot de/dt$. Output is proportional to the rate of change of error. 
 \node[font=\tiny\sffamily, WarnOrange, anchor=west] at (axis cs:9.1,0.9) {offset};
 \end{axis}
 \end{tikzpicture}
-\caption{Step response comparison: P-only has steady-state offset, PI eliminates offset (Figure~\ref{fig:pid}) but overshoots, PID provides fast settling with minimal overshoot. Tune P first, then I, then D (Figure~\ref{fig:pid_steps}).}
+\caption{Step response comparison: P-only has steady-state offset, PI eliminates offset but overshoots, PID provides fast settling with minimal overshoot. Tune P first, then I, then D.}
 \label{fig:pid_steps}
 \end{figure}
 
@@ -225,7 +225,7 @@ When the actuator saturates (e.g., heater at 100\% duty, valve fully open), the 
 \node[font=\tiny\sffamily, AccentTeal, anchor=west] at (axis cs:3.4,1.08) {12\% OS};
 \end{axis}
 \end{tikzpicture}
-\caption{Integral windup (Figure~\ref{fig:windup}): without anti-windup\index{anti-windup} (left), the integral accumulates during saturation, causing 80\%+ overshoot. With anti-windup clamping (right), the integral is frozen during saturation, limiting overshoot to $\sim$12\%. Always enable anti-windup.}
+\caption{Integral windup\index{anti-windup}: without anti-windup (left), the integral accumulates during saturation, causing 80\%+ overshoot. With anti-windup clamping (right), the integral is frozen during saturation, limiting overshoot to $\sim$12\%. Always enable anti-windup.}
 \label{fig:windup}
 \end{figure}
 
@@ -421,13 +421,6 @@ loop:
   wait(Ts)
 \end{verbatim}
 \end{enumerate}
-
-
-% ================================================================
-% BACK MATTER
-% ================================================================
-
-\backmatter
 
 
 

@@ -232,14 +232,14 @@ The sensitivity function $S(s) = 1/(1 + L(s))$ and the complementary sensitivity
 The crossover frequency (where $|L| = 1$) separates these two regimes. Below crossover: good tracking and disturbance rejection. Above crossover: no tracking, no disturbance rejection. This is why increasing bandwidth (moving the crossover to higher frequencies) improves performance, subject to the stability constraint.
 
 \section{Effect of Time Delay (Dead Time)}
-Dead time $L$ in the plant ($G_p(s) = K e^{-Ls}/(1+\tau s)$) introduces phase lag $\phi = -\omega L$ radians at frequency $\omega$, without affecting magnitude. This phase lag directly reduces the phase margin: $\Delta PM = -360 \times f_{BW} \times L$ degrees. For the ThermoRig with $L = 3$\,s and $f_{BW} = 0.058$\,Hz: $\Delta PM = -360 \times 0.058 \times 3 = -63$\degC{}. This is very significant; the dead time alone uses most of the available phase budget.
+Dead time $L$ in the plant ($G_p(s) = K e^{-Ls}/(1+\tau s)$) introduces phase lag $\phi = -\omega L$ radians at frequency $\omega$, without affecting magnitude. This phase lag directly reduces the phase margin: $\Delta PM = -360 \times f_{BW} \times L$ degrees. For the ThermoRig with $L = 3$\,s and $f_{BW} = 0.058$\,Hz: $\Delta PM = -360 \times 0.058 \times 3 = -63$\ensuremath{{}^{\circ}}. This is very significant; the dead time alone uses most of the available phase budget.
 
 Dead time is the enemy of feedback control. It limits the achievable bandwidth and the maximum usable gain. Systems with large $L/\tau$ ratios (dead time comparable to the time constant) are inherently difficult to control. The Smith predictor is an advanced control technique that compensates for dead time by including a model of the plant (including its delay) inside the controller.
 
 \section{Integral Action and Reset Windup}
 When integral action is added ($K_i > 0$), the steady-state error for step inputs becomes zero. However, integral action has two drawbacks:
 
-(1) \textbf{Reduced stability}: the integrator adds $-90$\degC{} of phase lag at all frequencies, reducing the phase margin. If the original P-only system had 60\degC{} phase margin, adding integral action might reduce it to 30\degC{} or less, producing oscillatory behavior. The solution: reduce $K_i$ (longer integral time $T_i$) to push the integral action to lower frequencies where its phase contribution at the crossover frequency is minimized.
+(1) \textbf{Reduced stability}: the integrator adds $-$\ang{90} of phase lag at all frequencies, reducing the phase margin. If the original P-only system had \ang{60} phase margin, adding integral action might reduce it to \ang{30} or less, producing oscillatory behavior. The solution: reduce $K_i$ (longer integral time $T_i$) to push the integral action to lower frequencies where its phase contribution at the crossover frequency is minimized.
 
 (2) \textbf{Integral windup}: when the actuator saturates, the integral continues to accumulate, causing massive overshoot when the error changes sign. This is addressed in Chapter~16.
 \section{Root Locus: Physical Interpretation}

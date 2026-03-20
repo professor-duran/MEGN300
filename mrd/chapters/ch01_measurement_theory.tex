@@ -62,7 +62,7 @@ Every measurement system, from a mercury thermometer to a satellite telemetry ch
 \draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (8.5,-1.0) -- (8.5,-0.2);
 \draw[-{Stealth[length=2mm]}, WarnOrange, dashed] (11.9,-1.0) -- (11.9,-0.2);
 \end{tikzpicture}}%
-\caption{The five-block generalized measurement system (Figure~\ref{fig:meas_system}) with error sources (orange, dashed) entering at each interface. The total system uncertainty is the RSS combination of all contributions.}
+\caption{The five-block generalized measurement system with error sources (orange, dashed) entering at each interface. The total system uncertainty is the RSS combination of all contributions.}
 \label{fig:meas_system}
 \end{figure}
 
@@ -95,7 +95,7 @@ Each block in the measurement chain generates testable requirements:
 \foreach \x/\y in {9.6/0.7, 8.5/-0.4, 9.2/0.9, 8.8/0.3, 9.4/-0.8}
     {\node[dot] at (\x,\y) {};}
 \end{tikzpicture}
-\caption{Accuracy vs.\ precision: the dartboard analogy (Figure~\ref{fig:accuracy_precision}). High precision with low accuracy (center) indicates systematic bias correctable by calibration. Low precision (right) requires averaging or a better sensor.}
+\caption{Accuracy vs.\ precision: the dartboard analogy. High precision with low accuracy (center) indicates systematic bias correctable by calibration. Low precision (right) requires averaging or a better sensor.}
 \label{fig:accuracy_precision}
 \end{figure}
 \index{accuracy}\index{precision}
@@ -171,7 +171,7 @@ Connecting a sensor to a circuit can change the quantity being measured. The sen
 \begin{equation}
 V_{\text{measured}} = V_{\text{true}} \times \frac{Z_m}{Z_m + Z_s}
 \end{equation}
-To keep the loading error below 1\%, require $Z_m > 100 \times Z_s$. This is why buffer amplifiers (Chapter~12) are essential for high-impedance sensors.
+To keep the loading error below 1\%, require $Z_m > 100 \times Z_s$. This is why buffer amplifiers (Chapter~\ref{ch:amplifiers}) are essential for high-impedance sensors.
 
 \textbf{Thermal loading}: inserting a temperature probe into a small fluid volume changes the fluid temperature. The probe absorbs or releases heat until it equilibrates. In small samples, this thermal mass effect can be significant.
 

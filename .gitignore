@@ -19,6 +19,18 @@
 *.bcf
 *.run.xml
 *.bak
+*.dvi
+*.ps
+*.xdv
+*.glg
+*.glo
+*.gls
+*.acn
+*.acr
+*.alg
+
+# PDFs (except pre-built outputs)
+*.pdf
 
 # Keep PDFs (built by CI)
 !megn300_master_reference.pdf

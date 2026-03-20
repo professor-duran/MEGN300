@@ -13,7 +13,7 @@
 \usepackage{parskip}
 \usepackage[T1]{fontenc}
 \usepackage{microtype}
-\usepackage[utf8]{inputenc}
+% \usepackage[utf8]{inputenc}  % UTF-8 is default in modern LaTeX
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{tabularx}
@@ -23,7 +23,7 @@
 \definecolor{minesgold}{RGB}{204,174,0}
 \definecolor{tipgreen}{RGB}{34,120,58}
 \definecolor{warnred}{RGB}{180,30,30}
-\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{bglight}{RGB}{245,245,245}
 
 % --- Hyperref Setup ---
 \hypersetup{
@@ -46,7 +46,7 @@
 \renewcommand{\headrule}{\hbox to\headwidth{\color{minesblue}\leaders\hrule height \headrulewidth\hfill}}
 
 % --- Custom tcolorbox environments ---
-\newtcolorbox{faqbox}[1][]{colback=lightgray,colframe=minesblue,fonttitle=\bfseries,title={#1},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
+\newtcolorbox{faqbox}[1][]{colback=bglight,colframe=minesblue,fonttitle=\bfseries,title={#1},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
 \newtcolorbox{tipbox}{colback=tipgreen!5,colframe=tipgreen,fonttitle=\bfseries\color{tipgreen},title={Tip},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
 \newtcolorbox{warnbox}{colback=warnred!5,colframe=warnred,fonttitle=\bfseries\color{warnred},title={Common Pitfall},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
 \newtcolorbox{protip}{colback=minesgold!8,colframe=minesgold!80!black,fonttitle=\bfseries\color{minesgold!80!black},title={Pro Tip},arc=2pt,boxrule=0.8pt,left=6pt,right=6pt,top=4pt,bottom=4pt}
@@ -152,7 +152,7 @@ When writing your calibration report, always report: the calibration equation (w
 \begin{priorities}
 \begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
     \item Measure $\tau$ from a step response (first-order sensor).
-    \item Understand the bandwidth-rise time relationship: $f_{-3\text{dB}} \times t_r \approx 0.35$.
+    \item Understand the bandwidth-rise time relationship: $f_{-3\text{dB}} \times t_r \approx 0.35$ (for a first-order system).
     \item Know when a sensor's dynamic response will distort your measurement.
 \end{enumerate}
 \end{priorities}
@@ -352,7 +352,7 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{warnbox}
 
 \begin{protip}
-\textbf{The INA128 is your best friend for bridge circuits.} It has $>$10\,G$\Omega$ balanced input impedance, $>$100\,dB CMRR, and gain set by a single resistor ($G = 1 + 50\,\text{k}\Omega/R_G$. For $G=100$: $R_G = 50\,\text{k}\Omega/99 = 505\,\Omega$ (use 510\,$\Omega$ standard)). Whenever you measure a Wheatstone bridge (strain gauge, RTD, load cell), reach for an instrumentation amplifier first.
+\textbf{The INA128 is your best friend for bridge circuits.} It has $>$10\,G$\Omega$ balanced input impedance, $>$100\,dB CMRR, and gain set by a single resistor with $G = 1 + 50\,\text{k}\Omega/R_G$. For $G=100$: $R_G = 50\,\text{k}\Omega/99 = 505\,\Omega$ (use 510\,$\Omega$ standard). Whenever you measure a Wheatstone bridge (strain gauge, RTD, load cell), reach for an instrumentation amplifier first.
 \end{protip}
 
 %=============================================================================
@@ -405,7 +405,7 @@ Three reasons: (1) The sensor output is too small (thermocouples produce $\mu$V;
 \end{warnbox}
 
 \begin{protip}
-\textbf{Check sensor output compatibility before ordering.} Verify three things: (1) the output voltage range fits your ADC input range (a 10\,V sensor on a 3.3\,V ADC will saturate and may damage the ADC), (2) the output impedance is compatible ($>$100:1 ratio with your ADC input impedance), and (3) the response time is fast enough for your signal ($\tau_{\text{sensor}} < f_{\text{signal}}/5$). Chapter~6 (Sensors and Actuators) has the sensor selection decision framework.
+\textbf{Check sensor output compatibility before ordering.} Verify three things: (1) the output voltage range fits your ADC input range (a 10\,V sensor on a 3.3\,V ADC will saturate and may damage the ADC), (2) the output impedance is compatible ($>$100:1 ratio with your ADC input impedance), and (3) the response time is fast enough for your signal ($\tau_{\text{sensor}} < 1/(5 f_{\text{signal}})$). Chapter~6 (Sensors and Actuators) has the sensor selection decision framework.
 \end{protip}
 
 %=============================================================================

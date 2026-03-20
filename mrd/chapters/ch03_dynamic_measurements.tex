@@ -294,7 +294,7 @@ G(s) = \frac{K}{(1 + \tau_1 s)(1 + \tau_2 s)}
 The step response shows a fast initial rise followed by a slow creep. The dominant (larger) time constant determines the settling time; the faster time constant determines the initial response rate. In the frequency domain, there are two breakpoints on the Bode plot.
 
 \section{Sensor Bandwidth and Control System Interaction}
-In a feedback control system, the sensor is part of the loop. Its dynamic response affects stability. A sensor with time constant $\tau_s$ introduces phase lag $\phi = -\arctan(\omega \tau_s)$ at the crossover frequency. If this lag reduces the total phase margin below 45\degC{}, the system becomes oscillatory or unstable.
+In a feedback control system, the sensor is part of the loop. Its dynamic response affects stability. A sensor with time constant $\tau_s$ introduces phase lag $\phi = -\arctan(\omega \tau_s)$ at the crossover frequency. If this lag reduces the total phase margin below \ang{45}, the system becomes oscillatory or unstable.
 
 Rule of thumb: the sensor bandwidth must be at least $5\times$ the closed-loop bandwidth. For a control system with 0.1\,Hz bandwidth (10\,s settling time): sensor $f_{-3\text{dB}} \geq 0.5$\,Hz ($\tau \leq 0.32$\,s). The ThermoRig thermocouple ($\tau = 0.42$\,s, $f_{-3\text{dB}} = 0.38$\,Hz) is marginally adequate; a faster thermocouple or an exposed-junction design would provide more stability margin.
 \section{Amplitude Ratio and Phase Measurement}
@@ -302,7 +302,7 @@ When characterizing sensor dynamics experimentally, two quantities must be measu
 
 For amplitude ratio: apply a sinusoidal input of known amplitude $A_{\text{in}}$ at frequency $f$. Measure the output amplitude $A_{\text{out}}$ after the transient has decayed (wait at least $5\tau$ or 10 cycles, whichever is longer). The amplitude ratio is $M = A_{\text{out}}/(K \cdot A_{\text{in}})$ where $K$ is the static sensitivity.
 
-For phase angle: measure the time delay $\Delta t$ between the input and output waveforms (zero-crossing to zero-crossing, or peak to peak). The phase angle in degrees is $\phi = -360 \cdot f \cdot \Delta t$. For a first-order system, $\phi$ is always negative (output lags input) and ranges from 0\,\degC{} at DC to $-90$\,\degC{} at infinite frequency. For a second-order system, $\phi$ ranges from 0\,\degC{} to $-180$\,\degC{}, passing through $-90$\,\degC{} at the natural frequency.
+For phase angle: measure the time delay $\Delta t$ between the input and output waveforms (zero-crossing to zero-crossing, or peak to peak). The phase angle in degrees is $\phi = -360 \cdot f \cdot \Delta t$. For a first-order system, $\phi$ is always negative (output lags input) and ranges from \ang{0} at DC to $-$\ang{90} at infinite frequency. For a second-order system, $\phi$ ranges from \ang{0} to $-$\ang{180}, passing through $-$\ang{90} at the natural frequency.
 
 \section{Practical Impact of Sensor Dynamics: Worked Examples}
 \textbf{Example 1: Temperature measurement during soldering.} A solder joint reaches peak temperature in approximately 2\,s. A thermocouple with $\tau = 0.5$\,s reads only 86\% of the peak temperature at $t = 2$\,s (missing $\sim$40\,\degC{} if the peak is 280\,\degC{}). A thermocouple with $\tau = 0.05$\,s (exposed junction, 0.25\,mm wire) reads 99.95\% of the peak. For process control where the peak temperature must not exceed 290\,\degC{}, the slow thermocouple could allow a 40\,\degC{} overshoot without detection.

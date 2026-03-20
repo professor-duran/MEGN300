@@ -162,7 +162,7 @@ When the bridge is balanced ($R_1/R_2 = R_3/R_4$), $V_o = 0$. A small change $\D
 \end{scope}
 \node[font=\scriptsize\sffamily\itshape, WarnOrange] at (7.5,-2.6) {Orange = active sensor elements; white = fixed reference resistors};
 \end{tikzpicture}
-\caption{Wheatstone bridge configurations. Sensitivity doubles with each step (Figure~\ref{fig:bridge}): quarter-bridge ($1$ active element), half-bridge\index{bridge!half} ($2$), full-bridge\index{bridge!full} ($4$). Full bridge also provides complete temperature compensation.}
+\caption{Wheatstone bridge configurations. Sensitivity doubles with each step: quarter-bridge ($1$ active element), half-bridge\index{bridge!half} ($2$), full-bridge\index{bridge!full} ($4$). Full bridge also provides complete temperature compensation.}
 \label{fig:bridge}
 \end{figure}
 
@@ -187,12 +187,6 @@ A calibration is only as good as the reference standard. \textbf{Traceability} m
 \end{itemize}
 
 
-\section{Fundamentals of Calibration}
-Calibration establishes the relationship between sensor output and true measurand value by applying known reference stimuli. Without calibration, a sensor's output is a raw electrical signal with no physical meaning.
-
-\subsection{Calibration Standards and Traceability}
-The reference standard must be at least 4$\times$ more accurate than the sensor under calibration (4:1 test accuracy ratio). Common standards: ice-point baths (0.000\,\degC{} $\pm$0.002\,\degC{}), dead-weight testers (pressure), precision decade resistors, certified mass sets. All standards must be traceable to NIST through an unbroken chain of documented calibrations.
-
 \subsection{Static Calibration Procedure}
 (1) Thermal equilibrium (15+ minutes after power-on). (2) Apply 5--7 known inputs spanning the full range. (3) Record sensor output at each. (4) Repeat sweep in reverse (detect hysteresis). (5) Repeat 3--5 times (quantify repeatability). (6) Fit calibration curve. (7) Calculate residuals and report uncertainty.
 
@@ -206,16 +200,6 @@ A calibration curve is valid only within the range of inputs used to generate it
 \begin{examplebox}[ThermoRig: Type K Thermocouple Calibration]
 Five calibration points: ice bath (0\,\degC{}), room temperature (23\,\degC{} from NIST-traceable reference), warm water at 50\,\degC{}, 75\,\degC{}, and boiling water (100\,\degC{} adjusted for altitude: $T_{bp} = 100 - 0.037(760 - P_{mmHg})$). At each point, 100 samples (10\,s at 10\,S/s), mean computed. Linear fit: $T = 24.12 \times V_{mV} + 0.31$, $R^2 = 0.9998$, max residual 0.28\,\degC{}. Calibration uncertainty: $\pm$0.3\,\degC{} (95\% confidence).
 \end{examplebox}
-
-\section{The Wheatstone Bridge in Detail}
-\subsection{Bridge Theory}
-Four resistors in a diamond, excitation voltage $V_{ex}$ across one diagonal, output $V_o$ across the other. For balanced bridge (all $R$ equal): $V_o = 0$. With one arm changed by $\Delta R$ (quarter bridge):
-\begin{equation}
-V_o \approx \frac{V_{ex}}{4} \cdot \frac{\Delta R}{R} \quad (\Delta R \ll R)
-\end{equation}
-
-\subsection{Bridge Nonlinearity}
-The exact output: $V_o = (V_{ex}/4) \cdot (\Delta R/R)/(1 + \Delta R/(2R))$. For $\Delta R/R = 1\%$: 0.5\% nonlinearity. For 10\%: 5\%. Half and full bridges cancel this.
 
 \subsection{Lead Wire Compensation}
 Remote sensors add series lead resistance that offsets and desensitizes the bridge. Three-wire connection: adds equal lead resistance to adjacent arm, canceling the effect. Four-wire (Kelvin): eliminates lead resistance entirely using separate current and voltage pairs.

@@ -19,7 +19,7 @@ An ADC converts a continuous voltage (Figure~\ref{fig:adc}) into a binary number
 \end{equation}
 For a $\pm$5\,V range (10\,V span), 12-bit: LSB $= 10/4096 = 2.44$\,mV. Any voltage change smaller than 1 LSB is invisible to the ADC.
 
-\textbf{Sampling rate} ($f_s$): number of conversions per second. Must satisfy the Nyquist criterion (Chapter~9).
+\textbf{Sampling rate} ($f_s$): number of conversions per second. Must satisfy the Nyquist criterion (Chapter~\ref{ch:dsp}).
 
 \textbf{Input range}: the voltage window the ADC can accept (e.g., 0--5\,V, $\pm$10\,V). Signals outside this range are clipped, losing information and potentially damaging the ADC.
 
@@ -51,7 +51,7 @@ Every ADC conversion introduces a rounding error of up to $\pm \frac{1}{2}$\,LSB
 \end{figure}
 
 \section{Digital-to-Analog Conversion (DAC)}
-A DAC converts a digital number back to an analog voltage. Used in control systems (Chapter~16) to drive actuators, in signal generators, and in audio output. Key parameters: resolution (bits), settling time, and output voltage range.
+A DAC converts a digital number back to an analog voltage. Used in control systems (Chapter~\ref{ch:pid}) to drive actuators, in signal generators, and in audio output. Key parameters: resolution (bits), settling time, and output voltage range.
 
 \section{Advantages and Trade-offs}
 \begin{table}[htbp]\centering\small
@@ -96,7 +96,7 @@ If you need simultaneous sampling of multiple channels (e.g., correlating vibrat
 \toprule
 \textbf{Device} & \textbf{AI Ch} & \textbf{Resolution} & \textbf{Max Rate} & \textbf{Range} & \textbf{Notes} \\
 \midrule
-USB-6001 & 8 diff / 4 SE & 14-bit & 20\,kS/s & $\pm$10\,V & Basic; multiplexed \\
+USB-6001 & 8 SE / 4 diff & 14-bit & 20\,kS/s & $\pm$10\,V & Basic; multiplexed \\
 USB-6002 & 8 diff / 4 SE & 16-bit & 50\,kS/s & $\pm$10\,V & Higher resolution \\
 USB-6009 & 8 diff / 4 SE & 14-bit & 48\,kS/s & $\pm$10\,V & Common in teaching labs \\
 USB-6356 & 8 AI & 16-bit & 1.25\,MS/s & $\pm$10\,V & Simultaneous sampling \\
