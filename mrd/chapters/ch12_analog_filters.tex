@@ -182,6 +182,8 @@ Do not calculate high-order filter components by hand. Use Texas Instruments Fil
 \section{Why Analog Filters Are Essential}
 Digital filters (Chapter~\ref{ch:digital_filters}) operate on digitized signals only. Before the ADC, the only noise removal tool is an analog filter. The anti-alias filter (analog LP before ADC) is mandatory; without it, aliasing permanently corrupts digital data.
 
+An alternative design procedure that starts from a target cutoff frequency and uses equal-component values is presented below. Both approaches yield valid Sallen-Key Butterworth filters; choose whichever fits your design constraints.
+
 \section{First-Order RC Low-Pass Filter}
 $f_c = 1/(2\pi RC)$. At $f_c$: $-3$\,dB. Above: $-20$\,dB/decade. Rarely adequate for anti-aliasing; at $10\times f_c$, only $-20$\,dB attenuation passes through. Choose $R$ in 1--100\,k$\Omega$ range (balance current draw vs.\ thermal noise).
 

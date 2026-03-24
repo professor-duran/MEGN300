@@ -127,7 +127,7 @@ V_{\text{out}} = V_{\text{in}} \cdot \frac{R_2}{R_1 + R_2}
 \textbf{Applications in MEGN 300}: scaling a sensor output to match the ADC input range (0--3.3\,V for the ESP32), creating a reference voltage, and biasing op-amp circuits.
 
 \begin{warningbox}[Loading a Voltage Divider]
-A voltage divider only produces the calculated voltage if the load draws negligible current compared to the divider current. Rule of thumb: the load resistance should be at least 10$\times$ the divider output resistance ($R_1 \| R_2$). If not, the load acts as a parallel resistor on $R_2$ and pulls the output voltage down. Use a voltage follower (op-amp buffer) to isolate a high-impedance divider from a low-impedance load.
+A voltage divider only produces the calculated voltage if the load draws negligible current compared to the divider current. Rule of thumb: the load resistance should be at least 10$\times$ the divider output resistance ($R_1 \| R_2$). For quick estimates a 10:1 ratio is acceptable; for precision measurements use the 100:1 rule introduced in Chapter~1. If not, the load acts as a parallel resistor on $R_2$ and pulls the output voltage down. Use a voltage follower (op-amp buffer) to isolate a high-impedance divider from a low-impedance load.
 \end{warningbox}
 
 \begin{examplebox}[ThermoRig: 12\,V Sensor to 3.3\,V ADC]

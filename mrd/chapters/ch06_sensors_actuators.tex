@@ -163,7 +163,7 @@ Actuators convert electrical energy into mechanical work. The choice of actuator
 Match the actuator to the load requirements: (1) What type of motion? (rotary, linear, on/off). (2) What force/torque is needed? (3) What speed or stroke? (4) What precision? (5) What duty cycle? (continuous, intermittent). (6) What control interface? (PWM, analog voltage, digital command). The Master Reference Document's Quick Reference tables include motor and pump selection guides.
 
 \begin{warningbox}[Actuators Need Drivers]
-No actuator connects directly to a microcontroller GPIO pin. Every motor needs a driver (H-bridge, ESC, stepper driver). Every solenoid needs a MOSFET with flyback diode. Every heater needs an SSR or MOSFET with current limiting. Chapter~15 (High-Power Devices) covers all driver circuits. Forgetting the driver circuit is the most common actuator integration mistake.
+No actuator connects directly to a microcontroller GPIO pin. Every motor needs a driver (H-bridge, ESC, stepper driver). Every solenoid needs a MOSFET with flyback diode. Every heater needs an SSR or MOSFET with current limiting. Chapter~\ref{ch:highpower} (High-Power Devices) covers all driver circuits. Forgetting the driver circuit is the most common actuator integration mistake.
 \end{warningbox}
 
 \begin{keyconceptbox}[Requirements Mapping: Sensors and Actuators]
