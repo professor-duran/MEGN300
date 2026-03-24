@@ -19,7 +19,7 @@
 %% File structure:
 %%   main.tex              <- this file (preamble + includes)
 %%   frontmatter/          <- title, preface, triage guide, safety
-%%   chapters/             <- ch01 through ch22
+%%   chapters/             <- ch01 through ch23
 %%   appendices/           <- LabVIEW ref, glossary, quick ref, etc.
 %%   figs/                 <- (reserved for any future external figures)
 %%
@@ -95,12 +95,17 @@
 \include{chapters/ch20_pid}
 
 % ================================================================
-% LABVIEW APPENDIX
+% PART V: SOFTWARE TOOLS FOR INSTRUMENTATION
 % ================================================================
-\input{appendices/labview}
+\part{Software Tools for Instrumentation}
+
+\include{chapters/ch23_labview}
+
+% Old LabVIEW appendix content is now incorporated into Chapter 23:
+% \input{appendices/labview}
 
 % ================================================================
-% PART V: ENGINEERING SCIENCE REFERENCE
+% PART VI: ENGINEERING SCIENCE REFERENCE
 % ================================================================
 \part{Engineering Science Reference}
 

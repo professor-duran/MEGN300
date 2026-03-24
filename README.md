@@ -3,6 +3,8 @@
 **Colorado School of Mines | Department of Mechanical Engineering**
 
 [![Build LaTeX PDFs](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml/badge.svg)](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml)
+![Built](https://img.shields.io/badge/built-YYYY--MM--DD-blue)
+![Version](https://img.shields.io/badge/version-v1.0.0-green)
 
 ---
 
@@ -18,7 +20,7 @@ All documents are open educational resources and are automatically rebuilt on ev
 
 | Document | Description | Download |
 |----------|-------------|----------|
-| **Master Reference Document** | 22-chapter technical reference spanning measurement theory, signal processing, electronics, control systems, and engineering science | [PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/megn300_master_reference.pdf) |
+| **Master Reference Document** | 23-chapter technical reference spanning measurement theory, signal processing, electronics, control systems, LabVIEW, and engineering science | [PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/megn300_master_reference.pdf) |
 | **Student Guide** | Course logistics, lab schedules, assignment details, rubrics, and operational reference | [PDF](https://raw.githubusercontent.com/professor-duran/MEGN300/main/MEGN300_Student_Guide.pdf) |
 
 ---
@@ -49,7 +51,7 @@ All figures are generated inline with TikZ / pgfplots — there is no separate f
 
 ---
 
-## Document Structure (22 Chapters)
+## Document Structure (23 Chapters)
 
 ### Laboratory Safety and Equipment Care
 
@@ -81,7 +83,10 @@ All figures are generated inline with TikZ / pgfplots — there is no separate f
 19. **Closed-Loop Control** — Feedback fundamentals, stability, steady-state error, block diagrams
 20. **PID Control** — Proportional, integral, and derivative action; tuning methods; implementation considerations
 
-### Part V: Engineering Science Reference
+### Part V: Software Tools for Instrumentation
+23. **Introduction to LabVIEW for Instrumentation** — Graphical programming, DAQmx pattern, data collection, shift registers, file I/O, signal processing VIs, PID implementation, debugging protocol
+
+### Part VI: Engineering Science Reference
 21. **Fundamentals of Heat Transfer** — Conduction, convection, radiation; thermal resistance; heat exchanger basics
 22. **Fluid Power** — Hydraulic and pneumatic systems, Pascal's law, flow control, actuator sizing
 

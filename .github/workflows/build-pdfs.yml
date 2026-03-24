@@ -8,6 +8,7 @@ on:
       - 'mrd/**'
       - 'student_guide/**'
       - '.github/workflows/build-pdfs.yml'
+      - 'VERSION'
   workflow_dispatch:
 
 permissions:
@@ -39,11 +40,18 @@ jobs:
           cp mrd/main.pdf megn300_master_reference.pdf
           cp student_guide/MEGN300_Student_Guide.pdf MEGN300_Student_Guide.pdf
 
+      - name: Update README badges
+        run: |
+          VERSION=$(cat VERSION)
+          DATE=$(date -u +%Y--%m--%d)
+          sed -i "s|https://img.shields.io/badge/built-[^)]*|https://img.shields.io/badge/built-${DATE}-blue|g" README.md
+          sed -i "s|https://img.shields.io/badge/version-[^)]*|https://img.shields.io/badge/version-v${VERSION}-green|g" README.md
+
       - name: Commit PDFs
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add -f megn300_master_reference.pdf MEGN300_Student_Guide.pdf
+          git add -f megn300_master_reference.pdf MEGN300_Student_Guide.pdf README.md
           git diff --staged --quiet || {
             git commit -m "Auto-build PDFs [skip ci]"
             git pull --rebase origin main

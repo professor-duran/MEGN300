@@ -1,0 +1,717 @@
+% Chapter 23: Introduction to LabVIEW for Instrumentation
+% MEGN 300 Master Reference Document
+
+\chapter{Introduction to LabVIEW for Instrumentation}
+\label{ch:labview}\index{LabVIEW}\index{virtual instrument}\index{dataflow programming}
+
+\begin{tipbox}[When to Read This Chapter]
+\textbf{All Modules}: This chapter is your LabVIEW reference for the entire course. Read Sections~\ref{sec:lv_what}--\ref{sec:lv_firstvi} before your first lab. Read Section~\ref{sec:lv_daqmx_pattern} before any lab involving the NI~DAQ. Revisit individual sections as needed when you encounter new LabVIEW tasks (filtering, PID, file I/O). \textbf{Related}: DAQ hardware concepts in Chapter~\ref{ch:analog_digital} (p.\,\pageref{ch:analog_digital}); PID control in Chapter~\ref{ch:pid} (p.\,\pageref{ch:pid}); debugging methodology in Chapter~\ref{ch:debugging} (p.\,\pageref{ch:debugging}).
+\end{tipbox}
+
+%% ================================================================
+\section{What Is LabVIEW?}
+\label{sec:lv_what}
+%% ================================================================
+
+LabVIEW (Laboratory Virtual Instrument Engineering Workbench) is a graphical programming environment developed by National Instruments (NI) specifically for measurement, automation, and control applications. Unlike text-based languages such as Python or C, LabVIEW uses a \textbf{dataflow programming paradigm}: you build programs by placing graphical nodes (functions) on a diagram and connecting them with wires that carry data. A node executes as soon as all of its input data are available, and its output data then flow downstream to the next node.
+
+\index{dataflow}\index{graphical programming}
+
+\subsection{Why LabVIEW for Instrumentation?}
+
+LabVIEW is the dominant software tool in instrumentation and test engineering for several reasons:
+
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Native hardware integration.} LabVIEW is designed to communicate directly with NI data acquisition (DAQ) hardware. The DAQmx driver library provides a standardized interface to hundreds of NI devices, including the NI~USB-6001 used in MEGN~300.
+\item \textbf{Built-in signal processing.} LabVIEW ships with libraries for FFT, filtering, statistics, curve fitting, and PID control---the same operations covered in Chapters~\ref{ch:fourier}--\ref{ch:digital_filters} and \ref{ch:pid} of this text.
+\item \textbf{Real-time visualization.} Waveform charts, graphs, and indicators update live during acquisition, enabling real-time monitoring that would require significant additional code in a text-based language.
+\item \textbf{Industry standard.} LabVIEW is used across aerospace, automotive, semiconductor, and energy industries for production test, structural health monitoring, and process control.
+\end{enumerate}
+
+\begin{industrybox}[LabVIEW in Professional Practice]
+LabVIEW is used in environments ranging from Formula~1 telemetry systems to particle accelerator controls at CERN. In manufacturing, LabVIEW-based test systems validate millions of devices daily. Learning LabVIEW in MEGN~300 gives you a directly transferable skill for co-ops, internships, and careers in test and measurement engineering.
+\end{industrybox}
+
+\subsection{Virtual Instruments (VIs)}
+\index{VI (Virtual Instrument)}\index{Front Panel}\index{Block Diagram}
+
+Every LabVIEW program is called a \textbf{Virtual Instrument (VI)} because it models the appearance and function of a physical instrument. Each VI has two paired windows:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Front Panel}: the user interface. You place \textbf{controls} (knobs, sliders, text inputs) for user input and \textbf{indicators} (charts, gauges, numeric displays) for output. The Front Panel is what the operator sees and interacts with while the VI runs.
+\item \textbf{Block Diagram}: the source code. You place function nodes, structures (loops, cases), and wire them together. Every control on the Front Panel has a corresponding terminal on the Block Diagram; every indicator has a corresponding terminal that receives data.
+\end{itemize}
+
+\begin{keyconceptbox}[The Dataflow Principle]
+In LabVIEW, \emph{wires determine execution order, not line numbers}. A node executes when---and only when---all of its input wires have data. This means:
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item Two nodes with no wire connection between them may execute in \emph{any order} or \emph{simultaneously}.
+\item To force sequential execution, use the \textbf{error wire}: thread it from one node's ``error out'' to the next node's ``error in.''
+\item Broken wires (shown as dashed lines with an ``X'') prevent the VI from running. You must fix all broken wires before execution.
+\end{itemize}
+\end{keyconceptbox}
+
+\subsection{The Connector Pane and SubVIs}
+\index{SubVI}\index{connector pane}
+
+A VI can be used as a building block inside another VI---this is called a \textbf{SubVI}, analogous to a function call in text-based programming. The \textbf{connector pane} (the small icon grid in the upper-right corner of the Front Panel) defines which controls and indicators become inputs and outputs of the SubVI. Good LabVIEW practice involves decomposing complex programs into reusable SubVIs, just as good C programming uses functions.
+
+%% ================================================================
+\section{Setting Up Your First VI}
+\label{sec:lv_firstvi}
+%% ================================================================
+
+This section walks through building a minimal VI from scratch. The goal is to produce a VI that generates a simulated sine wave, displays it on a chart, and allows the user to adjust the frequency with a knob.
+
+\subsection{Step-by-Step Walkthrough}
+
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Create a new VI.} Launch LabVIEW. Select \texttt{File $\to$ New VI}. Two windows open: the Front Panel (gray background) and the Block Diagram (white background).
+
+\item \textbf{Add controls to the Front Panel.} Right-click on the Front Panel to open the Controls palette. Navigate to \texttt{Numeric $\to$ Knob}. Place a knob and label it ``Frequency (Hz).'' Add a second control: \texttt{Numeric $\to$ Numeric Control}, label it ``Amplitude.''
+
+\item \textbf{Add an indicator.} From the Controls palette, select \texttt{Graph $\to$ Waveform Chart}. Place it on the Front Panel. This is your real-time display.
+
+\item \textbf{Switch to the Block Diagram.} Press \texttt{Ctrl+E} to toggle between Front Panel and Block Diagram. You will see terminal icons for each control and indicator you placed.
+
+\item \textbf{Add a While Loop.} Right-click the Block Diagram to open the Functions palette. Navigate to \texttt{Structures $\to$ While Loop}. Draw a rectangle around the area where you will place your code. The While Loop has two terminals: the \textbf{iteration counter} (\texttt{i}) and the \textbf{conditional terminal} (a red circle that must receive a Boolean to stop the loop).
+
+\item \textbf{Add a Stop button.} On the Front Panel, add a \texttt{Boolean $\to$ Stop Button}. On the Block Diagram, wire it to the While Loop's conditional terminal.
+
+\item \textbf{Generate the sine wave.} On the Block Diagram, from the Functions palette: \texttt{Signal Processing $\to$ Waveform Generation $\to$ Simulate Signal}. Place it inside the While Loop. Wire the Frequency control to the frequency input and the Amplitude control to the amplitude input.
+
+\item \textbf{Wire to the chart.} Wire the output of the Simulate Signal VI to the Waveform Chart terminal inside the loop.
+
+\item \textbf{Add timing.} From the Functions palette: \texttt{Timing $\to$ Wait (ms)}. Place it inside the While Loop. Wire a constant of 50 (for a 20\,Hz loop rate) to its input.
+
+\item \textbf{Run the VI.} Click the Run arrow (white triangle) on the toolbar. Adjust the Frequency knob and watch the chart update in real time. Press the Stop button to exit.
+
+\item \textbf{Save.} \texttt{File $\to$ Save As}. Use a descriptive name (e.g., \texttt{SineWaveGenerator.vi}). Save in your project folder.
+\end{enumerate}
+
+\begin{tipbox}[Keyboard Shortcuts You Will Use Constantly]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \texttt{Ctrl+E}: toggle Front Panel / Block Diagram.
+\item \texttt{Ctrl+B}: remove all broken wires (cleans up the diagram).
+\item \texttt{Ctrl+H}: toggle Context Help window (shows documentation for whatever your cursor hovers over).
+\item \texttt{Ctrl+Z}: undo (works on the Block Diagram).
+\item \texttt{Ctrl+R}: run the VI.
+\end{itemize}
+\end{tipbox}
+
+%% ================================================================
+\section{The DAQ Hardware Interface}
+\label{sec:lv_daq_hw}
+%% ================================================================
+\index{NI MAX}\index{DAQ!configuration}\index{Test Panels}
+
+Before writing any LabVIEW code that reads from hardware, you must verify that the operating system recognizes the DAQ device and that the device is functioning correctly.
+
+\subsection{NI MAX Setup and Verification}
+
+\textbf{NI MAX} (Measurement \& Automation Explorer) is a standalone utility installed with the NI driver package. It is your first stop for hardware configuration and testing.
+
+\begin{enumerate}[leftmargin=1.5em]
+\item Open NI~MAX (Start Menu $\to$ NI~MAX, or type ``MAX'' in the search bar).
+\item Expand \texttt{Devices and Interfaces} in the left panel. Your NI~USB-6001 should appear (e.g., ``Dev1 (USB-6001)'').
+\item If the device does not appear: check the USB cable, try a different USB port, reinstall the NI-DAQmx driver.
+\item Right-click the device $\to$ \texttt{Self-Test}. This runs a hardware diagnostic. A green checkmark means the device is operational.
+\item Right-click the device $\to$ \texttt{Test Panels}. This opens a tabbed interface where you can read analog inputs, write analog outputs, and toggle digital I/O \emph{without writing any LabVIEW code}.
+\end{enumerate}
+
+\begin{warningbox}[Always Use Test Panels First]
+Before debugging a LabVIEW VI, verify that the DAQ reads the correct voltage in NI~MAX Test Panels. If Test Panels shows a wrong reading, the problem is hardware (wiring, sensor, or DAQ configuration), not your LabVIEW code. This single check eliminates half of all debugging time.
+\end{warningbox}
+
+\subsection{Channel Configuration}
+\index{RSE}\index{differential}\index{terminal configuration}
+
+When configuring an analog input channel, you must specify the \textbf{terminal configuration}:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Differential (Diff)}: measures the voltage between two input terminals (AI+ and AI$-$). Rejects common-mode noise. Use this for bridge circuits, low-level sensors (thermocouples), and any measurement where noise rejection matters. The NI~USB-6001 provides 4 differential channels.
+\item \textbf{Referenced Single-Ended (RSE)}: measures the voltage between one input terminal and the device ground (AI~GND). Provides 8 channels but is susceptible to ground loops and common-mode noise. Use only for high-level signals ($>$1\,V) with a clean, shared ground.
+\end{itemize}
+
+\begin{warningbox}[RSE vs.\ Differential: The Most Common Configuration Mistake]
+Using RSE mode when Differential is required is one of the six most common mistakes in MEGN~300 labs. RSE introduces ground loop errors and doubles the noise floor for low-level sensor signals. \textbf{Default to Differential mode} unless you have a specific reason to use RSE and have verified that noise is acceptable.
+\end{warningbox}
+
+\subsection{DAQ Assistant vs.\ DAQmx VIs}
+\index{DAQ Assistant}\index{DAQmx}
+
+LabVIEW offers two approaches to DAQ programming:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{DAQ Assistant Express VI}: an interactive configuration dialog that generates a pre-configured task. Quick for simple measurements, but inflexible---changing parameters requires re-opening the dialog, and it hides the underlying structure.
+\item \textbf{DAQmx VIs}: individual function blocks (Create Channel, Timing, Start, Read, Stop, Clear) that you wire together explicitly. This approach is \textbf{required for MEGN~300} because it gives you full control over every parameter and makes the data acquisition process transparent.
+\end{itemize}
+
+\begin{tipbox}[Use DAQmx VIs, Not the DAQ Assistant]
+The DAQ Assistant is convenient for quick tests, but it obscures the acquisition pipeline and makes debugging difficult. All MEGN~300 labs require the explicit DAQmx programming pattern described in the next section. Learning this pattern once gives you the skill to configure any NI device.
+\end{tipbox}
+
+%% ================================================================
+\section{The DAQmx Programming Pattern}
+\label{sec:lv_daqmx_pattern}
+%% ================================================================
+\index{DAQmx!programming pattern}\index{DAQmx!Create Channel}\index{DAQmx!Timing}\index{DAQmx!Start Task}\index{DAQmx!Read}\index{DAQmx!Stop Task}\index{DAQmx!Clear Task}
+
+The DAQmx programming pattern is the single most important LabVIEW pattern in MEGN~300. Every VI that reads from or writes to the NI~DAQ must follow this five-step sequence. Memorize it.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    stepnode/.style={draw=MinesBlue, fill=LightBG, thick, rounded corners=3pt,
+                 minimum width=3.0cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
+    loop/.style={draw=AccentTeal, fill=AccentTeal!8, thick, rounded corners=3pt,
+                 minimum width=3.0cm, minimum height=1.0cm, align=center, font=\scriptsize\sffamily\bfseries},
+    arr/.style={-{Stealth[length=2.5mm]}, thick, MinesBlue},
+    note/.style={font=\tiny\sffamily\itshape, text=MinesSilver, align=left, anchor=west},
+]
+\node[stepnode] (create) at (0,0) {DAQmx\\Create Channel};
+\node[stepnode] (timing) at (0,-1.8) {DAQmx Timing};
+\node[stepnode] (start) at (0,-3.6) {DAQmx Start Task};
+\node[loop] (read) at (0,-5.4) {DAQmx Read\\(inside While Loop)};
+\node[stepnode] (stop) at (0,-7.2) {DAQmx Stop Task};
+\node[stepnode] (clear) at (0,-9.0) {DAQmx Clear Task};
+
+\draw[arr] (create) -- (timing);
+\draw[arr] (timing) -- (start);
+\draw[arr] (start) -- (read);
+\draw[arr] (read) -- (stop);
+\draw[arr] (stop) -- (clear);
+
+% Loop indicator
+\draw[AccentTeal, thick, dashed, rounded corners=5pt] (-2,-4.8) rectangle (2,-6.0);
+\node[font=\tiny\sffamily\bfseries, AccentTeal] at (1.5,-4.6) {While Loop};
+
+% Notes
+\node[note] at (2.2,0) {Channel type, physical channel,\\terminal config (Diff or RSE)};
+\node[note] at (2.2,-1.8) {Sample rate, samples/channel,\\continuous vs.\ finite};
+\node[note] at (2.2,-3.6) {Arms the acquisition\\(call once, outside loop)};
+\node[note] at (2.2,-5.4) {Read data each iteration\\Process, display, log here};
+\node[note] at (2.2,-7.2) {Stop acquisition\\(after loop exits)};
+\node[note] at (2.2,-9.0) {Release hardware resource\\(\textbf{omitting this = ``resource reserved''})};
+
+% Error wire
+\draw[WarnOrange, thick, decorate, decoration={snake, amplitude=1pt, segment length=5pt}]
+    (1.5,-0.4) -- (1.5,-8.6);
+\node[font=\tiny\sffamily\bfseries, WarnOrange, rotate=90, anchor=south] at (1.8,-4.5) {Error wire (thread all VIs)};
+\end{tikzpicture}
+\caption{The standard DAQmx programming pattern for MEGN~300. Every LabVIEW VI that reads from the NI~DAQ should follow this sequence. The error wire (orange) must connect through every VI to ensure proper cleanup on failure.}
+\label{fig:daqmx_pattern_ch}
+\end{figure}
+
+\subsection{Step 1: Create Virtual Channel}
+
+The \texttt{DAQmx Create Virtual Channel} VI defines what you are measuring. Key parameters:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Physical channel}: the hardware terminal (e.g., \texttt{Dev1/ai0}).
+\item \textbf{Measurement type}: voltage, temperature, strain, etc.
+\item \textbf{Terminal configuration}: Differential or RSE (see Section~\ref{sec:lv_daq_hw}).
+\item \textbf{Input range}: minimum and maximum expected voltage. Set this as tight as possible around your actual signal to maximize ADC resolution. For a 0--5\,V sensor, use a range of $-1$ to $+6$\,V (with some margin), not $\pm$10\,V.
+\end{itemize}
+
+\begin{tipbox}[Input Range Affects Resolution]
+The NI~USB-6001 has a 14-bit ADC. With a $\pm$10\,V range, the resolution (LSB) is $20\,\text{V}/2^{14} = 1.22$\,mV. With a $\pm$1\,V range (if supported by your device), the resolution improves to $2\,\text{V}/2^{14} = 0.122$\,mV. Always set the input range to match your actual signal swing.
+\end{tipbox}
+
+\subsection{Step 2: Timing}
+
+The \texttt{DAQmx Timing} VI configures how fast and how many samples are acquired:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Sample rate} (samples/second): how fast the ADC converts. Must satisfy the Nyquist criterion: $f_s > 2 f_{\max}$; in practice, use $f_s \geq 10 f_{\max}$ (see Chapter~\ref{ch:analog_digital}).
+\item \textbf{Samples per channel}: how many samples to read per DAQmx~Read call.
+\item \textbf{Sample mode}: \texttt{Continuous} (keeps acquiring until stopped; used with a While Loop) or \texttt{Finite} (acquires a fixed number of samples and stops).
+\end{itemize}
+
+\subsection{Step 3: Start Task}
+
+\texttt{DAQmx Start Task} arms the hardware and begins acquisition. This VI is called \emph{once}, \textbf{outside} the While Loop. Placing it inside the loop restarts the acquisition on every iteration, which is incorrect and causes data loss.
+
+\subsection{Step 4: Read (Inside the Loop)}
+
+\texttt{DAQmx Read} retrieves data from the hardware buffer. It is placed \emph{inside} the While Loop. Each iteration reads one batch of samples. After reading, you process the data (apply calibration, filter, compute statistics), display it on charts or graphs, and optionally log it to a file.
+
+The polymorphic selector on the DAQmx~Read VI determines the output data type. Common choices:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Analog $\to$ DBL $\to$ 1 Channel $\to$ 1 Sample}: returns a single scalar value. Simplest option for one sensor at low rates.
+\item \textbf{Analog $\to$ DBL $\to$ 1 Channel $\to$ N Samples}: returns a 1-D array of $N$ samples from one channel.
+\item \textbf{Analog $\to$ Wfm $\to$ 1 Channel $\to$ N Samples}: returns a waveform data type (includes timing metadata). Use this when feeding data to FFT or filter VIs.
+\end{itemize}
+
+\subsection{Step 5: Stop and Clear}
+
+After the While Loop exits:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \texttt{DAQmx Stop Task}: halts the acquisition.
+\item \texttt{DAQmx Clear Task}: releases the hardware resource. \textbf{If you omit Clear Task, the DAQ remains locked, and the next run of any VI that uses that device will fail with a ``resource reserved'' error.} This is the second most common mistake in MEGN~300 labs.
+\end{itemize}
+
+\subsection{The Error Wire}
+\index{error wire}\index{error cluster}
+
+The orange error wire is not optional. Thread it through every DAQmx VI in sequence: Create Channel $\to$ Timing $\to$ Start $\to$ Read (loop) $\to$ Stop $\to$ Clear. The error wire serves two purposes:
+
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item \textbf{Enforces execution order.} Without the error wire, LabVIEW's dataflow engine might execute Stop before Read, or Clear before Stop.
+\item \textbf{Propagates errors.} If any step fails, the error propagates downstream. Each subsequent VI checks the error input and skips execution if an error is present, preventing cascading failures. Wire the final error output to a \texttt{Simple Error Handler} VI to display a diagnostic message.
+\end{enumerate}
+
+\begin{keyconceptbox}[The DAQmx Pattern Is Non-Negotiable]
+Every DAQ-based VI in MEGN~300 must follow the five-step pattern:
+\begin{center}
+\textbf{Create Channel} $\to$ \textbf{Timing} $\to$ \textbf{Start} $\to$ \textbf{Read Loop} $\to$ \textbf{Stop + Clear}
+\end{center}
+with the error wire connecting all steps. Deviations from this pattern are the root cause of the majority of DAQ-related bugs. When in doubt, return to Figure~\ref{fig:daqmx_pattern_ch}.
+\end{keyconceptbox}
+
+%% ================================================================
+\section{Data Collection and Real-Time Display}
+\label{sec:lv_display}
+%% ================================================================
+\index{While Loop}\index{Waveform Chart}\index{Waveform Graph}\index{XY Graph}
+
+\subsection{While Loop Fundamentals}
+
+The While Loop is the fundamental execution structure for continuous data acquisition. It repeats the code inside it until the conditional terminal receives a \texttt{True} value (from a Stop button or an error condition). Key properties:
+
+\begin{itemize}[leftmargin=1.5em]
+\item The While Loop always executes \emph{at least once} (it checks the stop condition at the end of each iteration, like a do-while loop in C).
+\item The iteration terminal (\texttt{i}) provides a zero-based count of completed iterations.
+\item Tunnels on the loop boundary pass data in and out. Data wired from outside the loop enters on the first iteration and is available every iteration. Data leaving through a tunnel is available only after the loop stops.
+\end{itemize}
+
+\subsection{Waveform Chart vs.\ Waveform Graph}
+
+This distinction is one of the most commonly confused topics in LabVIEW. Getting it wrong produces confusing displays.
+
+\begin{keyconceptbox}[Chart vs.\ Graph: Know the Difference]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Waveform Chart}: accepts a \emph{single point or small batch} each iteration and appends it to a scrolling history buffer. Use it \textbf{inside the While Loop} for real-time, streaming display. The chart maintains its own internal history (configurable length).
+\item \textbf{Waveform Graph}: accepts an \emph{entire array} and plots it all at once. Use it \textbf{outside the While Loop} (or to display a complete acquired dataset). Wiring an array to a Graph inside a loop redraws the entire plot every iteration, which is correct only if the array is the complete dataset up to that point.
+\end{itemize}
+\textbf{Rule of thumb}: Chart for live streaming; Graph for completed datasets.
+\end{keyconceptbox}
+
+\subsection{Configuring Chart Properties}
+
+Right-click the Waveform Chart to access its properties:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Chart History Length}: the number of points the chart retains. Default is 1024. For a 10\,Hz loop, this gives about 100 seconds of visible data. Increase to 10{,}000 or more for long experiments.
+\item \textbf{Scale}: right-click an axis $\to$ Properties to set auto-scaling (convenient) or manual scaling (necessary for fixed-range displays like a PID setpoint overlay).
+\item \textbf{Multiple Plots}: to display multiple signals (e.g., setpoint and process variable), wire a \texttt{Bundle} function to combine two scalars into a cluster, then wire the cluster to the Chart. Each element becomes a separate plot trace.
+\end{itemize}
+
+\subsection{XY Graph for Calibration Curves}
+\index{XY Graph}\index{calibration curve}
+
+The XY Graph plots arbitrary $x$-$y$ data pairs. Use it for:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Calibration curves}: plot sensor output (voltage) vs.\ known reference value (temperature, pressure).
+\item \textbf{Hysteresis plots}: plot output vs.\ input during increasing and decreasing sweeps.
+\item \textbf{Lissajous figures}: plot one channel vs.\ another for phase relationship visualization.
+\end{itemize}
+
+Wire a cluster of two arrays (X data, Y data) created with \texttt{Bundle} to the XY Graph terminal.
+
+%% ================================================================
+\section{Shift Registers and State Management}
+\label{sec:lv_shift_reg}
+%% ================================================================
+\index{shift register}\index{state management}
+
+A \textbf{shift register} passes data from one loop iteration to the next. Without shift registers, each iteration of a While Loop starts with no memory of previous iterations.
+
+\subsection{Creating Shift Registers}
+
+Right-click the left or right border of the While Loop $\to$ \texttt{Add Shift Register}. A pair of terminals appears: one on the right border (where you write the value at the end of the current iteration) and one on the left border (where you read the value from the previous iteration). Wire the initial value to the left terminal from outside the loop.
+
+\subsection{Use Cases in MEGN~300}
+
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Running average}: accumulate a sum in one shift register and a count in another. Divide each iteration to get the running mean. Alternatively, maintain a circular buffer array in a shift register for a sliding-window average.
+
+\item \textbf{PID integral accumulation}: the integral term of a PID controller sums $e(t) \cdot \Delta t$ across iterations. The running sum must persist between iterations via a shift register. The built-in PID.vi handles this internally, but if you implement PID manually, you need a shift register for the integral state.
+
+\item \textbf{Previous-value storage for derivatives}: the derivative term requires the error from the previous iteration: $dE/dt \approx (e[k] - e[k-1])/\Delta t$. Store $e[k-1]$ in a shift register.
+
+\item \textbf{Event counting}: count the number of times a threshold is crossed (e.g., counting revolutions from an encoder pulse).
+\end{enumerate}
+
+\subsection{Initialized vs.\ Uninitialized Shift Registers}
+\index{shift register!uninitialized}
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Initialized}: wire a constant or control to the left terminal from outside the loop. The shift register starts with this value on the first iteration. \textbf{Always initialize your shift registers} unless you have a specific reason not to.
+\item \textbf{Uninitialized}: leave the left terminal unwired. The shift register retains the value from the \emph{previous run of the VI}. This is occasionally useful (e.g., retaining a calibration offset between runs) but is usually a bug source---if you stop and restart the VI, the shift register starts with whatever value it had when the VI last stopped, which may not be what you expect.
+\end{itemize}
+
+\begin{warningbox}[Uninitialized Shift Registers Are a Common Bug Source]
+If your VI produces correct results the first time but wrong results on subsequent runs (without restarting LabVIEW), check for uninitialized shift registers. The accumulated value from the previous run carries over, corrupting your data. Always initialize shift registers to zero (or the appropriate starting value) by wiring a constant to the left terminal.
+\end{warningbox}
+
+%% ================================================================
+\section{Saving Data to Files}
+\label{sec:lv_file_io}
+%% ================================================================
+\index{file I/O}\index{TDMS}\index{CSV}\index{Write to Measurement File}\index{data logging}
+
+\subsection{File I/O Methods}
+
+LabVIEW provides several approaches for saving acquired data:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Write to Measurement File (Express VI)}: the simplest option. Accepts waveform data and writes to TDMS or text format. Configure the file path, format, and write mode (``Append to file'' for continuous logging) in its dialog.
+\item \textbf{Write to Spreadsheet File}: writes a 2-D array of numbers to a tab-delimited or comma-separated text file. More flexible but requires you to build the data array manually.
+\item \textbf{TDMS File Functions}: NI's native binary format. Compact, fast, and self-documenting (stores channel names, units, and timestamps as metadata). Recommended for large datasets; can be opened in Excel with a plugin or read back into LabVIEW.
+\end{itemize}
+
+\subsection{File Format Selection}
+
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\textwidth}{l X l}
+\toprule
+\textbf{Format} & \textbf{When to Use} & \textbf{Opens In} \\
+\midrule
+TDMS & Large datasets, high-speed acquisition, metadata needed & LabVIEW, DIAdem, Excel (plugin) \\
+CSV & Sharing with MATLAB, Python, Excel; small datasets & Any spreadsheet or text editor \\
+Tab-delimited & Same as CSV; default for Write to Spreadsheet File & Any spreadsheet or text editor \\
+\bottomrule
+\end{tabularx}
+\caption{File format selection guide for LabVIEW data logging.}
+\end{table}
+
+\subsection{Best Practices for Data Logging}
+
+\begin{keyconceptbox}[Log Inside the Loop, Not After]
+Write each data point (or batch of points) to the file \textbf{inside} the While Loop. Do not accumulate data in arrays and write to a file after the loop exits. If LabVIEW crashes, the power goes out, or you accidentally press Stop, you lose \emph{all} data that was only stored in memory. Logging inside the loop guarantees that every acquired data point is saved to disk immediately.
+\end{keyconceptbox}
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{Always include timestamps.} Every data row should include a timestamp (use the \texttt{Get Date/Time String} VI or the waveform's built-in $t_0$ field). Data without timestamps is almost impossible to correlate with lab events.
+\item \textbf{Use descriptive file names.} Include the experiment name, date, and run number in the file name (e.g., \texttt{PID\_TuningTest\_2026-03-15\_Run03.csv}). Do not use \texttt{data.csv}---you will overwrite previous data.
+\item \textbf{Specify an absolute file path.} Use the \texttt{File Path Control} on the Front Panel or build a path with the \texttt{Build Path} function. Avoid writing to the LabVIEW installation directory.
+\item \textbf{Set ``Append to file'' mode} for continuous logging so that each loop iteration adds to the file rather than overwriting it.
+\end{itemize}
+
+\begin{warningbox}[Do Not Accumulate Data in Memory]
+A common mistake is to use \texttt{Build Array} inside the While Loop to grow an array with each new data point, then write the entire array to a file after the loop exits. This approach: (1) consumes increasing memory (the array grows every iteration), (2) slows the loop as the array gets larger, and (3) risks total data loss if the VI stops unexpectedly. Log to disk inside the loop instead.
+\end{warningbox}
+
+%% ================================================================
+\section{Timing and Loop Control}
+\label{sec:lv_timing}
+%% ================================================================
+\index{Wait (ms)}\index{loop timing}\index{loop rate}
+
+\subsection{The Wait (ms) Function}
+
+The \texttt{Wait (ms)} function pauses execution for a specified number of milliseconds. Place it inside the While Loop to control the loop iteration rate.
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item For a 10\,Hz loop: wire a constant of 100 (ms) to the Wait input.
+\item For a 100\,Hz loop: wire a constant of 10 (ms).
+\item For a 1\,Hz loop (slow monitoring): wire a constant of 1000 (ms).
+\end{itemize}
+
+\begin{warningbox}[Every While Loop Must Have Timing]
+A While Loop without a Wait function runs as fast as the processor allows---potentially millions of iterations per second. This: (1)~consumes 100\% of one CPU core, (2)~overwhelms the DAQ buffer, (3)~fills log files at enormous rates, and (4)~makes the Front Panel unresponsive. \textbf{Always include a Wait (ms) function} inside every While Loop.
+\end{warningbox}
+
+\subsection{Loop Rate vs.\ Sample Rate}
+\index{sample rate}\index{loop rate}
+
+The \textbf{loop rate} and the \textbf{DAQ sample rate} are not the same thing:
+
+\begin{itemize}[leftmargin=1.5em]
+\item The \textbf{DAQ sample rate} is set by DAQmx Timing (e.g., 1000\,S/s). This is the rate at which the ADC converts analog signals to digital values. It is controlled by the hardware clock and is precise.
+\item The \textbf{loop rate} is controlled by the Wait (ms) function (e.g., 100\,ms = 10\,Hz). This is the rate at which your LabVIEW code processes, displays, and logs batches of samples.
+\item If the DAQ samples at 1000\,S/s and your loop runs at 10\,Hz, each DAQmx~Read returns $1000/10 = 100$ samples per iteration.
+\end{itemize}
+
+\begin{tipbox}[Choosing Loop Rate for PID Control]
+For PID control, the loop rate determines $\Delta t$ in the integral and derivative calculations. A consistent, controlled loop period is essential. Use 50--200\,ms (5--20\,Hz) for thermal systems, 10--50\,ms (20--100\,Hz) for motor speed control. The loop rate must be fast enough to respond to process dynamics but slow enough to allow reliable sensor reads and actuator writes.
+\end{tipbox}
+
+\subsection{Elapsed Time VI}
+\index{Elapsed Time}
+
+The \texttt{Elapsed Time} Express VI measures the time elapsed since it was first called (or since its reset input was triggered). Use it for:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item Running experiments for a fixed duration (wire the elapsed time to a comparison with the desired run time, and use the result to stop the loop).
+\item Timestamping data points relative to the start of acquisition.
+\end{itemize}
+
+%% ================================================================
+\section{Essential Signal Processing VIs}
+\label{sec:lv_signal_proc}
+%% ================================================================
+\index{FFT!LabVIEW}\index{filter!LabVIEW}\index{signal processing!LabVIEW VIs}
+
+LabVIEW includes an extensive signal processing library. The table below lists the VIs most commonly used in MEGN~300, organized by their location in the Functions palette, along with the course chapter where the underlying theory is covered.
+
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\textwidth}{l X l l}
+\toprule
+\textbf{VI / Function} & \textbf{Purpose} & \textbf{Palette Location} & \textbf{MRD Ch.} \\
+\midrule
+FFT Power Spectrum & Single-sided amplitude or power spectrum & Signal Proc.\ $\to$ Spectral & 9--10 \\
+Filter (Express VI) & Interactive LP/HP/BP/notch filter design & Signal Proc.\ $\to$ Filters & 12--13 \\
+IIR/FIR Filter Design & Programmatic filter with full parameter control & Signal Proc.\ $\to$ Filters & 13 \\
+Mean / Std Dev & Basic statistics on a waveform or array & Mathematics $\to$ Probability & 5 \\
+Curve Fit & Polynomial or custom equation fit to data & Mathematics $\to$ Fitting & 2 \\
+Histogram & Distribution visualization and bin counting & Mathematics $\to$ Probability & 5 \\
+PID (autotuning) & PID controller with autotuning option & Control Design $\to$ PID & 18--20 \\
+Waveform Chart & Real-time scrolling display (indicator) & Graph Indicators & --- \\
+XY Graph & Plot arbitrary $x$ vs.\ $y$ data & Graph Indicators & --- \\
+Build Array / Index & Construct and access array elements & Array Functions & --- \\
+Bundle / Unbundle & Group multiple data types into a cluster & Cluster Functions & --- \\
+\bottomrule
+\end{tabularx}
+\caption{Essential LabVIEW VIs for MEGN~300 with palette locations and corresponding MRD chapters.}
+\label{tab:lv_essential_vis}
+\end{table}
+
+\subsection{Connecting LabVIEW Signal Processing to Course Theory}
+
+The signal processing VIs in LabVIEW are direct implementations of the theory covered in earlier chapters:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{FFT Power Spectrum} implements the Discrete Fourier Transform from Chapter~\ref{ch:fft}. When you set the number of points and window type in the VI, you are making the same decisions described in Section~10.3 (choosing $N$, $f_s$, and the window function).
+\item \textbf{Filter Express VI} and the \textbf{IIR/FIR Filter Design VIs} implement the digital filters from Chapter~\ref{ch:digital_filters}. You select Butterworth, Chebyshev, or Bessel response, set the cutoff frequency and order, and the VI applies the filter to your data in real time.
+\item \textbf{Curve Fit} performs the least-squares regression described in Chapter~\ref{ch:static} for calibration. Wire your reference values and sensor outputs, select the polynomial order, and the VI returns the coefficients and goodness-of-fit metrics.
+\end{itemize}
+
+\begin{tipbox}[FFT in LabVIEW: The Three Decisions]
+Before using the FFT Power Spectrum VI, make three decisions (see Chapter~\ref{ch:fft}):
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item \textbf{Sampling rate} $f_s$: set in DAQmx Timing. Use $f_s \geq 10 f_{\max}$.
+\item \textbf{Number of points} $N$: determines frequency resolution $\Delta f = f_s / N$. Use a power of 2.
+\item \textbf{Window}: Hanning for general analysis; Flat-Top for amplitude accuracy; Rectangular only for perfectly periodic signals in the window.
+\end{enumerate}
+\end{tipbox}
+
+%% ================================================================
+\section{Building a PID Controller in LabVIEW}
+\label{sec:lv_pid}
+%% ================================================================
+\index{PID!LabVIEW implementation}\index{PID.vi}
+
+LabVIEW provides a built-in \texttt{PID.vi} in the Control Design toolkit. This VI implements the standard parallel-form PID algorithm with anti-windup. Understanding its wiring pattern is essential for the control systems labs.
+
+\subsection{PID.vi Inputs and Outputs}
+
+\textbf{Inputs}:
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Setpoint (SP)}: the desired process value (Front Panel control).
+\item \textbf{Process Variable (PV)}: the measured value from the DAQ.
+\item \textbf{PID Gains}: a cluster of $K_p$, $K_i$, $K_d$ (Front Panel controls for real-time tuning).
+\item \textbf{Output range}: minimum and maximum allowable control output (prevents integral windup by clamping the output).
+\item \textbf{dt}: the loop period in seconds (must match your actual loop timing).
+\end{itemize}
+
+\textbf{Outputs}:
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Output}: the control signal to send to the actuator.
+\item \textbf{P, I, D components}: individual contributions for debugging (display these on separate indicators to see which term dominates).
+\end{itemize}
+
+\subsection{Implementation Pattern}
+
+\begin{enumerate}[leftmargin=1.5em]
+\item Read the process variable from the DAQ (DAQmx Read, inside the While Loop).
+\item Wire the setpoint (from a Front Panel control) and the PV to the PID.vi inputs.
+\item Wire the PID output to the actuator via DAQmx~Write (analog output for motor speed, or digital output with PWM for SSR duty cycle).
+\item Place PID.vi inside the While Loop with a consistent, controlled loop rate (e.g., 100\,ms Wait).
+\item Add Front Panel controls for $K_p$, $K_i$, $K_d$ so you can tune in real time without stopping the VI.
+\item Add a Waveform Chart showing setpoint, PV, and control output vs.\ time. Use \texttt{Bundle} to combine the three scalars into a cluster and wire to the Chart.
+\end{enumerate}
+
+\begin{examplebox}[PID Temperature Controller Wiring]
+For the ThermoRig temperature control lab:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item DAQmx Read (1 Channel, 1 Sample, DBL) reads the thermocouple voltage from \texttt{Dev1/ai0}.
+\item Apply the calibration equation: $T = m \cdot V + b$ (from your static calibration in Chapter~\ref{ch:static}).
+\item Wire $T$ to the PV input of PID.vi. Wire the setpoint control (e.g., 60\,\degC{}).
+\item Wire the PID output (0--100\%) to a DAQmx~Write (analog output) that controls the SSR duty cycle for the heater.
+\item Set the loop Wait to 100\,ms. Set the PID dt input to 0.1\,s.
+\item Start with $K_p = 5$, $K_i = 0.1$, $K_d = 0$. Tune following the procedure in Chapter~\ref{ch:pid}, Section~20.4.
+\end{enumerate}
+\end{examplebox}
+
+\begin{warningbox}[PID dt Must Match Loop Period]
+The PID.vi uses the dt input to scale the integral and derivative calculations. If your loop runs at 100\,ms but you wire dt = 1.0\,s, the integral accumulates 10$\times$ too slowly and the derivative responds 10$\times$ too weakly. Always verify that your dt input matches your actual loop Wait value. If using the Wait (ms) function with 100\,ms, wire dt = 0.1 to the PID.vi.
+\end{warningbox}
+
+%% ================================================================
+\section{Connecting LabVIEW to the Course Text}
+\label{sec:lv_course_map}
+%% ================================================================
+
+LabVIEW is the software thread that runs through every topic in this course. The table below maps each group of chapters to specific LabVIEW capabilities used in the corresponding labs.
+
+\begin{table}[htbp]\centering\small
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{MRD Chapters} & \textbf{Topic} & \textbf{LabVIEW Application} \\
+\midrule
+1--5 & Measurement fundamentals, statistics & Data acquisition with DAQmx, statistical VIs (mean, std dev), calibration curve fitting, uncertainty visualization \\
+6 & Sensors and actuators & Sensor interfacing via analog/digital I/O, actuator control via DAQmx Write, sensor characterization VIs \\
+7--8 & ADC, SNR & DAQ channel configuration (range, terminal mode), SNR measurement from acquired data \\
+9--10 & Fourier analysis, FFT & FFT Power Spectrum VI, spectral analysis, windowing, frequency-domain visualization \\
+11--13 & DSP, analog and digital filters & Filter Express VI, IIR/FIR filter design, real-time digital filtering in the acquisition loop \\
+14--16 & Circuits, amplifiers, power devices & DAQ analog output for excitation, PWM generation for motor/heater control, signal conditioning verification \\
+18--20 & Control systems, PID & PID.vi, real-time tuning, setpoint/PV/output charting, closed-loop system implementation \\
+\bottomrule
+\end{tabularx}
+\caption{Mapping of MRD chapters to LabVIEW capabilities used in MEGN~300 labs.}
+\label{tab:lv_course_map}
+\end{table}
+
+\begin{keyconceptbox}[LabVIEW Implements What the Theory Describes]
+The value of this course lies in the direct connection between mathematical theory and practical implementation. When you design a Butterworth filter on paper (Chapter~\ref{ch:analog_filters}), you implement it in LabVIEW and verify it works on real data. When you derive the PID control law (Chapter~\ref{ch:pid}), you wire it in LabVIEW and tune it on a physical system. LabVIEW is not a separate subject---it is the tool that makes every other chapter tangible.
+\end{keyconceptbox}
+
+%% ================================================================
+\section{The Signal Walk Debugging Protocol}
+\label{sec:lv_signal_walk}
+%% ================================================================
+\index{Signal Walk}\index{debugging!signal walk}
+
+When your measurement or control system produces incorrect results, do \textbf{not} change code randomly. Walk the signal chain from physical input to software output, verifying each stage. This protocol is the most effective debugging technique in instrumentation engineering.
+
+\subsection{Stage 1: Verify the Raw Sensor Voltage}
+
+Disconnect the DAQ. Measure the sensor output directly with a multimeter. If the voltage is wrong here, the problem is hardware (wiring, sensor, excitation), not software. Check:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item Is the sensor powered (if it requires excitation)?
+\item Is the wiring correct (signal, ground, excitation)?
+\item Is the output in the expected range for the current measurand value?
+\end{itemize}
+
+\subsection{Stage 2: Verify the DAQ Reading}
+
+Reconnect the DAQ. In NI~MAX Test Panels, read the analog input channel. Compare to the multimeter reading. If they disagree, check:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item Channel number (are you reading the right channel?).
+\item Terminal configuration (Differential vs.\ RSE).
+\item Input range (is the signal within the configured range?).
+\item Wiring polarity (is AI+ connected to the signal and AI$-$ to the reference?).
+\end{itemize}
+
+\subsection{Stage 3: Verify the LabVIEW Data Path}
+
+Add Probes (right-click wire $\to$ Probe) at key points on the Block Diagram:
+
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item After the DAQmx Read output.
+\item After the calibration equation.
+\item After any filter.
+\item At the PID input (if applicable).
+\end{itemize}
+
+Compare each probed value to what you expect. The first point where measured does not equal expected localizes the bug to that stage.
+
+\subsection{Stage 4: Verify the Actuator Response}
+
+Bypass the PID controller. Wire a manual constant (e.g., 50\%) directly to the actuator output. Does the heater heat? Does the motor spin? If not, the problem is in the output circuit (MOSFET, SSR, wiring, power supply), not the control algorithm.
+
+\subsection{Stage 5: Close the Loop}
+
+Only after Stages 1--4 pass should you troubleshoot PID tuning. If the sensor reads correctly and the actuator responds correctly but the closed-loop system still oscillates or overshoots, the issue is the PID gains. Start by reducing $K_p$ (see Chapter~\ref{ch:pid}, Section~20.4 for the tuning procedure).
+
+\begin{keyconceptbox}[The Signal Walk Prevents the Most Common Debugging Failure]
+The most common debugging failure in instrumentation is ``poking at the code'' to fix a hardware wiring error. The Signal Walk systematically isolates each stage of the signal chain, ensuring that you identify the actual fault location before attempting a fix. Five minutes of signal walking saves hours of guessing.
+\end{keyconceptbox}
+
+\begin{tipbox}[LabVIEW-Specific Debugging Tools]
+\begin{itemize}[nosep,leftmargin=1.5em]
+\item \textbf{Highlight Execution} (light bulb icon on the toolbar): animates dataflow so you can see values moving along wires. Extremely slow, but reveals logic errors and execution order.
+\item \textbf{Probes}: right-click any wire $\to$ ``Probe'' to display its value in real time without adding indicators to the Front Panel.
+\item \textbf{Breakpoints}: right-click any node $\to$ ``Breakpoint'' to pause execution at that point. Inspect all wire values, then resume.
+\item \textbf{Error clusters}: always wire ``error in'' and ``error out'' of DAQmx VIs in series. If any step fails, downstream VIs skip execution and propagate the error message to a \texttt{Simple Error Handler} at the end.
+\end{itemize}
+\end{tipbox}
+
+%% ================================================================
+\section{Common Mistakes in MEGN~300 Labs}
+\label{sec:lv_mistakes}
+%% ================================================================
+\index{common mistakes!LabVIEW}
+
+The following six mistakes account for the vast majority of LabVIEW-related grading deductions and debugging time in MEGN~300. Eliminate all six and you avoid most lost points.
+
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{No loop timing.}\index{loop timing} The While Loop runs at maximum speed, overwhelming the DAQ buffer and producing erratic sampling rates. The CPU usage spikes to 100\%, the Front Panel becomes unresponsive, and data logging files grow at uncontrollable rates. \textbf{Fix}: always add a \texttt{Wait (ms)} function inside every While Loop.
+
+\item \textbf{DAQ task not closed.}\index{resource reserved error} Forgetting \texttt{DAQmx Clear Task} leaves the DAQ in a locked state. The next run of any VI that uses that device fails with ``resource reserved.'' \textbf{Fix}: always wire \texttt{DAQmx Stop Task} $\to$ \texttt{DAQmx Clear Task} outside the While Loop, connected via the error wire chain. If you are already locked out, open NI~MAX and reset the device, or restart LabVIEW.
+
+\item \textbf{Wrong channel configuration.}\index{RSE!incorrect use} Selecting RSE (Referenced Single-Ended) when the sensor requires Differential mode. RSE adds ground loop noise and common-mode offset errors that can be many millivolts---larger than a thermocouple signal. \textbf{Fix}: default to Differential mode for all low-level sensor measurements.
+
+\item \textbf{Waveform Chart vs.\ Waveform Graph confusion.}\index{Chart vs.\ Graph} Using a Graph inside the loop (redraws the entire array every iteration, causing flicker and incorrect display) or a Chart outside the loop (displays only the last point). \textbf{Fix}: Chart inside the loop for real-time streaming; Graph outside the loop for complete datasets.
+
+\item \textbf{Incorrect PID loop rate.}\index{PID!loop rate} The PID.vi uses dt in its integral and derivative calculations. If the loop rate varies (no timing control), the PID gains effectively change from iteration to iteration, producing erratic control behavior. \textbf{Fix}: use a consistent, controlled loop period with a Wait function, and wire the matching dt value to PID.vi.
+
+\item \textbf{Forgetting anti-aliasing.}\index{aliasing!LabVIEW} Sampling at 1\,kS/s without a hardware anti-alias filter means any noise above 500\,Hz aliases into your measurement as a false lower-frequency signal. The NI~USB-6001 has \textbf{no built-in anti-alias filter}; you must add an external RC or active filter before the analog input. \textbf{Fix}: design and install an anti-alias filter with $f_c < f_s/2$ (see Chapter~\ref{ch:analog_filters}).
+\end{enumerate}
+
+\begin{warningbox}[These Six Mistakes Cost 80\% of LabVIEW Grading Deductions]
+Every semester, the same six mistakes appear in lab submissions. They are all preventable with the patterns described in this chapter. Before submitting any LabVIEW VI, run through this checklist:
+\begin{enumerate}[nosep,leftmargin=1.5em]
+\item Does my While Loop have a Wait (ms) function?
+\item Does my VI include DAQmx Clear Task outside the loop?
+\item Am I using Differential mode for low-level sensors?
+\item Am I using a Chart (not a Graph) for real-time display inside the loop?
+\item Is my PID loop rate controlled and does dt match?
+\item Do I have an anti-alias filter before the ADC?
+\end{enumerate}
+\end{warningbox}
+
+%% ================================================================
+\section*{Chapter Summary}
+%% ================================================================
+
+This chapter covered the complete LabVIEW workflow for instrumentation:
+
+\begin{enumerate}[leftmargin=1.5em]
+\item LabVIEW uses a dataflow paradigm: wires carry data, nodes execute when inputs are available.
+\item Every LabVIEW program (VI) has a Front Panel (user interface) and Block Diagram (code).
+\item The DAQmx five-step pattern (Create Channel $\to$ Timing $\to$ Start $\to$ Read Loop $\to$ Stop/Clear) is the foundation of all hardware-based VIs.
+\item Charts display streaming data point-by-point; Graphs display complete arrays.
+\item Shift registers pass data between loop iterations for running averages, PID integration, and derivative calculations.
+\item Log data inside the loop to prevent data loss; always include timestamps.
+\item Every While Loop must include a Wait (ms) function for timing control.
+\item LabVIEW's signal processing VIs directly implement the FFT, filter, and statistical theory from earlier chapters.
+\item The PID.vi provides a complete PID controller with anti-windup; ensure dt matches the loop period.
+\item The Signal Walk debugging protocol systematically isolates faults from sensor to software.
+\end{enumerate}
+
+\begin{masterycheckbox}[LabVIEW for Instrumentation]
+Can you answer these without looking at notes?
+\begin{enumerate}[leftmargin=1.5em]
+\item What are the five steps of the DAQmx programming pattern, and why must they appear in this order?
+\item What is the difference between a Waveform Chart and a Waveform Graph? When do you use each?
+\item Why must the error wire be threaded through every DAQmx VI? What two functions does it serve?
+\item What happens if you omit DAQmx Clear Task? How do you recover?
+\item What is a shift register? Give two examples of when you would use one in a MEGN~300 lab.
+\item Why must every While Loop contain a Wait (ms) function?
+\item When should you use Differential vs.\ RSE terminal configuration?
+\item Describe the five stages of the Signal Walk debugging protocol.
+\item What three decisions must you make before using the FFT Power Spectrum VI?
+\item In the PID.vi, what happens if the dt input does not match the actual loop period?
+\item Why should you log data inside the While Loop rather than accumulating and writing after the loop?
+\item How do you display setpoint, process variable, and control output simultaneously on a single Waveform Chart?
+\end{enumerate}
+If you can explain all twelve, you have mastered the LabVIEW content for MEGN~300.
+\end{masterycheckbox}

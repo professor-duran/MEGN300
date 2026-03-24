@@ -98,13 +98,13 @@ MEGN~300 teaches you to \textbf{measure physical quantities accurately and contr
 Three documents work together:
 \begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=0pt]
     \item \textbf{This Student Guide}: quick-hit tips, common pitfalls, and FAQ for each module.
-    \item \textbf{The Master Reference Document}: deep technical content organized in five parts (Measurement Fundamentals, Signals \& Signal Processing, Electronics including debugging methodology, Control Systems, and Engineering Science Reference). Every chapter has worked ThermoRig examples, practice questions with solutions, and Requirements Mapping boxes. Consult it when you need the equations, theory, or design procedures. Start with the ``What Should I Be Reading Right Now?'' triage guide on page~2 to find exactly the section you need.
+    \item \textbf{The Master Reference Document}: deep technical content organized in six parts (Measurement Fundamentals, Signals \& Signal Processing, Electronics including debugging methodology, Control Systems, Software Tools for Instrumentation, and Engineering Science Reference). Every chapter has worked ThermoRig examples, practice questions with solutions, and Requirements Mapping boxes. Consult it when you need the equations, theory, or design procedures. Start with the ``What Should I Be Reading Right Now?'' triage guide on page~2 to find exactly the section you need.
     \item \textbf{Canvas}: assignment details, deadlines, rubrics, lab handouts, and LabVIEW starter VIs.
 \end{enumerate}
 \end{faqbox}
 
 \begin{protip}
-\textbf{The Master Reference Document has a LabVIEW appendix with a Signal Walk Debugging Protocol.} Before every lab, check the appendix for the DAQmx programming pattern, essential VIs, and the ``Common Mistakes'' checklist. Most LabVIEW grading deductions come from the six mistakes listed there.
+\textbf{The Master Reference Document has a full LabVIEW chapter (Chapter~23) with the DAQmx programming pattern and Signal Walk Debugging Protocol.} Before every lab, check Chapter~23 for the DAQmx pattern, essential VIs, and the ``Common Mistakes'' checklist. Most LabVIEW grading deductions come from the six mistakes listed there. See also the ``LabVIEW Deep Dive'' section later in this guide for quick FAQ answers.
 \end{protip}
 
 %=============================================================================
@@ -535,6 +535,51 @@ Eliminate all six and you avoid most lost points.
 \end{protip}
 
 %=============================================================================
+\section{LabVIEW Deep Dive: FAQ and Practical Tips}
+%=============================================================================
+
+\begin{faqbox}[Q: Where is the comprehensive LabVIEW reference?]
+The Master Reference Document now has a full chapter dedicated to LabVIEW: \textbf{Chapter~23: Introduction to LabVIEW for Instrumentation}. It covers everything from creating your first VI to the DAQmx programming pattern, shift registers, file I/O, signal processing VIs, PID controller implementation, and the Signal Walk debugging protocol. The old LabVIEW appendix content has been incorporated and significantly expanded.
+\end{faqbox}
+
+\begin{faqbox}[Q: What is the DAQmx programming pattern and why does it matter?]
+Every VI that reads from the NI~DAQ must follow five steps in order: (1)~Create Virtual Channel, (2)~Timing, (3)~Start Task, (4)~Read inside a While Loop, (5)~Stop Task + Clear Task. The error wire must connect through all five steps. Deviating from this pattern is the root cause of most DAQ-related bugs. See MRD Chapter~23, Section~23.4 for the complete diagram and explanation.
+\end{faqbox}
+
+\begin{warnbox}
+\textbf{The ``resource reserved'' error means you forgot DAQmx Clear Task.} This is the second most common LabVIEW mistake. When your VI stops (even abnormally), the DAQ hardware remains locked unless Clear Task executes. Always wire Clear Task outside your While Loop. If you are already locked out, reset the device in NI~MAX or restart LabVIEW. See MRD Chapter~23, Section~23.4.
+\end{warnbox}
+
+\begin{faqbox}[Q: When do I use a Waveform Chart vs.\ a Waveform Graph?]
+\textbf{Chart} = real-time streaming display. It accepts one point (or a small batch) per iteration and appends it to a scrolling history. Place it \textbf{inside} the While Loop. \textbf{Graph} = complete dataset display. It accepts an entire array and plots it all at once. Place it \textbf{outside} the While Loop (or use it to display a fully acquired dataset). Confusing the two produces flickering, incorrect, or blank displays. MRD Chapter~23, Section~23.5 has the full explanation.
+\end{faqbox}
+
+\begin{faqbox}[Q: How do I save data in LabVIEW without losing it if the VI crashes?]
+Log data \textbf{inside} the While Loop using ``Write to Measurement File'' (set to Append mode). Do not accumulate data in arrays and write after the loop---if LabVIEW crashes, you lose everything. Always include timestamps. Use descriptive file names with the date and run number. See MRD Chapter~23, Section~23.7.
+\end{faqbox}
+
+\begin{protip}
+\textbf{Before every lab, run through the Six-Mistake Checklist} (MRD Chapter~23, Section~23.13):
+\begin{enumerate}[nosep,leftmargin=*]
+\item Wait (ms) inside the While Loop?
+\item DAQmx Clear Task outside the loop?
+\item Differential mode for low-level sensors?
+\item Chart (not Graph) for real-time display inside the loop?
+\item PID loop rate controlled and dt matching?
+\item Anti-alias filter before the ADC?
+\end{enumerate}
+Eliminating these six mistakes avoids 80\% of LabVIEW grading deductions.
+\end{protip}
+
+\begin{faqbox}[Q: My system gives wrong results but the code looks right. What do I do?]
+Use the \textbf{Signal Walk debugging protocol} (MRD Chapter~23, Section~23.12). Do not change code randomly. Instead, systematically verify each stage: (1)~Check raw sensor voltage with a multimeter, (2)~Verify the DAQ reading in NI~MAX Test Panels, (3)~Add Probes to the LabVIEW Block Diagram at key points, (4)~Bypass the PID and test the actuator with a manual constant, (5)~Only then troubleshoot PID tuning. The first stage where measured does not equal expected localizes the fault.
+\end{faqbox}
+
+\begin{tipbox}
+\textbf{Use NI~MAX Test Panels before writing any LabVIEW code.} Right-click your DAQ device in NI~MAX $\to$ Test Panels. If the Test Panel reading is wrong, the problem is hardware, not software. This single check eliminates half of all debugging time.
+\end{tipbox}
+
+%=============================================================================
 \section{Design Challenge Tips}
 %=============================================================================
 
@@ -629,6 +674,7 @@ Lab practicals test both theory and hands-on skills. You may be asked to: wire a
 12--13 & Debugging & Bottom-up methodology, signal walk, integration protocol & 17 \\
 13--14 & Control Systems & Open/closed-loop, PID tuning, LabVIEW PID VI & 18--20 \\
 15 & Engineering Science & Heat transfer, fluid power (if applicable) & 21--22 \\
+--- & LabVIEW Reference & DAQmx pattern, charts/graphs, shift registers, file I/O, PID.vi, debugging & 23 \\
 16 & Integration \& Exams & Complete system design, lab practicals & All \\
 \bottomrule
 \end{tabularx}
