@@ -54,36 +54,36 @@ All figures are generated inline with TikZ / pgfplots — there is no separate f
 ### Laboratory Safety and Equipment Care
 
 ### Part I: Measurement Fundamentals
-1. Fundamentals of Measurement Theory
-2. Static Measurements
-3. Dynamic Measurements
-4. Error Analysis and Uncertainty
-5. Statistics and Experimental Data Analysis
+1. **Fundamentals of Measurement Theory** — Measurement systems model, calibration, traceability, standards hierarchy
+2. **Static Measurements** — Steady-state response, sensitivity, linearity, hysteresis, resolution
+3. **Dynamic Measurements** — Time-domain response, first- and second-order systems, step and frequency response
+4. **Error Analysis and Uncertainty** — Systematic vs. random error, propagation of uncertainty, confidence intervals
+5. **Statistics and Experimental Data Analysis** — Descriptive statistics, hypothesis testing, regression, outlier detection
 
 ### Part II: Signals and Signal Processing
-6. Sensors & Actuators
-7. Analog vs. Digital Systems
-8. Signal-to-Noise Ratio
-9. Fourier Series and Complex Signal Construction
-10. FFT and Complex Signal Decomposition
-11. Fundamentals of Digital Signal Processing
-12. Analog Filter Design
-13. Digital Filter Design
+6. **Sensors & Actuators** — Transduction principles, common sensor types (temperature, pressure, strain, motion), actuator selection
+7. **Analog vs. Digital Systems** — Sampling theorem, aliasing, quantization, ADC/DAC fundamentals
+8. **Signal-to-Noise Ratio** — Noise sources, SNR calculation, shielding, grounding, averaging techniques
+9. **Fourier Series and Complex Signal Construction** — Harmonic decomposition, frequency-domain representation, synthesis
+10. **FFT and Complex Signal Decomposition** — Discrete Fourier Transform, spectral analysis, windowing, leakage
+11. **Fundamentals of Digital Signal Processing** — Convolution, transfer functions, z-transform basics, real-time processing
+12. **Analog Filter Design** — Low-pass, high-pass, band-pass, Butterworth and Chebyshev characteristics, op-amp implementations
+13. **Digital Filter Design** — FIR and IIR filters, filter specification, implementation in software
 
 ### Part III: Electronics for Instrumentation
-14. Circuit Fundamentals
-15. Amplifiers
-16. High-Power Devices and Switches
-17. Debugging
+14. **Circuit Fundamentals** — Ohm's Law, KVL/KCL, voltage dividers, Thevenin equivalents, power calculations
+15. **Amplifiers** — Operational amplifiers, gain configurations (inverting, non-inverting, differential), instrumentation amplifiers
+16. **High-Power Devices and Switches** — MOSFETs, relays, motor drivers, PWM control, flyback protection
+17. **Debugging** — Systematic troubleshooting methodology, multimeter and oscilloscope techniques, common failure modes
 
 ### Part IV: Control Systems
-18. Open-Loop Control
-19. Closed-Loop Control
-20. PID Control
+18. **Open-Loop Control** — Feed-forward control, calibration-based systems, limitations and applications
+19. **Closed-Loop Control** — Feedback fundamentals, stability, steady-state error, block diagrams
+20. **PID Control** — Proportional, integral, and derivative action; tuning methods; implementation considerations
 
 ### Part V: Engineering Science Reference
-21. Fundamentals of Heat Transfer
-22. Fluid Power
+21. **Fundamentals of Heat Transfer** — Conduction, convection, radiation; thermal resistance; heat exchanger basics
+22. **Fluid Power** — Hydraulic and pneumatic systems, Pascal's law, flow control, actuator sizing
 
 ---
 
