@@ -316,7 +316,7 @@ Instead of sweeping individual frequencies, apply broadband white noise as the i
 
 For thermal systems where white noise temperature input is impractical, use a Pseudo-Random Binary Sequence (PRBS): a square wave that switches between two temperatures at random intervals. The PRBS has a flat spectrum up to a frequency determined by the minimum switching interval, effectively exciting all frequencies simultaneously.
 \section{System Identification from Experimental Data}
-Determining the dynamic model (transfer function) of a sensor or plant from measured data are called \textbf{system identification}. For MEGN~300 applications, two simple methods suffice:
+Determining the dynamic model (transfer function) of a sensor or plant from measured data is called \textbf{system identification}. For MEGN~300 applications, two simple methods suffice:
 
 \subsection{Step Response Method}
 Apply a step input and record the output. For a first-order system: (1) measure the final steady-state value $y_{ss}$, (2) measure the time to reach $0.632 y_{ss}$ to get $\tau$, (3) the transfer function is $G(s) = y_{ss}/(1 + \tau s)$. For a second-order system: (1) measure the peak overshoot $\%OS$ to determine $\zeta$: $\zeta = -\ln(\%OS/100)/\sqrt{\pi^2 + \ln^2(\%OS/100)}$, (2) measure the peak time $t_p$ to determine $\omega_d$: $\omega_d = \pi/t_p$, (3) compute $\omega_n = \omega_d/\sqrt{1-\zeta^2}$, (4) the transfer function is $G(s) = K\omega_n^2/(s^2 + 2\zeta\omega_n s + \omega_n^2)$.
