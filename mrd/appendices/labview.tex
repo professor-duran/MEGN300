@@ -143,6 +143,10 @@ When your measurement or control system produces incorrect results, do \textbf{n
 
 This systematic isolation prevents the most common debugging failure: ``poking at the code'' to fix a hardware wiring error.
 
+\begin{tipbox}[LabVIEW Versions and Availability]
+NI offers LabVIEW Community Edition for non-commercial use, providing a free option for personal learning. The DAQmx programming patterns shown in this appendix are compatible with all modern LabVIEW versions.
+\end{tipbox}
+
 \section*{Common Mistakes in MEGN 300 Labs}
 \begin{enumerate}[leftmargin=1.5em]
 \item \textbf{No loop timing}: the While Loop runs at maximum speed, overwhelming the DAQ buffer and producing erratic sampling rates. Always add a Wait (ms) function.
