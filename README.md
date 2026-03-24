@@ -3,7 +3,7 @@
 **Colorado School of Mines | Department of Mechanical Engineering**
 
 [![Build LaTeX PDFs](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml/badge.svg)](https://github.com/professor-duran/MEGN300/actions/workflows/build-pdfs.yml)
-![Built](https://img.shields.io/badge/built-YYYY--MM--DD-blue)
+![Built](https://img.shields.io/badge/built-2026--03--24-blue)
 ![Version](https://img.shields.io/badge/version-v1.0.0-green)
 
 ---
